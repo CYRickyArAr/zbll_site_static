@@ -1,44 +1,17 @@
-# ZBLL 公式数据库（静态版）
+# ZBLL 公式数据库
 
-ZBLL（魔方顶层公式）学习网站的**纯静态只读版**，可直接部署到 GitHub Pages。
+一个收录 **472 条 ZBLL 魔方公式**的在线数据库，含顶层状态图、多行公式与选手实战标注。
 
-- 472 条 ZBLL 公式全集，含图片、多行公式与选手实战标注。
-- 分类：H（40 条）、U/T/L/Pi/S/AS（各 72 条）。
-- 数据来源：原 Flask + SQLite 项目 `zbll_database_6.0_全公式` 一次性导出。
+ZBLL（Zborowski-Bruchem Last Layer）是魔方顶层还原的最后一步公式体系。本站按 pepkin88 zbll-explorer 官方分类，完整收录全部 472 个 case，并标注了 **14 位顶尖选手**（耿暄一、Tymon Kolasiński、Feliks Zemdegs、南承赫、Max Park 等）在比赛实战中使用过的公式。
 
-## 目录结构
+## 内容
 
-```
-index.html       入口（SPA，hash 路由）
-data.js          静态数据 window.ZBLL_DATA
-css/style.css    样式
-js/app.js        hash 路由 + 渲染 + 子分类折叠
-images/          472 张公式 SVG
-```
+- **472 条公式全集**：每个 case 附带顶层状态图与多行公式。
+- **7 大分类**：H（40 条）、U / T / L / Pi / S / AS（各 72 条）。
+- **选手实战标注**：每条公式标注使用过它的选手，同一条公式被多人使用时会合并显示（如「耿 Tymon 藩」）。
 
-## 本地预览
+## 使用
 
-直接双击 `index.html`（`file://`），或启动静态服务器：
+打开网站即可浏览全部分类，点击分类进入查看公式；点子分类标题可折叠/展开。
 
-```bash
-python -m http.server 8000
-# 打开 http://localhost:8000
-```
-
-## 部署到 GitHub Pages
-
-1. 将本目录推送到 GitHub 仓库（`main` 分支）。
-2. 仓库 Settings → Pages → Source 选 **Deploy from a branch** → 分支 `main`、目录 `/ (root)` → Save。
-3. 访问 `https://<username>.github.io/<仓库名>/`。
-
-注意：所有资源均用**相对路径**，且 `.nojekyll` 已禁用 Jekyll 处理。
-
-## 重新导出数据
-
-当原数据库 `data/zbll.db` 更新后，运行导出脚本重新生成 `data.js` 与 `images/`：
-
-```
-原项目 .workbuddy/intermediate/export_static/export_data.py
-```
-
-（脚本只读原库，产出写到本目录。）
+> 在线访问：https://cyrickyarar.github.io/zbll_site_static/
