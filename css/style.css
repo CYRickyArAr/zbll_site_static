@@ -1,0 +1,375 @@
+/* ===== 基础 reset ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #f5f5f5;
+    font-family: 'Lato', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* ===== 顶部导航栏 ===== */
+.navbar {
+    background-color: #1a1a2e;
+    color: white;
+    padding: 0 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 60px !important;
+    z-index: 1000 !important;
+
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.navbar-logo {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: white;
+    text-decoration: none;
+    letter-spacing: 1px;
+}
+
+.navbar-logo:hover {
+    color: #00d8ff;
+}
+
+.navbar-version {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    color: #aaa;
+}
+
+/* 主内容区 */
+.main-content {
+    padding: 60px 0 20px 0;
+    min-height: 100vh;
+}
+
+/* ===== 首页 ===== */
+.category-card {
+    transition: transform 0.2s;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    height: 100%;
+}
+
+.category-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.category-card .card {
+    height: 100%;
+}
+
+/* 选手公式数统计框 */
+.player-stats {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin: -1.5rem 0 30px;
+}
+
+.player-stat-box {
+    border: 1px solid #7cb3ff;
+    background: #eaf3ff;
+    color: #0a58ca;
+    border-radius: 8px;
+    padding: 4px 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.player-stat-box b {
+    font-weight: 700;
+}
+
+/* ===== 分类页 ===== */
+.container {
+    max-width: 1200px;
+    margin-top: 20px;
+    margin-bottom: 30px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 15px;
+}
+
+.breadcrumb {
+    background: white;
+    padding: 12px 20px;
+    border-radius: 5px;
+    border: 1px solid #dee2e6;
+    margin-bottom: 25px;
+    font-family: 'Lato', sans-serif;
+}
+
+.breadcrumb a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.breadcrumb a:hover {
+    text-decoration: underline;
+}
+
+.category-title {
+    margin-bottom: 25px;
+    color: #333;
+    font-size: 2.2rem;
+    font-weight: 700;
+    font-family: 'Lato', sans-serif;
+}
+
+.subcategory-card {
+    margin-bottom: 25px;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    background: white;
+    overflow: visible;
+}
+
+/* 悬浮标题 */
+.sticky-header {
+    position: sticky;
+    top: 60px !important;
+    margin-top: 0 !important;
+    border-radius: 8px 8px 0 0 !important;
+    z-index: 100;
+    background: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 15px 25px;
+    border-radius: 0;
+    cursor: pointer;
+}
+
+/* 折叠状态的蓝线 */
+.sticky-header-collapsed {
+    border-bottom: 2px solid #007bff;
+}
+
+.sticky-header:hover {
+    background: #f8f9fa;
+}
+
+.sticky-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #007bff;
+}
+
+.sticky-header .badge {
+    font-size: 1rem;
+    margin-left: 10px;
+}
+
+.toggle-icon {
+    color: #6c757d;
+    font-size: 1.4rem;
+    margin-left: 15px;
+}
+
+.formula-grid {
+    padding: 25px;
+    background: white;
+    border-radius: 0 0 8px 8px;
+}
+
+.sortable-container {
+    display: flex;
+    flex-wrap: wrap;
+    margin: -10px;
+    width: 100%;
+}
+
+.sortable-item {
+    width: 50%;
+    padding: 10px;
+    box-sizing: border-box;
+    position: relative;
+    transition: opacity 0.2s;
+    float: left;
+}
+
+.formula-card {
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    background: white;
+    height: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.formula-card:hover {
+    background: #f8f9fa;
+}
+
+.formula-image {
+    width: 100%;
+    height: 140px;
+    object-fit: contain;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    padding: 8px;
+}
+
+.formula-id {
+    font-weight: 700;
+    color: #007bff;
+    margin-bottom: 10px;
+    font-size: 1.3rem;
+    font-family: 'Lato', sans-serif;
+    padding-right: 30px;
+}
+
+/* 公式行（图片下方）：每行 = 带边框圆角盒子 */
+.formula-lines {
+    margin-top: 12px;
+}
+
+.formula-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    padding: 6px 8px;
+    background: #ffffff;
+    transition: border-color 0.12s, background 0.12s;
+}
+
+.formula-line:last-child {
+    margin-bottom: 0;
+}
+
+.formula-line:hover {
+    background: #f0f7ff;
+    border-color: #007bff;
+}
+
+.formula-line-alg {
+    font-family: 'Lato', monospace;
+    font-size: 1.15rem;
+    font-weight: 500;
+    color: #212529;
+    flex: 1;
+    min-width: 120px;
+    word-break: break-word;
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+/* 选手标注：单独蓝色方框 */
+.formula-marks-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+}
+
+.formula-marks {
+    border: 1px solid #7cb3ff;
+    background: #eaf3ff;
+    color: #0a58ca;
+    border-radius: 4px;
+    padding: 1px 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    white-space: nowrap;
+    flex-shrink: 0;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.badge {
+    font-size: 0.9rem;
+    padding: 6px 12px;
+    font-weight: 400;
+    margin-right: 6px;
+    margin-bottom: 6px;
+}
+
+.empty-state {
+    padding: 40px;
+    text-align: center;
+    background: #f8f9fa;
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+    color: #6c757d;
+    font-size: 1.2rem;
+}
+
+.tags-container {
+    margin: 10px 0;
+}
+
+/* 备注文本 */
+.formula-notes {
+    font-family: 'Lato', monospace;
+    font-size: 1rem;
+    white-space: pre-wrap;
+    margin: 0;
+    background: transparent;
+    border: none;
+    padding: 0;
+    color: #495057;
+}
+
+/* ===== 响应式 ===== */
+@media (max-width: 768px) {
+    .sortable-item {
+        width: 100%;
+    }
+    .formula-image {
+        height: 120px;
+    }
+    .formula-id {
+        font-size: 1.2rem;
+    }
+    .formula-line-alg {
+        font-size: 1.05rem;
+    }
+    .sticky-header h3 {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .navbar {
+        height: auto !important;
+        padding: 10px 16px;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .navbar-left {
+        width: 100%;
+        justify-content: space-between;
+    }
+    .main-content {
+        padding-top: 100px;
+    }
+}
