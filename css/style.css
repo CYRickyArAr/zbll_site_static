@@ -197,17 +197,15 @@ body {
 .sortable-container {
     display: flex;
     flex-wrap: wrap;
-    margin: -10px;
+    gap: 20px;
     width: 100%;
 }
 
 .sortable-item {
-    width: 50%;
-    padding: 10px;
+    width: calc((100% - 20px) / 2);
     box-sizing: border-box;
     position: relative;
     transition: opacity 0.2s;
-    float: left;
 }
 
 .formula-card {
