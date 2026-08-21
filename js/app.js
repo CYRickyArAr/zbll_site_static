@@ -84,6 +84,7 @@
             html += '<a href="#/category/' + cat.id + '" class="category-card">';
             html += '<div class="card"><div class="card-body text-center">';
             html += '<h2 class="card-title">' + escapeHtml(cat.id) + '</h2>';
+            html += '<img src="images/' + cat.id + '.svg" class="category-thumb" alt="' + escapeHtml(cat.id) + '">';
             html += '<p class="card-text">' + total + '个公式</p>';
             html += '<span class="badge ' + badge + '">' + escapeHtml(range) + '</span>';
             html += '</div></div></a></div>';
@@ -119,6 +120,7 @@
             html += '<div class="d-flex justify-content-between align-items-center">';
             html += '<div class="d-flex align-items-center">';
             html += '<h3>' + escapeHtml(sub.id) + '</h3>';
+            html += '<img src="images/' + sub.id + '.svg" class="subcat-thumb" alt="' + escapeHtml(sub.id) + '">';
             html += '<span class="badge bg-secondary">' + total + '个公式</span>';
             html += '</div>';
             html += '<div class="d-flex align-items-center">';
