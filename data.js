@@ -1,6 +1,6 @@
 window.ZBLL_DATA = {
   "meta": {
-    "generatedAt": "2026-08-21T22:13:49+08:00",
+    "generatedAt": "2026-08-21T22:14:04+08:00",
     "totalFormulas": 472,
     "categoryOrder": [
       "H",
