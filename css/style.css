@@ -378,16 +378,13 @@ body {
 
 @media (max-width: 600px) {
     .navbar {
-        height: auto !important;
-        padding: 10px 16px;
-        flex-direction: column;
-        gap: 8px;
+        padding: 0 16px;
     }
     .navbar-left {
         width: 100%;
         justify-content: space-between;
     }
     .main-content {
-        padding-top: 100px;
+        padding-top: 60px;
     }
 }
