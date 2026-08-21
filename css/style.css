@@ -166,16 +166,8 @@ body {
     background: white;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     padding: 0 25px;
-    height: 102px;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
     border-radius: 0;
     cursor: pointer;
-}
-
-.sticky-header > div {
-    flex: 1;
 }
 
 /* 折叠状态的蓝线 */
@@ -193,9 +185,9 @@ body {
     color: #007bff;
 }
 
-/* 分类页子分类横栏里的子分类图（纯魔方，无框，大小对齐公式图内魔方 122px） */
+/* 分类页子分类横栏里的子分类图（纯魔方，无框） */
 .subcat-thumb {
-    height: 122px;
+    height: 110px;
     width: auto;
     margin-left: 12px;
     flex-shrink: 0;
