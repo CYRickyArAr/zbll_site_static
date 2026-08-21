@@ -150,18 +150,15 @@
         var html = '<div class="sortable-item" data-id="' + escapeHtml(f.id) + '">';
         html += '<div class="formula-card">';
 
-        html += '<div class="row">';
-        // 图片列
-        html += '<div class="col-4">';
+        html += '<div class="formula-top">';
         if (f.image) {
             html += '<img src="' + escapeHtml(f.image) + '" class="formula-image" alt="' + escapeHtml(f.id) + '" loading="lazy">';
         } else {
             html += '<div class="formula-image d-flex align-items-center justify-content-center bg-light"><span class="text-muted">无图</span></div>';
         }
-        html += '</div>';
 
-        // 信息列：名称 + 备注
-        html += '<div class="col-8">';
+        // 信息区：名称 + 备注
+        html += '<div class="formula-info">';
         html += '<div class="formula-id">' + escapeHtml(f.name) + '</div>';
         if (f.notes) {
             html += '<div style="margin-top: 6px;"><pre class="formula-notes">' + escapeHtml(f.notes) + '</pre></div>';

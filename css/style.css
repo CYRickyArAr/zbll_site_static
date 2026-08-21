@@ -225,14 +225,26 @@ body {
     background: #f8f9fa;
 }
 
+.formula-top {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+}
+
 .formula-image {
-    width: 100%;
+    width: 140px;
     height: 140px;
+    flex-shrink: 0;
     object-fit: contain;
     background-color: #f8f9fa;
     border: 1px solid #dee2e6;
     border-radius: 6px;
     padding: 8px;
+}
+
+.formula-info {
+    flex: 1;
+    min-width: 0;
 }
 
 .formula-id {
@@ -344,8 +356,14 @@ body {
     .sortable-item {
         width: 100%;
     }
-    .formula-image {
-        height: 120px;
+    .formula-grid {
+        padding: 12px;
+    }
+    .formula-card {
+        padding: 12px;
+    }
+    .formula-top {
+        gap: 12px;
     }
     .formula-id {
         font-size: 1.2rem;
