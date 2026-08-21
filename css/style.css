@@ -187,7 +187,7 @@ body {
 
 /* 分类页子分类横栏里的子分类图（纯魔方，无框） */
 .subcat-thumb {
-    height: 110px;
+    height: 100px;
     width: auto;
     margin-left: 12px;
     flex-shrink: 0;
