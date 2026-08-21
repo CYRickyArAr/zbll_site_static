@@ -37,6 +37,9 @@
     function restoreScroll(view) {
         try {
             var y = parseInt(localStorage.getItem(getScrollKey(view)), 10) || 0;
+            // 强制瞬时滚动（0 动画），覆盖浏览器「平滑滚动」偏好
+            document.documentElement.style.scrollBehavior = 'auto';
+            document.body.style.scrollBehavior = 'auto';
             window.scrollTo(0, y);
         } catch (e) {
             window.scrollTo(0, 0);
