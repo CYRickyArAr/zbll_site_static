@@ -85,7 +85,16 @@ body {
     height: 90px;
     width: auto;
     display: block;
-    margin: 6px auto 10px;
+    margin: 2px auto 6px;
+}
+
+/* 首页分类卡片内元素间距统一调小 */
+.category-card .card-title {
+    margin-bottom: 2px;
+}
+
+.category-card .card-text {
+    margin-bottom: 4px;
 }
 
 /* 选手公式数统计框 */
