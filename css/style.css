@@ -80,21 +80,21 @@ body {
     height: 100%;
 }
 
-/* 首页分类卡片里的分类图 */
+/* 首页分类卡片里的分类图（负 margin 抵消 SVG 自带的上下留白约 9px） */
 .category-thumb {
     height: 90px;
     width: auto;
     display: block;
-    margin: 2px auto 6px;
+    margin: -9px auto -9px;
 }
 
 /* 首页分类卡片内元素间距统一调小 */
 .category-card .card-title {
-    margin-bottom: 2px;
+    margin-bottom: 6px;
 }
 
 .category-card .card-text {
-    margin-bottom: 4px;
+    margin: 6px 0 6px;
 }
 
 /* 选手公式数统计框 */
