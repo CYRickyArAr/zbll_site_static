@@ -185,17 +185,12 @@ body {
     color: #007bff;
 }
 
-/* 分类页子分类横栏里的子分类图（与公式图 .formula-image 同框同内边距，魔方等大） */
+/* 分类页子分类横栏里的子分类图（纯魔方，无框，大小对齐公式图内魔方 122px） */
 .subcat-thumb {
-    height: 140px;
+    height: 122px;
     width: auto;
     margin-left: 12px;
     flex-shrink: 0;
-    object-fit: contain;
-    background-color: #f8f9fa;
-    border: 1px solid #dee2e6;
-    border-radius: 6px;
-    padding: 8px;
 }
 
 .sticky-header .badge {
