@@ -21,6 +21,28 @@
 
     var appEl = document.getElementById('app');
 
+    // 当前视图标识：'home' 或 'cat:' + 分类ID（用于记住每个页面的滚动位置）
+    var currentView = 'home';
+
+    function getScrollKey(view) {
+        return 'zbll_scroll_' + view;
+    }
+
+    function saveScroll() {
+        try {
+            localStorage.setItem(getScrollKey(currentView), String(window.pageYOffset || window.scrollY || 0));
+        } catch (e) {}
+    }
+
+    function restoreScroll(view) {
+        try {
+            var y = parseInt(localStorage.getItem(getScrollKey(view)), 10) || 0;
+            window.scrollTo(0, y);
+        } catch (e) {
+            window.scrollTo(0, 0);
+        }
+    }
+
     function getCategory(catId) {
         for (var i = 0; i < DATA.categories.length; i++) {
             if (DATA.categories[i].id === catId) return DATA.categories[i];
@@ -217,12 +239,23 @@
     function router() {
         var hash = location.hash || '#/';
         var m = hash.match(/^#\/category\/([A-Za-z]+)$/);
+        var nextView = m ? ('cat:' + m[1]) : 'home';
+
+        // 切换前保存当前视图的滚动位置
+        saveScroll();
+
         if (m) {
             renderCategory(m[1]);
         } else {
             renderHome();
         }
-        window.scrollTo(0, 0);
+
+        currentView = nextView;
+
+        // 渲染完成后恢复目标视图上次的滚动位置
+        requestAnimationFrame(function () {
+            restoreScroll(nextView);
+        });
     }
 
     // 事件委托：子分类折叠点击
@@ -231,6 +264,13 @@
         if (header && header.dataset.subcat) {
             toggleSubcategory(header.dataset.subcat);
         }
+    });
+
+    // 滚动时防抖保存当前位置（覆盖刷新、直接关闭页面等未触发路由切换的场景）
+    var scrollTimer = null;
+    window.addEventListener('scroll', function () {
+        if (scrollTimer) clearTimeout(scrollTimer);
+        scrollTimer = setTimeout(saveScroll, 150);
     });
 
     window.addEventListener('hashchange', router);
