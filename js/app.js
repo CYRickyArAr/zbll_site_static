@@ -225,14 +225,14 @@
             var header = document.getElementById('header-' + sub.id);
             var saved = null;
             try { saved = localStorage.getItem('subcat_' + sub.id); } catch (e) {}
-            if (saved === 'closed') {
-                content.style.display = 'none';
-                icon.textContent = '▶';
-                header.classList.add('sticky-header-collapsed');
-            } else {
+            if (saved === 'open') {
                 content.style.display = 'block';
                 icon.textContent = '▼';
                 header.classList.remove('sticky-header-collapsed');
+            } else {
+                content.style.display = 'none';
+                icon.textContent = '▶';
+                header.classList.add('sticky-header-collapsed');
             }
         });
     }
