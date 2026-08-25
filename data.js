@@ -1,6 +1,6 @@
 window.ZBLL_DATA = {
   "meta": {
-    "generatedAt": "2026-08-21T22:14:04+08:00",
+    "generatedAt": "2026-08-25T12:53:53+08:00",
     "totalFormulas": 472,
     "categoryOrder": [
       "H",
@@ -328,7 +328,7 @@ window.ZBLL_DATA = {
               "tags": [],
               "lines": [
                 {
-                  "alg": "U R' U2 R U R' U' F' R U R' U' R' F R U2 R",
+                  "alg": "U' R' U2 R U R' U' F' R U R' U' R' F R U2 R",
                   "marks": [
                     "耿"
                   ]
