@@ -1,6 +1,6 @@
 window.ZBLL_DATA = {
   "meta": {
-    "generatedAt": "2026-08-25T22:35:21+08:00",
+    "generatedAt": "2026-08-26T10:06:44+08:00",
     "totalFormulas": 472,
     "categoryOrder": [
       "H",
@@ -52,7 +52,7 @@ window.ZBLL_DATA = {
       },
       {
         "label": "董",
-        "count": 108
+        "count": 115
       },
       {
         "label": "Feliks",
@@ -935,7 +935,8 @@ window.ZBLL_DATA = {
                 {
                   "alg": "U R U R2 D' R U R' D R2 U2 R'",
                   "marks": [
-                    "耿"
+                    "耿",
+                    "董"
                   ]
                 },
                 {
@@ -4235,7 +4236,8 @@ window.ZBLL_DATA = {
                   "alg": "U2 R U' R' U R U' R' U' R U R2 D' R U' R' D R",
                   "marks": [
                     "耿",
-                    "Feliks"
+                    "Feliks",
+                    "董"
                   ]
                 }
               ]
@@ -4370,7 +4372,8 @@ window.ZBLL_DATA = {
                   "alg": "U2 R U R D R' U2 R D' R' U' R' U R U R'",
                   "marks": [
                     "耿",
-                    "Tymon"
+                    "Tymon",
+                    "董"
                   ]
                 }
               ]
@@ -6265,7 +6268,8 @@ window.ZBLL_DATA = {
                 {
                   "alg": "U2 R2 D R' U2 R D' R' U' R' U R2 D R' U2 R D' R2",
                   "marks": [
-                    "耿"
+                    "耿",
+                    "董"
                   ]
                 }
               ]
@@ -6575,6 +6579,7 @@ window.ZBLL_DATA = {
                   "marks": [
                     "耿",
                     "Tymon",
+                    "董",
                     "连"
                   ]
                 }
@@ -7172,7 +7177,8 @@ window.ZBLL_DATA = {
                 {
                   "alg": "R' U2 R U R' U' R' D' R U' R' D R U R U' R' U' R",
                   "marks": [
-                    "耿"
+                    "耿",
+                    "董"
                   ]
                 },
                 {
@@ -8776,7 +8782,8 @@ window.ZBLL_DATA = {
                 {
                   "alg": "U' R' F R F' U2 R U' R' U' F R' F' R",
                   "marks": [
-                    "耿"
+                    "耿",
+                    "董"
                   ]
                 }
               ]
