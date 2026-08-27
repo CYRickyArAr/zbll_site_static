@@ -1,6 +1,6 @@
 window.ZBLL_DATA = {
   "meta": {
-    "generatedAt": "2026-08-27T17:18:33+08:00",
+    "generatedAt": "2026-08-27T17:22:39+08:00",
     "totalFormulas": 472,
     "categoryOrder": [
       "H",
@@ -52,7 +52,7 @@ window.ZBLL_DATA = {
       },
       {
         "label": "董",
-        "count": 119
+        "count": 120
       },
       {
         "label": "Feliks",
@@ -294,7 +294,8 @@ window.ZBLL_DATA = {
                 {
                   "alg": "U L' U2 L R U2 L' U' R' U2 L U' R U' R'",
                   "marks": [
-                    "耿"
+                    "耿",
+                    "董"
                   ]
                 }
               ]
