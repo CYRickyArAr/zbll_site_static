@@ -10,6 +10,9 @@ __pycache__/
 *.db
 *.db.bak*
 
+# 本地备份文件（不入库）
+*.bak*
+
 # 系统文件
 .DS_Store
 Thumbs.db
