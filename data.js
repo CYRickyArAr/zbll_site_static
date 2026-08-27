@@ -1,6 +1,6 @@
 window.ZBLL_DATA = {
   "meta": {
-    "generatedAt": "2026-08-26T10:06:44+08:00",
+    "generatedAt": "2026-08-27T17:15:35+08:00",
     "totalFormulas": 472,
     "categoryOrder": [
       "H",
@@ -52,7 +52,7 @@ window.ZBLL_DATA = {
       },
       {
         "label": "董",
-        "count": 115
+        "count": 119
       },
       {
         "label": "Feliks",
@@ -5546,7 +5546,8 @@ window.ZBLL_DATA = {
                 {
                   "alg": "R' U' F' R U R' U' R' F R2 U2 R' U2 R",
                   "marks": [
-                    "耿"
+                    "耿",
+                    "董"
                   ]
                 }
               ]
@@ -5792,7 +5793,8 @@ window.ZBLL_DATA = {
                   "alg": "R U' R' U' R U' R' U R U R' U R' F' R U R U' R' F",
                   "marks": [
                     "耿",
-                    "Tymon"
+                    "Tymon",
+                    "董"
                   ]
                 }
               ]
@@ -6093,7 +6095,8 @@ window.ZBLL_DATA = {
                 {
                   "alg": "U2 L' U R U' L U R' U L' U R U' L U R'",
                   "marks": [
-                    "耿"
+                    "耿",
+                    "董"
                   ]
                 },
                 {
@@ -7130,7 +7133,8 @@ window.ZBLL_DATA = {
                 {
                   "alg": "U2 R U R' U R U' R2 D' R U R' D R2 U2 R'",
                   "marks": [
-                    "耿"
+                    "耿",
+                    "董"
                   ]
                 }
               ]
