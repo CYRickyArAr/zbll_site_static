@@ -1,6 +1,5 @@
 window.ZBLL_DATA = {
   "meta": {
-    "generatedAt": "2026-09-01T00:08:03+08:00",
     "totalFormulas": 472,
     "categoryOrder": [
       "H",
@@ -98,7 +97,9 @@ window.ZBLL_DATA = {
         "label": "连",
         "count": 1
       }
-    ]
+    ],
+    "generatedAt": "2026-09-01T00:18:25+08:00",
+    "fingerprint": "a470a8c5ecdbb6904e56fde5b9b9fed67ea5e64dcfff76f836d1dd8294b05ebe"
   },
   "categories": [
     {
