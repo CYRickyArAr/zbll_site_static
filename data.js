@@ -2,19 +2,15 @@ window.ZBLL_DATA = {
   "meta": {
     "totalFormulas": 472,
     "categoryOrder": [
-      "H",
       "U",
       "T",
       "L",
       "Pi",
       "S",
-      "AS"
+      "AS",
+      "H"
     ],
     "categoryStats": [
-      {
-        "id": "H",
-        "total": 40
-      },
       {
         "id": "U",
         "total": 72
@@ -38,6 +34,10 @@ window.ZBLL_DATA = {
       {
         "id": "AS",
         "total": 72
+      },
+      {
+        "id": "H",
+        "total": 40
       }
     ],
     "playerStats": [
@@ -98,797 +98,10 @@ window.ZBLL_DATA = {
         "count": 1
       }
     ],
-    "generatedAt": "2026-09-01T00:18:25+08:00",
-    "fingerprint": "a470a8c5ecdbb6904e56fde5b9b9fed67ea5e64dcfff76f836d1dd8294b05ebe"
+    "generatedAt": "2026-09-01T10:26:47+08:00",
+    "fingerprint": "09c6c5a0e2599e869f4da088722589002ec9862dde6bca29ed35fd9a12a5a288"
   },
   "categories": [
-    {
-      "id": "H",
-      "subcategories": [
-        {
-          "id": "H1",
-          "formulas": [
-            {
-              "id": "H1-1",
-              "name": "H1-1",
-              "image": "images/H1-1.svg",
-              "notes": "ZBLL H 1",
-              "tags": [],
-              "lines": [
-                {
-                  "alg": "U' F' r U R' U' r' F R2 U2 R' U' R U' R'",
-                  "marks": [
-                    "耿"
-                  ]
-                }
-              ]
-            },
-            {
-              "id": "H1-2",
-              "name": "H1-2",
-              "image": "images/H1-2.svg",
-              "notes": "ZBLL H 2",
-              "tags": [],
-              "lines": [
-                {
-                  "alg": "U F R' F' r U R U' r' L' U2 L U L' U L",
-                  "marks": [
-                    "耿"
-                  ]
-                }
-              ]
-            },
-            {
-              "id": "H1-3",
-              "name": "H1-3",
-              "image": "images/H1-3.svg",
-              "notes": "ZBLL H 3",
-              "tags": [],
-              "lines": [
-                {
-                  "alg": "U R U2 R' U' R U R' U2 R' F R2 U' R' U' R U R' F'",
-                  "marks": [
-                    "耿",
-                    "杜"
-                  ]
-                }
-              ]
-            },
-            {
-              "id": "H1-4",
-              "name": "H1-4",
-              "image": "images/H1-4.svg",
-              "notes": "ZBLL H 4",
-              "tags": [],
-              "lines": [
-                {
-                  "alg": "U' F' R U2 R' U2 R' F U' R U R U' R' U' R' U R",
-                  "marks": [
-                    "耿"
-                  ]
-                },
-                {
-                  "alg": "U' R' D R2 U' R2 D' R U' R' D R2 U2 R2 D' R",
-                  "marks": [
-                    "杜"
-                  ]
-                }
-              ]
-            },
-            {
-              "id": "H1-5",
-              "name": "H1-5",
-              "image": "images/H1-5.svg",
-              "notes": "ZBLL H 5",
-              "tags": [],
-              "lines": [
-                {
-                  "alg": "R' U2 R2 U R2 U R U2 R' F R U R U' R' F'",
-                  "marks": [
-                    "耿"
-                  ]
-                }
-              ]
-            },
-            {
-              "id": "H1-6",
-              "name": "H1-6",
-              "image": "images/H1-6.svg",
-              "notes": "ZBLL H 6",
-              "tags": [],
-              "lines": [
-                {
-                  "alg": "U R U2 R' U' R U R' U' F' R U R' U' R' F R2 U' R'",
-                  "marks": [
-                    "耿",
-                    "董"
-                  ]
-                }
-              ]
-            },
-            {
-              "id": "H1-7",
-              "name": "H1-7",
-              "image": "images/H1-7.svg",
-              "notes": "ZBLL H 7",
-              "tags": [],
-              "lines": [
-                {
-                  "alg": "U' R' D' R U2 R' D R U R U2 R' U R U' R' U' R U' R'",
-                  "marks": [
-                    "耿",
-                    "Tymon"
-                  ]
-                },
-                {
-                  "alg": "F R U' R' U' R U2 R' U' F' R U2 R' U' R U' R'",
-                  "marks": [
-                    "耿"
-                  ]
-                },
-                {
-                  "alg": "R' U' R U' R' U R U R' F R U R' U' R' F' R2",
-                  "marks": [
-                    "南"
-                  ]
-                }
-              ]
-            },
-            {
-              "id": "H1-8",
-              "name": "H1-8",
-              "image": "images/H1-8.svg",
-              "notes": "ZBLL H 8",
-              "tags": [],
-              "lines": [
-                {
-                  "alg": "F R U' R' U R U2 R' U' R U R' U' F'",
-                  "marks": [
-                    "耿"
-                  ]
-                }
-              ]
-            },
-            {
-              "id": "H1-9",
-              "name": "H1-9",
-              "image": "images/H1-9.svg",
-              "notes": "ZBLL H 9",
-              "tags": [],
-              "lines": [
-                {
-                  "alg": "U2 R' F R U R' U' F' R U' R' U R' F R F' U R",
-                  "marks": [
-                    "耿"
-                  ]
-                },
-                {
-                  "alg": "F R' F' R2 U2 R' U R U2 R' U R U' R2 F R F'",
-                  "marks": [
-                    "Tymon"
-                  ]
-                }
-              ]
-            },
-            {
-              "id": "H1-10",
-              "name": "H1-10",
-              "image": "images/H1-10.svg",
-              "notes": "ZBLL H 10",
-              "tags": [],
-              "lines": [
-                {
-                  "alg": "U R' U2 R U2 R2 F' R U R U' R' F U R",
-                  "marks": [
-                    "耿",
-                    "董"
-                  ]
-                }
-              ]
-            },
-            {
-              "id": "H1-11",
-              "name": "H1-11",
-              "image": "images/H1-11.svg",
-              "notes": "ZBLL H 11",
-              "tags": [],
-              "lines": [
-                {
-                  "alg": "U L' U2 L R U2 L' U' R' U2 L U' R U' R'",
-                  "marks": [
-                    "耿",
-                    "董"
-                  ]
-                }
-              ]
-            },
-            {
-              "id": "H1-12",
-              "name": "H1-12",
-              "image": "images/H1-12.svg",
-              "notes": "ZBLL H 12",
-              "tags": [],
-              "lines": [
-                {
-                  "alg": "U2 F U' R U2 R' U2 R U' R' U' R U R' U F'",
-                  "marks": [
-                    "耿",
-                    "Tymon"
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": "H2",
-          "formulas": [
-            {
-              "id": "H2-1",
-              "name": "H2-1",
-              "image": "images/H2-1.svg",
-              "notes": "ZBLL H 13",
-              "tags": [],
-              "lines": [
-                {
-                  "alg": "U' R' U2 R U R' U' F' R U R' U' R' F R U2 R",
-                  "marks": [
-                    "耿"
-                  ]
-                },
-                {
-                  "alg": "U2 R2 D R' U R D' R2 U R2 D R' U2 R D' R2",
-                  "marks": [
-                    "Tymon",
-                    "杜",
-                    "南"
-                  ]
-                }
-              ]
-            },
-            {
-              "id": "H2-2",
-              "name": "H2-2",
-              "image": "images/H2-2.svg",
-              "notes": "ZBLL H 14",
-              "tags": [],
-              "lines": [
-                {
-                  "alg": "U' R U2 R' U' R2 D R' U R D' R2 U' R U' R'",
-                  "marks": [
-                    "耿",
-                    "Tymon",
-                    "董"
-                  ]
-                }
-              ]
-            },
-            {
-              "id": "H2-3",
-              "name": "H2-3",
-              "image": "images/H2-3.svg",
-              "notes": "ZBLL H 15",
-              "tags": [],
-              "lines": [
-                {
-                  "alg": "U2 R2 D' R U' R' D R2 U' R2 D' R U2 R' D R2",
-                  "marks": [
-                    "耿",
-                    "Tymon"
-                  ]
-                },
-                {
-                  "alg": "R' U2 R U R' U R U F R U' R' U' R U2 R' U' F'",
-                  "marks": [
-                    "杜"
-                  ]
-                }
-              ]
-            },
-            {
-              "id": "H2-4",
-              "name": "H2-4",
-              "image": "images/H2-4.svg",
-              "notes": "ZBLL H 16",
-              "tags": [],
-              "lines": [
-                {
-                  "alg": "U R' U2 R U R2 D' R U' R' D R2 U R' U R",
-                  "marks": [
-                    "耿",
-                    "董"
-                  ]
-                }
-              ]
-            },
-            {
-              "id": "H2-5",
-              "name": "H2-5",
-              "image": "images/H2-5.svg",
-              "notes": "ZBLL H 17",
-              "tags": [],
-              "lines": [
-                {
-                  "alg": "U R' D' R U R' D R2 U R' U2 R U2 R' U R U2 R'",
-                  "marks": [
-                    "耿"
-                  ]
-                },
-                {
-                  "alg": "U2 L' U R U' L U2 R' U R' U' R2 U' R2 U2 R",
-                  "marks": [
-                    "董"
-                  ]
-                }
-              ]
-            },
-            {
-              "id": "H2-6",
-              "name": "H2-6",
-              "image": "images/H2-6.svg",
-              "notes": "ZBLL H 18",
-              "tags": [],
-              "lines": [
-                {
-                  "alg": "R' U' R U' R U R2 U R2 U L' U R' U' L",
-                  "marks": [
-                    "耿"
-                  ]
-                },
-                {
-                  "alg": "U2 R' U' R U' R' U F' R U R' U' R' F R2 U' R' U R",
-                  "marks": [
-                    "耿"
-                  ]
-                }
-              ]
-            },
-            {
-              "id": "H2-7",
-              "name": "H2-7",
-              "image": "images/H2-7.svg",
-              "notes": "ZBLL H 19",
-              "tags": [],
-              "lines": [
-                {
-                  "alg": "R' U' R D' R U' R' U2 R U2 R U R U' R2 D",
-                  "marks": [
-                    "耿",
-                    "Tymon"
-                  ]
-                },
-                {
-                  "alg": "U F R U' R' U' R U2 R' U' F' U R U R' U R U2 R'",
-                  "marks": [
-                    "耿"
-                  ]
-                }
-              ]
-            },
-            {
-              "id": "H2-8",
-              "name": "H2-8",
-              "image": "images/H2-8.svg",
-              "notes": "ZBLL H 20",
-              "tags": [],
-              "lines": [
-                {
-                  "alg": "U R U R' U R U2 R' F R U' R' U' R U2 R' U' F'",
-                  "marks": [
-                    "耿",
-                    "Tymon",
-                    "懿"
-                  ]
-                }
-              ]
-            },
-            {
-              "id": "H2-9",
-              "name": "H2-9",
-              "image": "images/H2-9.svg",
-              "notes": "ZBLL H 21",
-              "tags": [],
-              "lines": [
-                {
-                  "alg": "R' U' R U' R' U' L U' R U L'",
-                  "marks": [
-                    "耿",
-                    "Tymon"
-                  ]
-                },
-                {
-                  "alg": "U2 R' F' R U2 R U2 R' F U' R U' R'",
-                  "marks": [
-                    "耿"
-                  ]
-                },
-                {
-                  "alg": "U2 R' U' R U' R' U2 R U2 L' U R U' L U R'",
-                  "marks": [
-                    "杜"
-                  ]
-                }
-              ]
-            },
-            {
-              "id": "H2-10",
-              "name": "H2-10",
-              "image": "images/H2-10.svg",
-              "notes": "ZBLL H 22",
-              "tags": [],
-              "lines": [
-                {
-                  "alg": "R U R' U R U r' F R' F' r",
-                  "marks": [
-                    "耿",
-                    "Luke"
-                  ]
-                }
-              ]
-            },
-            {
-              "id": "H2-11",
-              "name": "H2-11",
-              "image": "images/H2-11.svg",
-              "notes": "ZBLL H 23",
-              "tags": [],
-              "lines": [
-                {
-                  "alg": "U R' F R' F' R2 U' r' U r U' r' U' r",
-                  "marks": [
-                    "耿",
-                    "Tymon",
-                    "董"
-                  ]
-                }
-              ]
-            },
-            {
-              "id": "H2-12",
-              "name": "H2-12",
-              "image": "images/H2-12.svg",
-              "notes": "ZBLL H 24",
-              "tags": [],
-              "lines": [
-                {
-                  "alg": "U' R U R2 F R F' r U' r' U r U r'",
-                  "marks": [
-                    "耿"
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": "H3",
-          "formulas": [
-            {
-              "id": "H3-1",
-              "name": "H3-1",
-              "image": "images/H3-1.svg",
-              "notes": "ZBLL H 25",
-              "tags": [],
-              "lines": [
-                {
-                  "alg": "U2 R' F R' F' R2 U R' U' R U' B U' B'",
-                  "marks": [
-                    "耿"
-                  ]
-                }
-              ]
-            },
-            {
-              "id": "H3-2",
-              "name": "H3-2",
-              "image": "images/H3-2.svg",
-              "notes": "ZBLL H 26",
-              "tags": [],
-              "lines": [
-                {
-                  "alg": "U' r U2 R2 F R F' R U2 r' L' U2 L U L' U L",
-                  "marks": [
-                    "耿"
-                  ]
-                },
-                {
-                  "alg": "U' r U2 R2 F R F' R U2 r' U2 R' U2 R U R' U R",
-                  "marks": [
-                    "杜"
-                  ]
-                },
-                {
-                  "alg": "U' R U' R2 U' F2 U' R2 U R2 U F2 R2 U R'",
-                  "marks": [
-                    "南"
-                  ]
-                }
-              ]
-            },
-            {
-              "id": "H3-3",
-              "name": "H3-3",
-              "image": "images/H3-3.svg",
-              "notes": "ZBLL H 27",
-              "tags": [],
-              "lines": [
-                {
-                  "alg": "U F R U R' U' R U R' U' R U R' U' F'",
-                  "marks": [
-                    "耿"
-                  ]
-                }
-              ]
-            },
-            {
-              "id": "H3-4",
-              "name": "H3-4",
-              "image": "images/H3-4.svg",
-              "notes": "ZBLL H 28",
-              "tags": [],
-              "lines": [
-                {
-                  "alg": "R U' r' F R' F' r R U' r' F R' F' r",
-                  "marks": [
-                    "耿"
-                  ]
-                },
-                {
-                  "alg": "x' U' R U' R' U R' F2 R U' R U R' U x",
-                  "marks": [
-                    "Matty",
-                    "南"
-                  ]
-                }
-              ]
-            },
-            {
-              "id": "H3-5",
-              "name": "H3-5",
-              "image": "images/H3-5.svg",
-              "notes": "ZBLL H 29",
-              "tags": [],
-              "lines": [
-                {
-                  "alg": "R' U2 R U R' U R U' r U2 R2 F R F' R U2 r'",
-                  "marks": [
-                    "耿"
-                  ]
-                },
-                {
-                  "alg": "R' U2 R U R' U R U R' U' R U R' F' R U R' U' R' F R2",
-                  "marks": [
-                    "Tymon"
-                  ]
-                }
-              ]
-            },
-            {
-              "id": "H3-6",
-              "name": "H3-6",
-              "image": "images/H3-6.svg",
-              "notes": "ZBLL H 30",
-              "tags": [],
-              "lines": [
-                {
-                  "alg": "R U' R' U R U R' U' L U L' U' R U R' U2 L U L'",
-                  "marks": [
-                    "耿"
-                  ]
-                },
-                {
-                  "alg": "R' F2 r2 U' r' F r' F2 R2 U R' U R U2 R'",
-                  "marks": [
-                    "藩"
-                  ]
-                }
-              ]
-            },
-            {
-              "id": "H3-7",
-              "name": "H3-7",
-              "image": "images/H3-7.svg",
-              "notes": "ZBLL H 31",
-              "tags": [],
-              "lines": [
-                {
-                  "alg": "U' R' U' R U' R' U2 R U R' U' R U R' F' R U R' U' R' F R2",
-                  "marks": [
-                    "耿"
-                  ]
-                },
-                {
-                  "alg": "R' U' F' U F R U' F U R U' R' U R U' R' F'",
-                  "marks": [
-                    "杜"
-                  ]
-                }
-              ]
-            },
-            {
-              "id": "H3-8",
-              "name": "H3-8",
-              "image": "images/H3-8.svg",
-              "notes": "ZBLL H 32",
-              "tags": [],
-              "lines": [
-                {
-                  "alg": "U R U R' U F' U F U' F2 r U r' F",
-                  "marks": [
-                    "耿"
-                  ]
-                },
-                {
-                  "alg": "f R f' U R' U R U' R2 F R F' R",
-                  "marks": [
-                    "藩",
-                    "懿"
-                  ]
-                },
-                {
-                  "alg": "U2 F R' U R U2 R2 U' R U2 R' U' R2 U F'",
-                  "marks": [
-                    "杜"
-                  ]
-                },
-                {
-                  "alg": "U R U R' U y' R' U R U' R2 F R F' R",
-                  "marks": [
-                    "南"
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": "H4",
-          "formulas": [
-            {
-              "id": "H4-1",
-              "name": "H4-1",
-              "image": "images/H4-1.svg",
-              "notes": "ZBLL H 33",
-              "tags": [],
-              "lines": [
-                {
-                  "alg": "R U R' U R U' R' U R U2 R'",
-                  "marks": [
-                    "耿",
-                    "Tymon",
-                    "杜"
-                  ]
-                }
-              ]
-            },
-            {
-              "id": "H4-2",
-              "name": "H4-2",
-              "image": "images/H4-2.svg",
-              "notes": "ZBLL H 34",
-              "tags": [],
-              "lines": [
-                {
-                  "alg": "U2 R' U' R U' R' U R U' R' U2 R",
-                  "marks": [
-                    "耿"
-                  ]
-                }
-              ]
-            },
-            {
-              "id": "H4-3",
-              "name": "H4-3",
-              "image": "images/H4-3.svg",
-              "notes": "ZBLL H 35",
-              "tags": [],
-              "lines": [
-                {
-                  "alg": "U' R' U2 R U R' U' R U R' U R",
-                  "marks": [
-                    "耿",
-                    "懿",
-                    "Feliks"
-                  ]
-                }
-              ]
-            },
-            {
-              "id": "H4-4",
-              "name": "H4-4",
-              "image": "images/H4-4.svg",
-              "notes": "ZBLL H 36",
-              "tags": [],
-              "lines": [
-                {
-                  "alg": "U' R U2 R' U' R U R' U' R U' R'",
-                  "marks": [
-                    "耿",
-                    "Matty",
-                    "南",
-                    "Tymon",
-                    "董"
-                  ]
-                }
-              ]
-            },
-            {
-              "id": "H4-5",
-              "name": "H4-5",
-              "image": "images/H4-5.svg",
-              "notes": "ZBLL H 37",
-              "tags": [],
-              "lines": [
-                {
-                  "alg": "U R' U2 R U R' U R U R U R' U R U2 R'",
-                  "marks": [
-                    "耿"
-                  ]
-                }
-              ]
-            },
-            {
-              "id": "H4-6",
-              "name": "H4-6",
-              "image": "images/H4-6.svg",
-              "notes": "ZBLL H 38",
-              "tags": [],
-              "lines": [
-                {
-                  "alg": "U R U2 R' U' R U' R' U' R' U' R U' R' U2 R",
-                  "marks": [
-                    "耿"
-                  ]
-                }
-              ]
-            },
-            {
-              "id": "H4-7",
-              "name": "H4-7",
-              "image": "images/H4-7.svg",
-              "notes": "ZBLL H 39",
-              "tags": [],
-              "lines": [
-                {
-                  "alg": "R' U' R U' R' U2 R U R U2 R' U' R U' R'",
-                  "marks": [
-                    "耿"
-                  ]
-                },
-                {
-                  "alg": "R U R' U R U2 R' U' R' U2 R U R' U R",
-                  "marks": [
-                    "Tymon",
-                    "董"
-                  ]
-                }
-              ]
-            },
-            {
-              "id": "H4-8",
-              "name": "H4-8",
-              "image": "images/H4-8.svg",
-              "notes": "ZBLL H 40",
-              "tags": [],
-              "lines": [
-                {
-                  "alg": "R U R' U R U' R' U R U' R' U R' U' R2 U' R' U R' U R",
-                  "marks": [
-                    "耿"
-                  ]
-                },
-                {
-                  "alg": "R U R' U R U' R' U R' U' R2 U' R' U R' U R U2 R U R' U R U2 R'",
-                  "marks": [
-                    "耿"
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    },
     {
       "id": "U",
       "subcategories": [
@@ -9329,6 +8542,793 @@ window.ZBLL_DATA = {
                   "alg": "R' U' R U' R' U2 R U' R2 U R U R' U' R3 U' R' U R'",
                   "marks": [
                     "董"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "H",
+      "subcategories": [
+        {
+          "id": "H1",
+          "formulas": [
+            {
+              "id": "H1-1",
+              "name": "H1-1",
+              "image": "images/H1-1.svg",
+              "notes": "ZBLL H 1",
+              "tags": [],
+              "lines": [
+                {
+                  "alg": "U' F' r U R' U' r' F R2 U2 R' U' R U' R'",
+                  "marks": [
+                    "耿"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "H1-2",
+              "name": "H1-2",
+              "image": "images/H1-2.svg",
+              "notes": "ZBLL H 2",
+              "tags": [],
+              "lines": [
+                {
+                  "alg": "U F R' F' r U R U' r' L' U2 L U L' U L",
+                  "marks": [
+                    "耿"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "H1-3",
+              "name": "H1-3",
+              "image": "images/H1-3.svg",
+              "notes": "ZBLL H 3",
+              "tags": [],
+              "lines": [
+                {
+                  "alg": "U R U2 R' U' R U R' U2 R' F R2 U' R' U' R U R' F'",
+                  "marks": [
+                    "耿",
+                    "杜"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "H1-4",
+              "name": "H1-4",
+              "image": "images/H1-4.svg",
+              "notes": "ZBLL H 4",
+              "tags": [],
+              "lines": [
+                {
+                  "alg": "U' F' R U2 R' U2 R' F U' R U R U' R' U' R' U R",
+                  "marks": [
+                    "耿"
+                  ]
+                },
+                {
+                  "alg": "U' R' D R2 U' R2 D' R U' R' D R2 U2 R2 D' R",
+                  "marks": [
+                    "杜"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "H1-5",
+              "name": "H1-5",
+              "image": "images/H1-5.svg",
+              "notes": "ZBLL H 5",
+              "tags": [],
+              "lines": [
+                {
+                  "alg": "R' U2 R2 U R2 U R U2 R' F R U R U' R' F'",
+                  "marks": [
+                    "耿"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "H1-6",
+              "name": "H1-6",
+              "image": "images/H1-6.svg",
+              "notes": "ZBLL H 6",
+              "tags": [],
+              "lines": [
+                {
+                  "alg": "U R U2 R' U' R U R' U' F' R U R' U' R' F R2 U' R'",
+                  "marks": [
+                    "耿",
+                    "董"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "H1-7",
+              "name": "H1-7",
+              "image": "images/H1-7.svg",
+              "notes": "ZBLL H 7",
+              "tags": [],
+              "lines": [
+                {
+                  "alg": "U' R' D' R U2 R' D R U R U2 R' U R U' R' U' R U' R'",
+                  "marks": [
+                    "耿",
+                    "Tymon"
+                  ]
+                },
+                {
+                  "alg": "F R U' R' U' R U2 R' U' F' R U2 R' U' R U' R'",
+                  "marks": [
+                    "耿"
+                  ]
+                },
+                {
+                  "alg": "R' U' R U' R' U R U R' F R U R' U' R' F' R2",
+                  "marks": [
+                    "南"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "H1-8",
+              "name": "H1-8",
+              "image": "images/H1-8.svg",
+              "notes": "ZBLL H 8",
+              "tags": [],
+              "lines": [
+                {
+                  "alg": "F R U' R' U R U2 R' U' R U R' U' F'",
+                  "marks": [
+                    "耿"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "H1-9",
+              "name": "H1-9",
+              "image": "images/H1-9.svg",
+              "notes": "ZBLL H 9",
+              "tags": [],
+              "lines": [
+                {
+                  "alg": "U2 R' F R U R' U' F' R U' R' U R' F R F' U R",
+                  "marks": [
+                    "耿"
+                  ]
+                },
+                {
+                  "alg": "F R' F' R2 U2 R' U R U2 R' U R U' R2 F R F'",
+                  "marks": [
+                    "Tymon"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "H1-10",
+              "name": "H1-10",
+              "image": "images/H1-10.svg",
+              "notes": "ZBLL H 10",
+              "tags": [],
+              "lines": [
+                {
+                  "alg": "U R' U2 R U2 R2 F' R U R U' R' F U R",
+                  "marks": [
+                    "耿",
+                    "董"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "H1-11",
+              "name": "H1-11",
+              "image": "images/H1-11.svg",
+              "notes": "ZBLL H 11",
+              "tags": [],
+              "lines": [
+                {
+                  "alg": "U L' U2 L R U2 L' U' R' U2 L U' R U' R'",
+                  "marks": [
+                    "耿",
+                    "董"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "H1-12",
+              "name": "H1-12",
+              "image": "images/H1-12.svg",
+              "notes": "ZBLL H 12",
+              "tags": [],
+              "lines": [
+                {
+                  "alg": "U2 F U' R U2 R' U2 R U' R' U' R U R' U F'",
+                  "marks": [
+                    "耿",
+                    "Tymon"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "H2",
+          "formulas": [
+            {
+              "id": "H2-1",
+              "name": "H2-1",
+              "image": "images/H2-1.svg",
+              "notes": "ZBLL H 13",
+              "tags": [],
+              "lines": [
+                {
+                  "alg": "U' R' U2 R U R' U' F' R U R' U' R' F R U2 R",
+                  "marks": [
+                    "耿"
+                  ]
+                },
+                {
+                  "alg": "U2 R2 D R' U R D' R2 U R2 D R' U2 R D' R2",
+                  "marks": [
+                    "Tymon",
+                    "杜",
+                    "南"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "H2-2",
+              "name": "H2-2",
+              "image": "images/H2-2.svg",
+              "notes": "ZBLL H 14",
+              "tags": [],
+              "lines": [
+                {
+                  "alg": "U' R U2 R' U' R2 D R' U R D' R2 U' R U' R'",
+                  "marks": [
+                    "耿",
+                    "Tymon",
+                    "董"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "H2-3",
+              "name": "H2-3",
+              "image": "images/H2-3.svg",
+              "notes": "ZBLL H 15",
+              "tags": [],
+              "lines": [
+                {
+                  "alg": "U2 R2 D' R U' R' D R2 U' R2 D' R U2 R' D R2",
+                  "marks": [
+                    "耿",
+                    "Tymon"
+                  ]
+                },
+                {
+                  "alg": "R' U2 R U R' U R U F R U' R' U' R U2 R' U' F'",
+                  "marks": [
+                    "杜"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "H2-4",
+              "name": "H2-4",
+              "image": "images/H2-4.svg",
+              "notes": "ZBLL H 16",
+              "tags": [],
+              "lines": [
+                {
+                  "alg": "U R' U2 R U R2 D' R U' R' D R2 U R' U R",
+                  "marks": [
+                    "耿",
+                    "董"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "H2-5",
+              "name": "H2-5",
+              "image": "images/H2-5.svg",
+              "notes": "ZBLL H 17",
+              "tags": [],
+              "lines": [
+                {
+                  "alg": "U R' D' R U R' D R2 U R' U2 R U2 R' U R U2 R'",
+                  "marks": [
+                    "耿"
+                  ]
+                },
+                {
+                  "alg": "U2 L' U R U' L U2 R' U R' U' R2 U' R2 U2 R",
+                  "marks": [
+                    "董"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "H2-6",
+              "name": "H2-6",
+              "image": "images/H2-6.svg",
+              "notes": "ZBLL H 18",
+              "tags": [],
+              "lines": [
+                {
+                  "alg": "R' U' R U' R U R2 U R2 U L' U R' U' L",
+                  "marks": [
+                    "耿"
+                  ]
+                },
+                {
+                  "alg": "U2 R' U' R U' R' U F' R U R' U' R' F R2 U' R' U R",
+                  "marks": [
+                    "耿"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "H2-7",
+              "name": "H2-7",
+              "image": "images/H2-7.svg",
+              "notes": "ZBLL H 19",
+              "tags": [],
+              "lines": [
+                {
+                  "alg": "R' U' R D' R U' R' U2 R U2 R U R U' R2 D",
+                  "marks": [
+                    "耿",
+                    "Tymon"
+                  ]
+                },
+                {
+                  "alg": "U F R U' R' U' R U2 R' U' F' U R U R' U R U2 R'",
+                  "marks": [
+                    "耿"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "H2-8",
+              "name": "H2-8",
+              "image": "images/H2-8.svg",
+              "notes": "ZBLL H 20",
+              "tags": [],
+              "lines": [
+                {
+                  "alg": "U R U R' U R U2 R' F R U' R' U' R U2 R' U' F'",
+                  "marks": [
+                    "耿",
+                    "Tymon",
+                    "懿"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "H2-9",
+              "name": "H2-9",
+              "image": "images/H2-9.svg",
+              "notes": "ZBLL H 21",
+              "tags": [],
+              "lines": [
+                {
+                  "alg": "R' U' R U' R' U' L U' R U L'",
+                  "marks": [
+                    "耿",
+                    "Tymon"
+                  ]
+                },
+                {
+                  "alg": "U2 R' F' R U2 R U2 R' F U' R U' R'",
+                  "marks": [
+                    "耿"
+                  ]
+                },
+                {
+                  "alg": "U2 R' U' R U' R' U2 R U2 L' U R U' L U R'",
+                  "marks": [
+                    "杜"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "H2-10",
+              "name": "H2-10",
+              "image": "images/H2-10.svg",
+              "notes": "ZBLL H 22",
+              "tags": [],
+              "lines": [
+                {
+                  "alg": "R U R' U R U r' F R' F' r",
+                  "marks": [
+                    "耿",
+                    "Luke"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "H2-11",
+              "name": "H2-11",
+              "image": "images/H2-11.svg",
+              "notes": "ZBLL H 23",
+              "tags": [],
+              "lines": [
+                {
+                  "alg": "U R' F R' F' R2 U' r' U r U' r' U' r",
+                  "marks": [
+                    "耿",
+                    "Tymon",
+                    "董"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "H2-12",
+              "name": "H2-12",
+              "image": "images/H2-12.svg",
+              "notes": "ZBLL H 24",
+              "tags": [],
+              "lines": [
+                {
+                  "alg": "U' R U R2 F R F' r U' r' U r U r'",
+                  "marks": [
+                    "耿"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "H3",
+          "formulas": [
+            {
+              "id": "H3-1",
+              "name": "H3-1",
+              "image": "images/H3-1.svg",
+              "notes": "ZBLL H 25",
+              "tags": [],
+              "lines": [
+                {
+                  "alg": "U2 R' F R' F' R2 U R' U' R U' B U' B'",
+                  "marks": [
+                    "耿"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "H3-2",
+              "name": "H3-2",
+              "image": "images/H3-2.svg",
+              "notes": "ZBLL H 26",
+              "tags": [],
+              "lines": [
+                {
+                  "alg": "U' r U2 R2 F R F' R U2 r' L' U2 L U L' U L",
+                  "marks": [
+                    "耿"
+                  ]
+                },
+                {
+                  "alg": "U' r U2 R2 F R F' R U2 r' U2 R' U2 R U R' U R",
+                  "marks": [
+                    "杜"
+                  ]
+                },
+                {
+                  "alg": "U' R U' R2 U' F2 U' R2 U R2 U F2 R2 U R'",
+                  "marks": [
+                    "南"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "H3-3",
+              "name": "H3-3",
+              "image": "images/H3-3.svg",
+              "notes": "ZBLL H 27",
+              "tags": [],
+              "lines": [
+                {
+                  "alg": "U F R U R' U' R U R' U' R U R' U' F'",
+                  "marks": [
+                    "耿"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "H3-4",
+              "name": "H3-4",
+              "image": "images/H3-4.svg",
+              "notes": "ZBLL H 28",
+              "tags": [],
+              "lines": [
+                {
+                  "alg": "R U' r' F R' F' r R U' r' F R' F' r",
+                  "marks": [
+                    "耿"
+                  ]
+                },
+                {
+                  "alg": "x' U' R U' R' U R' F2 R U' R U R' U x",
+                  "marks": [
+                    "Matty",
+                    "南"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "H3-5",
+              "name": "H3-5",
+              "image": "images/H3-5.svg",
+              "notes": "ZBLL H 29",
+              "tags": [],
+              "lines": [
+                {
+                  "alg": "R' U2 R U R' U R U' r U2 R2 F R F' R U2 r'",
+                  "marks": [
+                    "耿"
+                  ]
+                },
+                {
+                  "alg": "R' U2 R U R' U R U R' U' R U R' F' R U R' U' R' F R2",
+                  "marks": [
+                    "Tymon"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "H3-6",
+              "name": "H3-6",
+              "image": "images/H3-6.svg",
+              "notes": "ZBLL H 30",
+              "tags": [],
+              "lines": [
+                {
+                  "alg": "R U' R' U R U R' U' L U L' U' R U R' U2 L U L'",
+                  "marks": [
+                    "耿"
+                  ]
+                },
+                {
+                  "alg": "R' F2 r2 U' r' F r' F2 R2 U R' U R U2 R'",
+                  "marks": [
+                    "藩"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "H3-7",
+              "name": "H3-7",
+              "image": "images/H3-7.svg",
+              "notes": "ZBLL H 31",
+              "tags": [],
+              "lines": [
+                {
+                  "alg": "U' R' U' R U' R' U2 R U R' U' R U R' F' R U R' U' R' F R2",
+                  "marks": [
+                    "耿"
+                  ]
+                },
+                {
+                  "alg": "R' U' F' U F R U' F U R U' R' U R U' R' F'",
+                  "marks": [
+                    "杜"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "H3-8",
+              "name": "H3-8",
+              "image": "images/H3-8.svg",
+              "notes": "ZBLL H 32",
+              "tags": [],
+              "lines": [
+                {
+                  "alg": "U R U R' U F' U F U' F2 r U r' F",
+                  "marks": [
+                    "耿"
+                  ]
+                },
+                {
+                  "alg": "f R f' U R' U R U' R2 F R F' R",
+                  "marks": [
+                    "藩",
+                    "懿"
+                  ]
+                },
+                {
+                  "alg": "U2 F R' U R U2 R2 U' R U2 R' U' R2 U F'",
+                  "marks": [
+                    "杜"
+                  ]
+                },
+                {
+                  "alg": "U R U R' U y' R' U R U' R2 F R F' R",
+                  "marks": [
+                    "南"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "H4",
+          "formulas": [
+            {
+              "id": "H4-1",
+              "name": "H4-1",
+              "image": "images/H4-1.svg",
+              "notes": "ZBLL H 33",
+              "tags": [],
+              "lines": [
+                {
+                  "alg": "R U R' U R U' R' U R U2 R'",
+                  "marks": [
+                    "耿",
+                    "Tymon",
+                    "杜"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "H4-2",
+              "name": "H4-2",
+              "image": "images/H4-2.svg",
+              "notes": "ZBLL H 34",
+              "tags": [],
+              "lines": [
+                {
+                  "alg": "U2 R' U' R U' R' U R U' R' U2 R",
+                  "marks": [
+                    "耿"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "H4-3",
+              "name": "H4-3",
+              "image": "images/H4-3.svg",
+              "notes": "ZBLL H 35",
+              "tags": [],
+              "lines": [
+                {
+                  "alg": "U' R' U2 R U R' U' R U R' U R",
+                  "marks": [
+                    "耿",
+                    "懿",
+                    "Feliks"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "H4-4",
+              "name": "H4-4",
+              "image": "images/H4-4.svg",
+              "notes": "ZBLL H 36",
+              "tags": [],
+              "lines": [
+                {
+                  "alg": "U' R U2 R' U' R U R' U' R U' R'",
+                  "marks": [
+                    "耿",
+                    "Matty",
+                    "南",
+                    "Tymon",
+                    "董"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "H4-5",
+              "name": "H4-5",
+              "image": "images/H4-5.svg",
+              "notes": "ZBLL H 37",
+              "tags": [],
+              "lines": [
+                {
+                  "alg": "U R' U2 R U R' U R U R U R' U R U2 R'",
+                  "marks": [
+                    "耿"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "H4-6",
+              "name": "H4-6",
+              "image": "images/H4-6.svg",
+              "notes": "ZBLL H 38",
+              "tags": [],
+              "lines": [
+                {
+                  "alg": "U R U2 R' U' R U' R' U' R' U' R U' R' U2 R",
+                  "marks": [
+                    "耿"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "H4-7",
+              "name": "H4-7",
+              "image": "images/H4-7.svg",
+              "notes": "ZBLL H 39",
+              "tags": [],
+              "lines": [
+                {
+                  "alg": "R' U' R U' R' U2 R U R U2 R' U' R U' R'",
+                  "marks": [
+                    "耿"
+                  ]
+                },
+                {
+                  "alg": "R U R' U R U2 R' U' R' U2 R U R' U R",
+                  "marks": [
+                    "Tymon",
+                    "董"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "H4-8",
+              "name": "H4-8",
+              "image": "images/H4-8.svg",
+              "notes": "ZBLL H 40",
+              "tags": [],
+              "lines": [
+                {
+                  "alg": "R U R' U R U' R' U R U' R' U R' U' R2 U' R' U R' U R",
+                  "marks": [
+                    "耿"
+                  ]
+                },
+                {
+                  "alg": "R U R' U R U' R' U R' U' R2 U' R' U R' U R U2 R U R' U R U2 R'",
+                  "marks": [
+                    "耿"
                   ]
                 }
               ]
