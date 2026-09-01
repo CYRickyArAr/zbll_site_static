@@ -88,6 +88,7 @@ body {
 
 .category-card .card {
     height: 100%;
+    border-radius: 12px;
 }
 
 /* 首页分类卡片里的分类图（负 margin 抵消 SVG 自带的上下留白约 9px） */
