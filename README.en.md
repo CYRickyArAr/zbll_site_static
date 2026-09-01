@@ -6,7 +6,7 @@
 
 An online database of **472 ZBLL Rubik's cube algorithms**, including top-layer state diagrams, multi-line algorithms, and competition annotations from top competitors.
 
-ZBLL (Zborowski–Bruchem Last Layer) is the final step of the CFOP method, solving the entire last layer in one algorithm. This site follows the official pepkin88 zbll-explorer classification and includes all 472 cases. Each algorithm is annotated with the top competitors (Xuanyi Geng, Tymon Kolasiński, Feliks Zemdegs, Seung Hyuk Nahm, Max Park, and more) who used it in competition.
+ZBLL (Zborowski–Bruchem Last Layer) is the algorithm system for the final step of solving the cube's Last Layer. This site follows the official pepkin88 zbll-explorer classification and includes all 472 cases. Each algorithm is annotated with the top competitors (Xuanyi Geng, Tymon Kolasiński, Feliks Zemdegs, Seung Hyuk Nahm, Max Park, and more) who used it in competition.
 
 ## Content
 
