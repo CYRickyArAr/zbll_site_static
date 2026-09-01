@@ -6,7 +6,7 @@
 
 一个收录 **472 条 ZBLL 魔方公式**的在线数据库，含顶层状态图、多行公式与选手实战标注。
 
-ZBLL（Zborowski-Bruchem Last Layer）是魔方顶层还原的最后一步公式体系。本站按 pepkin88 zbll-explorer 官方分类，完整收录全部 472 个 case，并标注了 **多位顶尖选手**（耿暄一、Tymon Kolasiński、Feliks Zemdegs、南承赫、Max Park 等）在比赛实战中使用过的公式。
+ZBLL（Zborowski-Bruchem Last Layer）是魔方顶层还原的最后一步公式体系。本站按 pepkin88 zbll-explorer 官方分类，完整收录全部 472 个 case，并标注了 **多位顶尖选手**（耿暄一、Tymon Kolasiński、Feliks Zemdegs、南承赫、Max Park 等）在实战中使用过的公式。
 
 ## 内容
 
