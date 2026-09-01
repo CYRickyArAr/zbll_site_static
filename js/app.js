@@ -15,8 +15,8 @@
         'L': 'bg-warning text-dark',
         'Pi': 'bg-info text-dark',
         'S': 'bg-success',
-        'AS': 'bg-secondary',
-        'H': 'bg-dark'
+        'AS': 'bg-dark',
+        'H': 'bg-secondary'
     };
 
     var appEl = document.getElementById('app');
