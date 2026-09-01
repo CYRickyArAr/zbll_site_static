@@ -79,6 +79,7 @@ body {
     color: inherit;
     display: block;
     height: 100%;
+    border-radius: 12px;
 }
 
 .category-card:hover {
