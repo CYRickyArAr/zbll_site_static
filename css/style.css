@@ -158,6 +158,19 @@ body {
     white-space: nowrap;
 }
 
+.player-stat-box:link,
+.player-stat-box:visited {
+    text-decoration: none;
+    color: #0a58ca;
+}
+
+.player-stat-box:hover,
+.player-stat-box:focus {
+    background: #0d6efd;
+    color: #fff;
+    border-color: #0d6efd;
+}
+
 .player-stat-box b {
     font-weight: 700;
 }

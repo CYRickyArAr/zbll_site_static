@@ -43,63 +43,77 @@ window.ZBLL_DATA = {
     "playerStats": [
       {
         "label": "耿",
-        "count": 471
+        "count": 471,
+        "wca": "2023GENG02"
       },
       {
         "label": "Tymon",
-        "count": 211
+        "count": 211,
+        "wca": "2016KOLA02"
       },
       {
         "label": "杜",
-        "count": 131
+        "count": 131,
+        "wca": "2023DUYU01"
       },
       {
         "label": "董",
-        "count": 120
+        "count": 120,
+        "wca": "2023DONG20"
       },
       {
         "label": "Feliks",
-        "count": 89
+        "count": 89,
+        "wca": "2009ZEMD01"
       },
       {
         "label": "南",
-        "count": 64
+        "count": 64,
+        "wca": "2013NAHM01"
       },
       {
         "label": "Park",
-        "count": 36
+        "count": 36,
+        "wca": "2012PARK03"
       },
       {
         "label": "藩",
-        "count": 34
+        "count": 34,
+        "wca": "2021ZHAN01"
       },
       {
         "label": "Leo",
-        "count": 31
+        "count": 31,
+        "wca": "2015BORR01"
       },
       {
         "label": "懿",
-        "count": 29
+        "count": 29,
+        "wca": "2026SHEN01"
       },
       {
         "label": "Matty",
-        "count": 27
+        "count": 27,
+        "wca": "2016INAB01"
       },
       {
         "label": "Luke",
-        "count": 16
+        "count": 16,
+        "wca": "2017GARR05"
       },
       {
         "label": "昆",
-        "count": 12
+        "count": 12,
+        "wca": "2024LIZH03"
       },
       {
         "label": "连",
-        "count": 1
+        "count": 1,
+        "wca": "2025LIAN01"
       }
     ],
-    "generatedAt": "2026-09-01T17:21:00+08:00",
-    "fingerprint": "664e1a0ed20769c9cb38cc02704f679abebed389340b774efcbebaa663580516"
+    "generatedAt": "2026-09-01T17:45:21+08:00",
+    "fingerprint": "ccbfdff8172307c6305d57e5b74395f179a520955cf8fcf56f448d8097363a0e"
   },
   "categories": [
     {
