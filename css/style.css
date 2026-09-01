@@ -81,6 +81,19 @@ body {
     transform: scale(1.1);
 }
 
+.navbar-gh {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    transition: color 0.2s, transform 0.2s;
+}
+
+.navbar-gh:hover {
+    color: #c9d1d9;
+    transform: scale(1.1);
+}
+
 /* 主内容区 */
 .main-content {
     padding: 60px 0 20px 0;
