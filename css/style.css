@@ -165,7 +165,7 @@ body {
 }
 
 .player-stat-box:hover,
-.player-stat-box:focus {
+.player-stat-box:focus-visible {
     background: #0d6efd;
     color: #fff;
     border-color: #0d6efd;
