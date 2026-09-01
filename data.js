@@ -112,8 +112,8 @@ window.ZBLL_DATA = {
         "wca": "2025LIAN01"
       }
     ],
-    "generatedAt": "2026-09-01T19:22:19+08:00",
-    "fingerprint": "125ad99ed699f6ff839fbd20b754814689359fe180624139345153dd8616df59"
+    "generatedAt": "2026-09-01T19:46:15+08:00",
+    "fingerprint": "f370fbfd8606abb6f4f31011a32d811c7dc081a83c6201a52ca4b1887529a2c6"
   },
   "categories": [
     {
@@ -8566,7 +8566,7 @@ window.ZBLL_DATA = {
                   ]
                 },
                 {
-                  "alg": "U2 L' U R U' L U2 R' U R' U' R2 U' R2 U2 R",
+                  "alg": "L' U R U' L U2 R' U R' U' R2 U' R2 U2 R",
                   "marks": [
                     "董"
                   ]
@@ -8608,7 +8608,7 @@ window.ZBLL_DATA = {
                   ]
                 },
                 {
-                  "alg": "U F R U' R' U' R U2 R' U' F' U R U R' U R U2 R'",
+                  "alg": "U' F R U' R' U' R U2 R' U' F' U R U R' U R U2 R'",
                   "marks": [
                     "耿"
                   ]
@@ -8646,13 +8646,13 @@ window.ZBLL_DATA = {
                   ]
                 },
                 {
-                  "alg": "U2 R' F' R U2 R U2 R' F U' R U' R'",
+                  "alg": "R' F' R U2 R U2 R' F U' R U' R'",
                   "marks": [
                     "耿"
                   ]
                 },
                 {
-                  "alg": "U2 R' U' R U' R' U2 R U2 L' U R U' L U R'",
+                  "alg": "R' U' R U' R' U2 R U2 L' U R U' L U R'",
                   "marks": [
                     "杜"
                   ]
