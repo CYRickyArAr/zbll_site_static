@@ -55,6 +55,24 @@ body {
     color: #aaa;
 }
 
+.navbar-right {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-bili {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    transition: color 0.2s, transform 0.2s;
+}
+
+.navbar-bili:hover {
+    color: #00A1D6;
+    transform: scale(1.1);
+}
+
 /* 主内容区 */
 .main-content {
     padding: 60px 0 20px 0;
@@ -404,7 +422,8 @@ body {
         padding: 0 16px;
     }
     .navbar-left {
-        width: 100%;
+        flex: 1;
+        min-width: 0;
         justify-content: space-between;
     }
     .main-content {
