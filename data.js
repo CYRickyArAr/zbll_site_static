@@ -71,7 +71,7 @@ window.ZBLL_DATA = {
       },
       {
         "label": "藩",
-        "count": 32
+        "count": 34
       },
       {
         "label": "Leo",
@@ -98,8 +98,8 @@ window.ZBLL_DATA = {
         "count": 1
       }
     ],
-    "generatedAt": "2026-09-01T17:16:22+08:00",
-    "fingerprint": "456da8093dfccfa0d456dd153c730dd90c7b24fcf2c95bfa9cc08840c5b32022"
+    "generatedAt": "2026-09-01T17:21:00+08:00",
+    "fingerprint": "664e1a0ed20769c9cb38cc02704f679abebed389340b774efcbebaa663580516"
   },
   "categories": [
     {
@@ -1694,7 +1694,8 @@ window.ZBLL_DATA = {
                 {
                   "alg": "U2 R' U' R' D' R U R' D R2",
                   "marks": [
-                    "Tymon"
+                    "Tymon",
+                    "藩"
                   ]
                 }
               ]
@@ -5265,7 +5266,8 @@ window.ZBLL_DATA = {
                 {
                   "alg": "U' R' U2' R U R' U R2 U' r' F R' F' r",
                   "marks": [
-                    "耿"
+                    "耿",
+                    "藩"
                   ]
                 }
               ]
@@ -8837,7 +8839,8 @@ window.ZBLL_DATA = {
                   "marks": [
                     "耿",
                     "Tymon",
-                    "杜"
+                    "杜",
+                    "藩"
                   ]
                 }
               ]
