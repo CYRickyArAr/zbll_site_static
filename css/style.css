@@ -360,6 +360,11 @@ body {
     margin-bottom: 6px;
 }
 
+.bg-orange {
+    background-color: #f76707;
+    color: #fff;
+}
+
 .empty-state {
     padding: 40px;
     text-align: center;

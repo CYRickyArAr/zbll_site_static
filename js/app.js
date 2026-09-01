@@ -13,8 +13,8 @@
         'U': 'bg-primary',
         'T': 'bg-danger',
         'L': 'bg-warning text-dark',
-        'Pi': 'bg-info text-dark',
-        'S': 'bg-success',
+        'Pi': 'bg-success',
+        'S': 'bg-orange',
         'AS': 'bg-dark',
         'H': 'bg-secondary'
     };
