@@ -1,0 +1,4 @@
+# 强制图片 SVG 使用 LF 换行，避免 Windows autocrlf 反复提示 "LF will be replaced by CRLF"
+*.svg text eol=lf
+# 本文件自身同样用 LF
+.gitattributes text eol=lf
