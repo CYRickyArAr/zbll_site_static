@@ -50,6 +50,22 @@ body {
 .navbar-right {
     display: flex;
     align-items: center;
+    gap: 14px;
+}
+
+.navbar-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.navbar-icon img {
+    transition: filter 0.2s, transform 0.2s;
+}
+
+.navbar-icon:hover img {
+    filter: brightness(1.15);
+    transform: scale(1.1);
 }
 
 .navbar-bili {
