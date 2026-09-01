@@ -10,13 +10,13 @@
 
     // 分类徽章颜色
     var CAT_BADGE = {
-        'H': 'bg-primary',
-        'U': 'bg-success',
+        'U': 'bg-primary',
         'T': 'bg-danger',
         'L': 'bg-warning text-dark',
         'Pi': 'bg-info text-dark',
-        'S': 'bg-secondary',
-        'AS': 'bg-dark'
+        'S': 'bg-success',
+        'AS': 'bg-secondary',
+        'H': 'bg-dark'
     };
 
     var appEl = document.getElementById('app');
