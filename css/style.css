@@ -47,14 +47,6 @@ body {
     color: #00d8ff;
 }
 
-.navbar-version {
-    background: rgba(255, 255, 255, 0.15);
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    color: #aaa;
-}
-
 .navbar-right {
     display: flex;
     align-items: center;
@@ -424,7 +416,6 @@ body {
     .navbar-left {
         flex: 1;
         min-width: 0;
-        justify-content: space-between;
     }
     .main-content {
         padding-top: 60px;
