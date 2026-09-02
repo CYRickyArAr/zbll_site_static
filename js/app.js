@@ -19,6 +19,24 @@
         'H': 'bg-secondary'
     };
 
+    // 选手短标签 -> WCA 官方姓名（纯前端，用于悬浮 title；不改数据/导出脚本）
+    var LABEL_TO_NAME = {
+        '耿': 'Xuanyi Geng (耿暄一)',
+        'Tymon': 'Tymon Kolasiński',
+        '杜': 'Yufang Du (杜昱方)',
+        '董': 'Yize Dong (董一泽)',
+        'Feliks': 'Feliks Zemdegs',
+        '南': 'Seung Hyuk Nahm',
+        'Park': 'Max Park',
+        '藩': 'Bofan Zhang (张博藩)',
+        'Leo': 'Leo Borromeo',
+        '懿': 'Yi Shen (沈懿)',
+        'Matty': 'Matty Hiroto Inaba',
+        'Luke': 'Luke Garrett',
+        '昆': 'Zhaokun Li (李昭昆)',
+        '连': 'Yunzhi Lian (连允之)'
+    };
+
     var appEl = document.getElementById('app');
 
     // 当前视图标识：'home' 或 'cat:' + 分类ID（用于记住每个页面的滚动位置）
@@ -70,7 +88,7 @@
         html += '<div class="player-stats">';
         DATA.meta.playerStats.forEach(function (p) {
             if (p.wca) {
-                var hoverName = (p.name || p.label);
+                var hoverName = (LABEL_TO_NAME[p.label] || p.label);
                 html += '<a class="player-stat-box" href="https://www.worldcubeassociation.org/persons/' + encodeURIComponent(p.wca) + '" target="_blank" rel="noopener noreferrer" title="' + escapeHtml(hoverName) + '">' + escapeHtml(p.label) + ' <b>' + p.count + '</b></a>';
             } else {
                 html += '<span class="player-stat-box">' + escapeHtml(p.label) + ' <b>' + p.count + '</b></span>';
