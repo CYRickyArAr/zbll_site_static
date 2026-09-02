@@ -12,6 +12,7 @@ __pycache__/
 
 # 本地备份文件（不入库）
 *.bak*
+backups/
 
 # 系统文件
 .DS_Store
