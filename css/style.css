@@ -192,6 +192,14 @@ body {
     margin: 6px 0 6px;
 }
 
+/* 首页分类范围徽章统一宽度，避免 Pi/AS 等较长名称把框撑宽 */
+.category-card .badge {
+    display: inline-block;
+    width: 88px;
+    text-align: center;
+    white-space: nowrap;
+}
+
 /* 选手公式数统计框 */
 .player-stats {
     display: flex;
