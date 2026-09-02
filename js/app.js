@@ -240,7 +240,8 @@
                 if (line.marks && line.marks.length) {
                     html += '<span class="formula-marks-group">';
                     line.marks.forEach(function (mark) {
-                        html += '<span class="formula-marks">' + escapeHtml(mark) + '</span>';
+                        var hoverName = LABEL_TO_NAME[mark] || mark;
+                        html += '<span class="formula-marks" title="' + escapeHtml(hoverName) + '">' + escapeHtml(mark) + '</span>';
                     });
                     html += '</span>';
                 }
