@@ -8,7 +8,7 @@ An online database of **472 ZBLL Rubik's cube algorithms**, including top-layer 
 
 ZBLL (Zborowski–Bruchem Last Layer) is the algorithm system for the final step of solving the cube's Last Layer. This site follows the official pepkin88 zbll-explorer classification and includes all 472 cases. Each algorithm is annotated with the top competitors (Xuanyi Geng, Tymon Kolasiński, Feliks Zemdegs, Seung Hyuk Nahm, Max Park, and more) who used it in real solves.
 
-Formulas and competitor annotations are sourced from [reco.nz](https://reco.nz/), CubeStation, and WCU CUBE. Every annotation is confirmed to have been used by the corresponding competitor, but it may not be their current go-to algorithm, so please treat it as a learning reference.
+Algorithms and competitor annotations are sourced from [reco.nz](https://reco.nz/), CubeStation, and WCU CUBE. Every annotation is confirmed to have been used by the corresponding competitor, but it may not be their current go-to algorithm, so please treat it as a learning reference.
 
 ## Content
 
