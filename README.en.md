@@ -21,3 +21,5 @@ Algorithms and competitor annotations are sourced from [reco.nz](https://reco.nz
 Open the site to browse all categories. Click a category to view its algorithms; click a sub-category title to collapse / expand.
 
 > Online: https://cyrickyarar.github.io/zbll_site_static/
+>
+> Classification reference: [ZBLL Explorer](https://pepkin88.me/zbll-explorer/)

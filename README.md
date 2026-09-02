@@ -21,3 +21,5 @@ ZBLL（Zborowski-Bruchem Last Layer）是魔方顶层还原的最后一步公式
 打开网站即可浏览全部分类，点击分类进入查看公式；点子分类标题可折叠/展开。
 
 > 在线访问：https://cyrickyarar.github.io/zbll_site_static/
+>
+> 分类参考：[ZBLL Explorer](https://pepkin88.me/zbll-explorer/)
