@@ -48,7 +48,7 @@ window.ZBLL_DATA = {
       },
       {
         "label": "杜",
-        "count": 223,
+        "count": 241,
         "wca": "2023DUYU01"
       },
       {
@@ -112,8 +112,8 @@ window.ZBLL_DATA = {
         "wca": "2025LIAN01"
       }
     ],
-    "generatedAt": "2026-09-02T13:37:21+08:00",
-    "fingerprint": "2eaad880b912cd7e6ef4e51b16d374927288f93403a26eb3685e28eb66e4f1e7"
+    "generatedAt": "2026-09-02T16:47:32+08:00",
+    "fingerprint": "8511e74ca9a3c295b1f71ed13edc646082cee7b2cd0c4f246a890885d420c2e5"
   },
   "categories": [
     {
@@ -626,6 +626,7 @@ window.ZBLL_DATA = {
                   "alg": "r2 F2 r U2 r U' r' F R' F R F' r",
                   "marks": [
                     "耿",
+                    "杜",
                     "董"
                   ]
                 }
@@ -855,6 +856,7 @@ window.ZBLL_DATA = {
                   "marks": [
                     "耿",
                     "Tymon",
+                    "杜",
                     "Feliks"
                   ]
                 }
@@ -1000,6 +1002,7 @@ window.ZBLL_DATA = {
                   "alg": "U F' R U R' U' R' F R2 U R' U2 R U R' U2 R U' R'",
                   "marks": [
                     "耿",
+                    "杜",
                     "董"
                   ]
                 }
@@ -1810,6 +1813,7 @@ window.ZBLL_DATA = {
                   "marks": [
                     "耿",
                     "Tymon",
+                    "杜",
                     "董",
                     "南"
                   ]
@@ -2231,7 +2235,8 @@ window.ZBLL_DATA = {
                   "alg": "F R U' R' U' R U2 R' U' F' R' U' R U' R' U2 R",
                   "marks": [
                     "耿",
-                    "Tymon"
+                    "Tymon",
+                    "杜"
                   ]
                 },
                 {
@@ -2760,9 +2765,10 @@ window.ZBLL_DATA = {
                   "alg": "U2 R U R' U2 R' D' R U R' D R2 U' R' U R U' R'",
                   "marks": [
                     "耿",
+                    "杜",
+                    "董",
                     "Feliks",
-                    "Matty",
-                    "董"
+                    "Matty"
                   ]
                 },
                 {
@@ -3322,6 +3328,12 @@ window.ZBLL_DATA = {
                   ]
                 },
                 {
+                  "alg": "U D' R U R' U2 R U R' U D R' U2 R U' R' U' R",
+                  "marks": [
+                    "杜"
+                  ]
+                },
+                {
                   "alg": "U R U R' U2 R U R' U D R' U2 R U' R' U' R D'",
                   "marks": [
                     "Feliks"
@@ -3422,6 +3434,7 @@ window.ZBLL_DATA = {
                 {
                   "alg": "R U' R2 F2 R U2 R U2 R' F2 U2 R U' R'",
                   "marks": [
+                    "杜",
                     "董"
                   ]
                 }
@@ -3964,6 +3977,7 @@ window.ZBLL_DATA = {
                   "marks": [
                     "耿",
                     "Tymon",
+                    "杜",
                     "懿"
                   ]
                 }
@@ -4029,6 +4043,7 @@ window.ZBLL_DATA = {
                   "alg": "U' R U R' U R U R' U2 R' D' r U2 r' D R",
                   "marks": [
                     "耿",
+                    "杜",
                     "南"
                   ]
                 },
@@ -4324,6 +4339,12 @@ window.ZBLL_DATA = {
                     "耿",
                     "Feliks"
                   ]
+                },
+                {
+                  "alg": "U L U L' U' L F L' U' L U L F' L2",
+                  "marks": [
+                    "杜"
+                  ]
                 }
               ]
             },
@@ -4428,6 +4449,7 @@ window.ZBLL_DATA = {
                   "alg": "U R' U2 R U R' U R U' R U2 R' U' R U' R'",
                   "marks": [
                     "耿",
+                    "杜",
                     "藩",
                     "Feliks"
                   ]
@@ -6022,6 +6044,7 @@ window.ZBLL_DATA = {
                   "alg": "U' R U R' U R2 D r' U2 r D' R2",
                   "marks": [
                     "耿",
+                    "杜",
                     "董"
                   ]
                 }
@@ -6070,6 +6093,7 @@ window.ZBLL_DATA = {
                   "alg": "U R U R2 F' R U2 R U2 R' F R U' R'",
                   "marks": [
                     "耿",
+                    "杜",
                     "董"
                   ]
                 }
@@ -7421,7 +7445,8 @@ window.ZBLL_DATA = {
                 {
                   "alg": "R' U2 R' D' R U R' D R2 U' R' U2 R",
                   "marks": [
-                    "耿"
+                    "耿",
+                    "杜"
                   ]
                 }
               ]
@@ -8008,6 +8033,7 @@ window.ZBLL_DATA = {
                   "marks": [
                     "耿",
                     "Tymon",
+                    "杜",
                     "董"
                   ]
                 }
@@ -8243,6 +8269,12 @@ window.ZBLL_DATA = {
                   "alg": "U2 S' r U2 R' U' R U' r' U2 S",
                   "marks": [
                     "耿"
+                  ]
+                },
+                {
+                  "alg": "U R' U' R U' R' U' R' U' R' U' R' U R U R2",
+                  "marks": [
+                    "杜"
                   ]
                 }
               ]
@@ -8573,6 +8605,12 @@ window.ZBLL_DATA = {
                   "alg": "F R' F' R2 U2 R' U R U2 R' U R U' R2 F R F'",
                   "marks": [
                     "Tymon"
+                  ]
+                },
+                {
+                  "alg": "U2 R F R2 U' R2 U' R2 U2 R2 U' F' R'",
+                  "marks": [
+                    "杜"
                   ]
                 }
               ]
