@@ -42,6 +42,47 @@
     // 当前视图标识：'home' 或 'cat:' + 分类ID（用于记住每个页面的滚动位置）
     var currentView = 'home';
 
+    // 主题：首次跟随系统，用户切换后记住选择
+    var THEME_KEY = 'zbll_theme';
+
+    function systemTheme() {
+        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    function applyTheme(theme, persist) {
+        theme = theme === 'dark' ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', theme);
+        if (persist) {
+            try { localStorage.setItem(THEME_KEY, theme); } catch (e) {}
+        }
+        var button = document.getElementById('theme-toggle');
+        if (!button) return;
+        var dark = theme === 'dark';
+        var icon = button.querySelector('.theme-toggle-icon');
+        if (icon) icon.textContent = dark ? '☀' : '☾';
+        var label = dark ? '切换到浅色模式' : '切换到深色模式';
+        button.setAttribute('aria-label', label);
+        button.setAttribute('title', label);
+        button.setAttribute('aria-pressed', dark ? 'true' : 'false');
+    }
+
+    function initThemeToggle() {
+        var saved = null;
+        try { saved = localStorage.getItem(THEME_KEY); } catch (e) {}
+        var theme = saved === 'light' || saved === 'dark' ? saved :
+            (document.documentElement.getAttribute('data-theme') || systemTheme());
+        applyTheme(theme, false);
+        var button = document.getElementById('theme-toggle');
+        if (button) {
+            button.addEventListener('click', function () {
+                var current = document.documentElement.getAttribute('data-theme') || 'light';
+                applyTheme(current === 'dark' ? 'light' : 'dark', true);
+            });
+        }
+    }
+
+    initThemeToggle();
+
     function getScrollKey(view) {
         return 'zbll_scroll_' + view;
     }

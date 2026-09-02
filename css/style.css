@@ -1,4 +1,31 @@
 /* ===== 基础 reset ===== */
+:root {
+    color-scheme: light;
+    --site-bg: #f5f5f5;
+    --surface: #ffffff;
+    --surface-muted: #f8f9fa;
+    --border: #dee2e6;
+    --text: #212529;
+    --text-muted: #6c757d;
+    --note-text: #495057;
+    --line-hover: #f0f7ff;
+    --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+html[data-theme="dark"] {
+    color-scheme: dark;
+    background-color: #14171b;
+    --site-bg: #14171b;
+    --surface: #20252b;
+    --surface-muted: #292f36;
+    --border: #3e4853;
+    --text: #f1f3f5;
+    --text-muted: #adb5bd;
+    --note-text: #c4cbd3;
+    --line-hover: #1c3657;
+    --shadow: 0 2px 10px rgba(0, 0, 0, 0.32);
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -6,7 +33,8 @@
 }
 
 body {
-    background-color: #f5f5f5;
+    background-color: var(--site-bg);
+    color: var(--text);
     font-family: 'Lato', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
@@ -81,6 +109,30 @@ body {
     transform: scale(1.1);
 }
 
+.theme-toggle {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 1rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.theme-toggle:hover,
+.theme-toggle:focus-visible {
+    background: rgba(255, 255, 255, 0.24);
+    border-color: rgba(255, 255, 255, 0.65);
+    color: #fff;
+}
+
 .navbar-gh {
     display: flex;
     align-items: center;
@@ -119,6 +171,8 @@ body {
 .category-card .card {
     height: 100%;
     border-radius: 12px;
+    background: var(--surface);
+    border-color: var(--border);
 }
 
 /* 首页分类卡片里的分类图（负 margin 抵消 SVG 自带的上下留白约 9px） */
@@ -431,6 +485,125 @@ body {
     border: none;
     padding: 0;
     color: #495057;
+}
+
+/* ===== 深色模式 ===== */
+html[data-theme="dark"] .breadcrumb,
+html[data-theme="dark"] .subcategory-card,
+html[data-theme="dark"] .formula-grid,
+html[data-theme="dark"] .formula-card {
+    background: var(--surface);
+    border-color: var(--border);
+}
+
+html[data-theme="dark"] .breadcrumb {
+    color: var(--text);
+}
+
+html[data-theme="dark"] .category-title,
+html[data-theme="dark"] .formula-line-alg {
+    color: var(--text);
+}
+
+html[data-theme="dark"] .breadcrumb-item.active,
+html[data-theme="dark"] .breadcrumb-item + .breadcrumb-item::before {
+    color: var(--text-muted);
+}
+
+html[data-theme="dark"] .sticky-header {
+    background: var(--surface);
+    box-shadow: var(--shadow);
+}
+
+html[data-theme="dark"] .sticky-header:hover,
+html[data-theme="dark"] .formula-card:hover {
+    background: #272d34;
+}
+
+html[data-theme="dark"] .toggle-icon {
+    color: #adb5bd;
+}
+
+html[data-theme="dark"] .formula-line {
+    background: var(--surface-muted);
+    border-color: var(--border);
+}
+
+html[data-theme="dark"] .formula-line:hover {
+    background: var(--line-hover);
+    border-color: #4e9cff;
+}
+
+html[data-theme="dark"] .player-stat-box,
+html[data-theme="dark"] .formula-marks {
+    background: #173b67;
+    border-color: #4e9cff;
+    color: #dbeafe;
+}
+
+html[data-theme="dark"] .player-stat-box:link,
+html[data-theme="dark"] .player-stat-box:visited {
+    color: #dbeafe;
+}
+
+html[data-theme="dark"] .player-stat-box:hover,
+html[data-theme="dark"] .player-stat-box:focus-visible {
+    background: #0d6efd;
+    border-color: #0d6efd;
+    color: #fff;
+}
+
+html[data-theme="dark"] .formula-image,
+html[data-theme="dark"] .formula-card .bg-light {
+    background-color: var(--surface-muted) !important;
+    border-color: var(--border);
+}
+
+html[data-theme="dark"] .formula-notes {
+    color: var(--note-text);
+}
+
+html[data-theme="dark"] .empty-state {
+    background: var(--surface-muted);
+    border-color: var(--border);
+    color: var(--text-muted);
+}
+
+html[data-theme="dark"] .text-muted {
+    color: var(--text-muted) !important;
+}
+
+html[data-theme="dark"] .form-control,
+html[data-theme="dark"] .form-select {
+    color: var(--text);
+    background-color: var(--surface-muted);
+    border-color: #56616d;
+}
+
+html[data-theme="dark"] .form-control:focus,
+html[data-theme="dark"] .form-select:focus {
+    color: var(--text);
+    background-color: var(--surface-muted);
+    border-color: #6ea8fe;
+}
+
+html[data-theme="dark"] .form-control::placeholder {
+    color: #9299a3;
+}
+
+html[data-theme="dark"] .btn-outline-secondary {
+    color: #d6dbe1;
+    border-color: #68737e;
+}
+
+html[data-theme="dark"] .btn-outline-secondary:hover {
+    color: #fff;
+    background-color: #3c4651;
+    border-color: #8793a0;
+}
+
+html[data-theme="dark"] .form-check-label {
+    color: var(--text);
 }
 
 /* ===== 响应式 ===== */
