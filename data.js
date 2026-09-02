@@ -44,76 +44,90 @@ window.ZBLL_DATA = {
       {
         "label": "耿",
         "count": 471,
-        "wca": "2023GENG02"
+        "wca": "2023GENG02",
+        "name": "Xuanyi Geng (耿暄一)"
       },
       {
         "label": "杜",
         "count": 223,
-        "wca": "2023DUYU01"
+        "wca": "2023DUYU01",
+        "name": "Yufang Du (杜昱方)"
       },
       {
         "label": "Tymon",
         "count": 211,
-        "wca": "2016KOLA02"
+        "wca": "2016KOLA02",
+        "name": "Tymon Kolasiński"
       },
       {
         "label": "董",
         "count": 120,
-        "wca": "2023DONG20"
+        "wca": "2023DONG20",
+        "name": "Yize Dong (董一泽)"
       },
       {
         "label": "Feliks",
         "count": 89,
-        "wca": "2009ZEMD01"
+        "wca": "2009ZEMD01",
+        "name": "Feliks Zemdegs"
       },
       {
         "label": "南",
         "count": 64,
-        "wca": "2013NAHM01"
+        "wca": "2013NAHM01",
+        "name": "Seung Hyuk Nahm"
       },
       {
         "label": "Park",
         "count": 36,
-        "wca": "2012PARK03"
+        "wca": "2012PARK03",
+        "name": "Max Park"
       },
       {
         "label": "藩",
         "count": 34,
-        "wca": "2021ZHAN01"
+        "wca": "2021ZHAN01",
+        "name": "Bofan Zhang (张博藩)"
       },
       {
         "label": "Leo",
         "count": 31,
-        "wca": "2015BORR01"
+        "wca": "2015BORR01",
+        "name": "Leo Borromeo"
       },
       {
         "label": "懿",
         "count": 29,
-        "wca": "2026SHEN01"
+        "wca": "2026SHEN01",
+        "name": "Yi Shen (沈懿)"
       },
       {
         "label": "Matty",
         "count": 27,
-        "wca": "2016INAB01"
+        "wca": "2016INAB01",
+        "name": "Matty Hiroto Inaba"
       },
       {
         "label": "Luke",
         "count": 16,
-        "wca": "2017GARR05"
+        "wca": "2017GARR05",
+        "name": "Luke Garrett"
       },
       {
         "label": "昆",
         "count": 12,
-        "wca": "2024LIZH03"
+        "wca": "2024LIZH03",
+        "name": "Zhaokun Li (李昭昆)"
       },
       {
         "label": "连",
         "count": 1,
-        "wca": "2025LIAN01"
+        "wca": "2025LIAN01",
+        "name": "Yunzhi Lian (连允之)"
       }
     ],
-    "generatedAt": "2026-09-02T13:26:42+08:00",
-    "fingerprint": "2eaad880b912cd7e6ef4e51b16d374927288f93403a26eb3685e28eb66e4f1e7"
+    "generatedAt": "2026-09-02T13:32:10+08:00",
+    "fingerprint": "3c8bbf9d5bf5ef9664feacfe95921747e783bddd2127b47b92fb652cc3b4b187"
   },
   "categories": [
     {

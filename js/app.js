@@ -70,7 +70,8 @@
         html += '<div class="player-stats">';
         DATA.meta.playerStats.forEach(function (p) {
             if (p.wca) {
-                html += '<a class="player-stat-box" href="https://www.worldcubeassociation.org/persons/' + encodeURIComponent(p.wca) + '" target="_blank" rel="noopener noreferrer" title="' + escapeHtml(p.label) + ' 的 WCA 主页">' + escapeHtml(p.label) + ' <b>' + p.count + '</b></a>';
+                var hoverName = (p.name || p.label);
+                html += '<a class="player-stat-box" href="https://www.worldcubeassociation.org/persons/' + encodeURIComponent(p.wca) + '" target="_blank" rel="noopener noreferrer" title="' + escapeHtml(hoverName) + '">' + escapeHtml(p.label) + ' <b>' + p.count + '</b></a>';
             } else {
                 html += '<span class="player-stat-box">' + escapeHtml(p.label) + ' <b>' + p.count + '</b></span>';
             }
