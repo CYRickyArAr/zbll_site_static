@@ -48,7 +48,7 @@ window.ZBLL_DATA = {
       },
       {
         "label": "杜",
-        "count": 300,
+        "count": 301,
         "wca": "2023DUYU01"
       },
       {
@@ -112,8 +112,8 @@ window.ZBLL_DATA = {
         "wca": "2025LIAN01"
       }
     ],
-    "generatedAt": "2026-09-02T23:29:03+08:00",
-    "fingerprint": "64fc40c7ce385530ce88cf4de66454a4510c2189fbe9fa162de395f95c06aeda"
+    "generatedAt": "2026-09-02T23:57:15+08:00",
+    "fingerprint": "0dee9784c43c0bd927452fbfa4955b94a829e0716efac521103fac352a64ab4f"
   },
   "categories": [
     {
@@ -5453,7 +5453,8 @@ window.ZBLL_DATA = {
                 {
                   "alg": "U R U2 R' U' R U R' U' R' D' R U' R' D R2 U' R' U R U' R'",
                   "marks": [
-                    "耿"
+                    "耿",
+                    "杜"
                   ]
                 }
               ]
