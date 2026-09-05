@@ -21,3 +21,7 @@ Algorithms and competitor annotations are sourced from [reco.nz](https://reco.nz
 Open the site to browse all categories. Click a category to view its algorithms; click a sub-category title to collapse / expand.
 
 > Online: https://cyrickyarar.github.io/zbll_site_static/
+>
+> Editable version: https://cyricky.pythonanywhere.com/
+>
+> The editable version lets signed-in users manage their own algorithms, images, and notes; public data is maintained by the administrator.
