@@ -48,7 +48,7 @@ window.ZBLL_DATA = {
       },
       {
         "label": "杜",
-        "count": 391,
+        "count": 396,
         "wca": "2023DUYU01"
       },
       {
@@ -112,8 +112,8 @@ window.ZBLL_DATA = {
         "wca": "2025LIAN01"
       }
     ],
-    "generatedAt": "2026-09-05T20:33:38+08:00",
-    "fingerprint": "5b21ad1ed3858b2e3021792942d9de8fe4022000436501ae4058283db3481cd0"
+    "generatedAt": "2026-09-06T00:05:13+08:00",
+    "fingerprint": "eb21e2a987b7e78f68e196478eb5958f492af1ef702089161f4e6dbc6f85537d"
   },
   "categories": [
     {
@@ -1000,6 +1000,7 @@ window.ZBLL_DATA = {
                   "marks": [
                     "耿",
                     "Tymon",
+                    "杜",
                     "Feliks",
                     "董"
                   ]
@@ -1151,6 +1152,7 @@ window.ZBLL_DATA = {
                   "alg": "U' F R U R' U' R U R' U' F' U' R' F' U' F U R",
                   "marks": [
                     "耿",
+                    "杜",
                     "Feliks"
                   ]
                 }
@@ -3090,6 +3092,7 @@ window.ZBLL_DATA = {
                   "marks": [
                     "耿",
                     "Tymon",
+                    "杜",
                     "Feliks",
                     "Matty",
                     "Park"
@@ -4982,7 +4985,8 @@ window.ZBLL_DATA = {
                 {
                   "alg": "U' R2 D R' U2 R D' R2 U' R2 D R' U' R D' R2",
                   "marks": [
-                    "耿"
+                    "耿",
+                    "杜"
                   ]
                 }
               ]
@@ -6218,6 +6222,12 @@ window.ZBLL_DATA = {
                   "alg": "U' R U R' U' R U R2 D' r U2 r' D R2 U2 R'",
                   "marks": [
                     "耿"
+                  ]
+                },
+                {
+                  "alg": "U2 R' F R U R' U' R' F' D' R U R' D R2",
+                  "marks": [
+                    "杜"
                   ]
                 },
                 {
@@ -9454,16 +9464,16 @@ window.ZBLL_DATA = {
                   ]
                 },
                 {
+                  "alg": "U2 F R' U R U2 R2 U' R U2 R' U' R2 U F'",
+                  "marks": [
+                    "杜"
+                  ]
+                },
+                {
                   "alg": "f R f' U R' U R U' R2 F R F' R",
                   "marks": [
                     "藩",
                     "懿"
-                  ]
-                },
-                {
-                  "alg": "U2 F R' U R U2 R2 U' R U2 R' U' R2 U F'",
-                  "marks": [
-                    "杜"
                   ]
                 },
                 {
