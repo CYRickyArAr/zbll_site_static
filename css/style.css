@@ -805,7 +805,7 @@ html[data-theme="dark"] .form-check-label {
 .workspace-nav-btn {
     border: 0;
     border-radius: 6px;
-    background: transparent;
+    background: rgba(255, 255, 255, 0.12);
     color: #fff;
     box-sizing: border-box !important;
     padding: 5px 0.5em;
