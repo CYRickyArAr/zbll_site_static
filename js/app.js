@@ -446,10 +446,13 @@
         listEl.innerHTML = list.length ? list.map(function (item) {
             return '<button type="button" class="workspace-list-item' + ((activeWorkspace && activeWorkspace.id === item.id) || (!activeWorkspace && selectedId === item.id) ? ' active' : '') + '" data-workspace-id="' + escapeHtml(item.id) + '"><span>' + escapeHtml(item.name) + '</span><small>' + escapeHtml(new Date(item.updatedAt).toLocaleString()) + '</small></button>';
         }).join('') : '<div class="workspace-empty">还没有本地工作区</div>';
-        ['workspace-export', 'workspace-rename', 'workspace-delete'].forEach(function (id) { var button = document.getElementById(id); if (button) button.disabled = !activeWorkspace; });
+        var exportButton = document.getElementById('workspace-export');
+        if (exportButton) exportButton.disabled = !(activeWorkspace || publicCopy);
+        ['workspace-rename', 'workspace-delete'].forEach(function (id) { var button = document.getElementById(id); if (button) button.disabled = !activeWorkspace; });
         var publicStatus = document.getElementById('workspace-public-status');
         if (publicStatus) publicStatus.textContent = publicCopy ? '已编辑' : '未编辑：当前使用最新大神版公式库';
-        ['workspace-public-export', 'workspace-public-reset'].forEach(function (id) { var button = document.getElementById(id); if (button) button.disabled = !publicCopy; });
+        var resetButton = document.getElementById('workspace-public-reset');
+        if (resetButton) resetButton.disabled = !publicCopy;
         updateWorkspaceNav();
     }
     async function openWorkspaceManager() { setWorkspaceMessage(''); showOverlay('workspace-overlay', true); await refreshWorkspaceList(); }
@@ -672,8 +675,7 @@
         try {
             if (id === 'workspace-new') return createWorkspace();
             if (id === 'workspace-import') return document.getElementById('workspace-file').click();
-            if (id === 'workspace-export' && activeWorkspace) return WS.exportFile(activeWorkspace);
-            if (id === 'workspace-public-export' && publicCopy) return WS.exportFile(publicCopy);
+            if (id === 'workspace-export' && (activeWorkspace || publicCopy)) return WS.exportFile(activeWorkspace || publicCopy);
             if (id === 'workspace-public-reset' && publicCopy) {
                 if (!window.confirm('删除本地编辑并恢复最新大神版公式库？')) return;
                 await WS.resetPublicCopy(); publicCopy = null;
