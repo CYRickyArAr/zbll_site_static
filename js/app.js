@@ -23,6 +23,7 @@
     };
     var currentView = 'home';
     var activeWorkspace = null;
+    var publicCopy = null;
     var themeKey = 'zbll_theme';
 
     function escapeHtml(value) {
@@ -30,8 +31,31 @@
         return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;')
             .replace(/>/g, '&gt;').replace(/\"/g, '&quot;').replace(/'/g, '&#39;');
     }
-    function viewData() { return activeWorkspace || DATA; }
+    function viewData() { return activeWorkspace || publicCopy || DATA; }
     function isWorkspace() { return !!activeWorkspace; }
+    function isPublicCopy() { return !activeWorkspace && !!publicCopy; }
+    function isEditableView() { return true; }
+    function usesLearnedStats() { return isWorkspace() || isPublicCopy(); }
+    function updateWorkspaceNav() {
+        var nav = document.getElementById('workspace-open');
+        if (nav) nav.textContent = activeWorkspace ? '工作区：' + activeWorkspace.name : (publicCopy ? '公开数据（本地副本）' : '本地工作区');
+    }
+    async function ensureEditableData() {
+        if (activeWorkspace) return activeWorkspace;
+        if (!publicCopy) { publicCopy = await WS.ensurePublicCopy(DATA); updateWorkspaceNav(); }
+        return publicCopy;
+    }
+    async function persistCurrentData() {
+        if (activeWorkspace) return WS.put(activeWorkspace);
+        if (publicCopy) return WS.putPublicCopy(publicCopy);
+    }
+    function getPlayerStats(data) {
+        if (data === DATA) return DATA.meta.playerStats || [];
+        var counts = {}, order = {};
+        (DATA.meta.playerStats || []).forEach(function (item, index) { counts[item.label] = 0; order[item.label] = index; });
+        (data.categories || []).forEach(function (cat) { (cat.subcategories || []).forEach(function (sub) { (sub.formulas || []).forEach(function (formula) { (formula.lines || []).forEach(function (line) { (line.marks || []).forEach(function (mark) { counts[mark] = (counts[mark] || 0) + 1; if (order[mark] === undefined) order[mark] = 1000 + Object.keys(order).length; }); }); }); }); });
+        return Object.keys(counts).map(function (label) { var base = (DATA.meta.playerStats || []).find(function (item) { return item.label === label; }) || {}; return { label: label, count: counts[label], wca: base.wca || '' }; }).filter(function (item) { return item.count > 0; }).sort(function (a, b) { return b.count - a.count || order[a.label] - order[b.label]; });
+    }
     function systemTheme() {
         return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
@@ -96,7 +120,7 @@
         return first === last ? first : first + '-' + last;
     }
     function displayFormulaId(sub, formula, index) {
-        return isWorkspace() ? sub.id + '-' + (index + 1) : (formula.name || formula.id || sub.id + '-' + (index + 1));
+        return (isWorkspace() || isPublicCopy()) ? sub.id + '-' + (index + 1) : (formula.name || formula.id || sub.id + '-' + (index + 1));
     }
     function lineText(line) {
         var marks = line.marks && line.marks.length ? ' （' + line.marks.join(' ') + '）' : '';
@@ -108,7 +132,7 @@
         var html = '<div class="container mt-5"><h1 class="text-center mb-5">ZBLL 公式数据库</h1>';
         if (!isWorkspace()) {
             html += '<div class="player-stats">';
-            (DATA.meta.playerStats || []).forEach(function (p) {
+            getPlayerStats(data).forEach(function (p) {
                 if (p.wca) {
                     var name = LABEL_TO_NAME[p.label] || p.label;
                     html += '<a class="player-stat-box" href="https://www.worldcubeassociation.org/persons/' + encodeURIComponent(p.wca) + '" target="_blank" rel="noopener noreferrer" title="' + escapeHtml(name) + '">' + escapeHtml(p.label) + ' <b>' + p.count + '</b></a>';
@@ -116,13 +140,16 @@
             });
             html += '</div>';
         } else html += '<div class="workspace-mode-hint">当前工作区：' + escapeHtml(activeWorkspace.name) + '</div>';
+        if (isPublicCopy()) html += '<div class="workspace-mode-hint">当前为公开数据本地副本，修改只保存在本浏览器</div>';
         html += '<div class="row row-cols-1 row-cols-md-3 g-4">';
         (data.categories || []).forEach(function (cat) {
             var total = 0;
             (cat.subcategories || []).forEach(function (sub) { total += sub.formulas.length; });
             html += '<div class="col"><a href="#/category/' + encodeURIComponent(cat.id) + '" class="category-card"><div class="card"><div class="card-body text-center">';
             html += '<h2 class="card-title">' + escapeHtml(cat.id) + '</h2><img src="images/' + encodeURIComponent(cat.id) + '.svg" class="category-thumb" alt="' + escapeHtml(cat.id) + '">';
-            html += '<p class="card-text">' + total + '个情况</p><span class="badge ' + (CAT_BADGE[cat.id] || 'bg-secondary') + '">' + escapeHtml(subcatRange(cat)) + '</span>';
+            var learned = 0;
+            (cat.subcategories || []).forEach(function (sub) { learned += sub.formulas.filter(function (formula) { return formula.learned; }).length; });
+            html += '<p class="card-text">' + (usesLearnedStats() ? '已学 ' + learned + '/' + total + '个情况' : total + '个情况') + '</p><span class="badge ' + (CAT_BADGE[cat.id] || 'bg-secondary') + '">' + escapeHtml(subcatRange(cat)) + '</span>';
             html += '</div></div></a></div>';
         });
         html += '</div></div>';
@@ -136,28 +163,28 @@
         html += '<div class="category-title-row"><h1 class="category-title">' + escapeHtml(cat.id) + ' Case</h1><button type="button" class="btn btn-outline-secondary collapse-all-btn" id="toggle-all-subcategories">全部展开</button></div>';
         (cat.subcategories || []).forEach(function (sub) {
             var total = sub.formulas.length, learned = sub.formulas.filter(function (formula) { return formula.learned; }).length;
-            html += '<div class="subcategory-card" id="card-' + escapeHtml(sub.id) + '"><div class="sticky-header" id="header-' + escapeHtml(sub.id) + '" data-subcat="' + escapeHtml(sub.id) + '"><div class="d-flex justify-content-between align-items-center"><div class="d-flex align-items-center"><h3>' + escapeHtml(sub.id) + '</h3><img src="images/' + encodeURIComponent(sub.id) + '.svg" class="subcat-thumb" alt="' + escapeHtml(sub.id) + '"><span class="badge bg-secondary">' + (isWorkspace() ? '已学 ' + learned + '/' + total + '个情况' : total + '个情况') + '</span></div><div class="d-flex align-items-center"><span class="toggle-icon" id="icon-' + escapeHtml(sub.id) + '">▼</span></div></div></div>';
+            html += '<div class="subcategory-card" id="card-' + escapeHtml(sub.id) + '"><div class="sticky-header" id="header-' + escapeHtml(sub.id) + '" data-subcat="' + escapeHtml(sub.id) + '"><div class="d-flex justify-content-between align-items-center"><div class="d-flex align-items-center"><h3>' + escapeHtml(sub.id) + '</h3><img src="images/' + encodeURIComponent(sub.id) + '.svg" class="subcat-thumb" alt="' + escapeHtml(sub.id) + '"><span class="badge bg-secondary">' + (usesLearnedStats() ? '已学 ' + learned + '/' + total + '个情况' : total + '个情况') + '</span></div><div class="d-flex align-items-center"><span class="toggle-icon" id="icon-' + escapeHtml(sub.id) + '">▼</span></div></div></div>';
             html += '<div class="formula-grid" id="subcat-' + escapeHtml(sub.id) + '">';
             if (sub.formulas.length) {
                 html += '<div class="sortable-container" data-category="' + escapeHtml(cat.id) + '" data-subcategory="' + escapeHtml(sub.id) + '">';
                 sub.formulas.forEach(function (formula, index) { html += renderFormulaCard(cat.id, sub.id, formula, index); });
                 html += '</div>';
-            } else if (!isWorkspace()) html += '<div class="empty-state"><p class="mb-0">该子分类下暂无公式</p></div>';
-            if (isWorkspace()) html += '<button type="button" class="workspace-add" data-action="add-formula" data-category="' + escapeHtml(cat.id) + '" data-subcategory="' + escapeHtml(sub.id) + '">＋</button>';
+            } else if (!isEditableView()) html += '<div class="empty-state"><p class="mb-0">该子分类下暂无公式</p></div>';
+            if (isEditableView()) html += '<button type="button" class="workspace-add" data-action="add-formula" data-category="' + escapeHtml(cat.id) + '" data-subcategory="' + escapeHtml(sub.id) + '">＋</button>';
             html += '</div></div>';
         });
         html += '</div>';
         appEl.innerHTML = html;
         restoreSubcategoryState(cat);
-        if (isWorkspace()) bindSorting();
+        if (isEditableView()) bindSorting();
     }
 
     function renderFormulaCard(catId, subId, formula, index) {
         var cat = findCategory(catId), sub = cat.subcategories.filter(function (s) { return s.id === subId; })[0];
         var id = displayFormulaId(sub, formula, index), uid = formula.uid || formula.id || (subId + '-' + index);
-        var html = '<div class="sortable-item" data-uid="' + escapeHtml(uid) + '" id="formula-' + escapeHtml(uid) + '" draggable="' + (isWorkspace() ? 'true' : 'false') + '">';
-        html += '<div class="formula-card' + (formula.learned ? ' learned' : '') + (isWorkspace() ? ' content-editable learning-enabled' : '') + '">';
-        if (isWorkspace()) html += '<div class="drag-handle" title="拖动排序" aria-label="拖动排序">⋮⋮</div>';
+        var html = '<div class="sortable-item" data-uid="' + escapeHtml(uid) + '" id="formula-' + escapeHtml(uid) + '" draggable="' + (isEditableView() ? 'true' : 'false') + '">';
+        html += '<div class="formula-card' + (formula.learned ? ' learned' : '') + (isEditableView() ? ' content-editable learning-enabled' : '') + '">';
+        if (isEditableView()) html += '<div class="drag-handle" title="拖动排序" aria-label="拖动排序">⋮⋮</div>';
         html += '<div class="row"><div class="col-4">';
         if (formula.image) html += '<img src="' + escapeHtml(formula.image) + '" class="formula-image" alt="' + escapeHtml(id) + '" loading="lazy">';
         else html += '<div class="formula-image d-flex align-items-center justify-content-center bg-light"><span class="text-muted">无图</span></div>';
@@ -176,8 +203,8 @@
                 html += '</div>';
             });
             html += '</div>';
-        } else if (isWorkspace()) html += '<div class="workspace-empty">暂无公式</div>';
-        if (isWorkspace()) {
+        } else if (isEditableView()) html += '<div class="workspace-empty">暂无公式</div>';
+        if (isEditableView()) {
             html += '<div class="action-buttons">';
             html += '<button type="button" class="add-variant-btn workspace-action" title="添加一行变体" aria-label="添加一行变体" data-action="add-variant" data-category="' + escapeHtml(catId) + '" data-subcategory="' + escapeHtml(subId) + '" data-uid="' + escapeHtml(uid) + '">＋</button>';
             html += '<div class="action-buttons-row"><button type="button" class="btn btn-outline-secondary btn-sm workspace-action" data-action="edit-formula" data-category="' + escapeHtml(catId) + '" data-subcategory="' + escapeHtml(subId) + '" data-uid="' + escapeHtml(uid) + '">编辑</button></div></div>';
@@ -235,12 +262,13 @@
                 item.addEventListener('drop', async function (e) {
                     e.preventDefault(); item.classList.remove('workspace-drag-over');
                     if (!dragged || dragged === item) return;
+                    await ensureEditableData();
                     var cat = findCategory(container.dataset.category), sub = cat && cat.subcategories.filter(function (s) { return s.id === container.dataset.subcategory; })[0];
                     if (!sub) return;
                     var from = sub.formulas.findIndex(function (f) { return f.uid === dragged.dataset.uid; }), to = sub.formulas.findIndex(function (f) { return f.uid === item.dataset.uid; });
                     if (from < 0 || to < 0) return;
                     var moved = sub.formulas.splice(from, 1)[0]; sub.formulas.splice(to, 0, moved);
-                    await WS.put(activeWorkspace); renderCategory(container.dataset.category);
+                    await persistCurrentData(); renderCategory(container.dataset.category);
                 });
             });
         });
@@ -254,21 +282,28 @@
     async function refreshWorkspaceList() {
         var listEl = document.getElementById('workspace-list'), currentEl = document.getElementById('workspace-current');
         if (!listEl) return;
-        var list = await WS.list();
-        currentEl.textContent = activeWorkspace ? '当前：' + activeWorkspace.name : '当前：公开数据';
+        var list = (await WS.list()).filter(function (item) { return item.id !== '__public_copy__'; });
+        currentEl.textContent = activeWorkspace ? '当前：' + activeWorkspace.name : (publicCopy ? '当前：公开数据副本' : '当前：公开数据');
         listEl.innerHTML = list.length ? list.map(function (item) {
             return '<button type="button" class="workspace-list-item' + (activeWorkspace && activeWorkspace.id === item.id ? ' active' : '') + '" data-workspace-id="' + escapeHtml(item.id) + '"><span>' + escapeHtml(item.name) + '</span><small>' + escapeHtml(new Date(item.updatedAt).toLocaleString()) + '</small></button>';
         }).join('') : '<div class="workspace-empty">还没有本地工作区</div>';
         ['workspace-export', 'workspace-rename', 'workspace-delete'].forEach(function (id) { var button = document.getElementById(id); if (button) button.disabled = !activeWorkspace; });
-        var nav = document.getElementById('workspace-open'); if (nav) nav.textContent = activeWorkspace ? '工作区：' + activeWorkspace.name : '本地工作区';
+        var publicStatus = document.getElementById('workspace-public-status');
+        if (publicStatus) publicStatus.textContent = publicCopy ? '已创建：当前公开页面使用本地副本' : '尚未创建：当前使用最新公开数据';
+        ['workspace-public-export', 'workspace-public-reset'].forEach(function (id) { var button = document.getElementById(id); if (button) button.disabled = !publicCopy; });
+        updateWorkspaceNav();
     }
     async function openWorkspaceManager() { setWorkspaceMessage(''); showOverlay('workspace-overlay', true); await refreshWorkspaceList(); }
-    async function activateWorkspace(id) { activeWorkspace = id ? await WS.activate(id) : await WS.activate(null); router(); await refreshWorkspaceList(); }
+    async function activateWorkspace(id) {
+        if (id) { publicCopy = null; activeWorkspace = await WS.activate(id); }
+        else { activeWorkspace = await WS.activate(null); publicCopy = await WS.getPublicCopy(); }
+        router(); await refreshWorkspaceList();
+    }
     async function createWorkspace() {
         var name = window.prompt('请输入工作区名称', '我的 ZBLL 工作区');
         if (name === null) return;
         name = name.trim() || '我的 ZBLL 工作区';
-        activeWorkspace = await WS.create(DATA, name); showOverlay('workspace-overlay', false); router();
+        publicCopy = null; activeWorkspace = await WS.create(DATA, name); showOverlay('workspace-overlay', false); router();
     }
     function splitNotes(notes, formula, subId) {
         var text = String(notes || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n'), parts = text.split('\n');
@@ -305,7 +340,7 @@
         return new Promise(function (resolve, reject) { if (!file) return resolve(null); var reader = new FileReader(); reader.onload = function () { resolve(reader.result); }; reader.onerror = reject; reader.readAsDataURL(file); });
     }
     async function saveFormulaEditor(e) {
-        e.preventDefault(); if (!activeWorkspace) return;
+        e.preventDefault(); await ensureEditableData();
         var overlay = document.getElementById('editor-overlay'), catId = overlay.dataset.category, subId = document.getElementById('editor-subcategory').value, uid = document.getElementById('editor-uid').value;
         var cat = findCategory(catId), sub = cat && cat.subcategories.filter(function (s) { return s.id === subId; })[0]; if (!sub) return;
         var formula = uid ? sub.formulas.find(function (f) { return f.uid === uid; }) : null;
@@ -315,24 +350,26 @@
         if (input.files && input.files[0]) image = await readFileData(input.files[0]);
         if (!formula) { formula = { uid: 'f-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2), id: 'new-' + Date.now(), image: image || '', notes: notes, lines: [], learned: false }; sub.formulas.push(formula); }
         formula.lines = parseFormulaLines(document.getElementById('editor-formula').value); formula.notes = notes; formula.image = image || ''; formula.learned = !!formula.learned;
-        await WS.put(activeWorkspace); showOverlay('editor-overlay', false); renderCategory(catId);
+        await persistCurrentData(); showOverlay('editor-overlay', false); renderCategory(catId);
     }
     async function addVariant(catId, subId, uid) {
+        await ensureEditableData();
         var ref = findFormula(catId, subId, uid); if (!ref) return;
         var alg = window.prompt('输入新公式（只输入一行）'); if (alg === null || !alg.trim()) return;
         var markText = window.prompt('标注（可选，多个用空格分隔），如：耿 Tymon', ''); if (markText === null) return;
         ref.formula.lines = ref.formula.lines || []; ref.formula.lines.push({ alg: alg.trim(), marks: markText.trim().split(/[\s,，]+/).filter(Boolean) });
-        await WS.put(activeWorkspace); renderCategory(catId);
+        await persistCurrentData(); renderCategory(catId);
     }
     async function deleteFromEditor() {
-        if (!activeWorkspace) return;
+        await ensureEditableData();
         var overlay = document.getElementById('editor-overlay'), ref = findFormula(overlay.dataset.category, document.getElementById('editor-subcategory').value, document.getElementById('editor-uid').value);
         if (!ref || !window.confirm('确定删除这条公式卡吗？')) return;
         ref.subcat.formulas.splice(ref.index, 1);
-        await WS.put(activeWorkspace); showOverlay('editor-overlay', false); renderCategory(overlay.dataset.category);
+        await persistCurrentData(); showOverlay('editor-overlay', false); renderCategory(overlay.dataset.category);
     }
     async function handleWorkspaceAction(button) {
         var action = button.dataset.action, catId = button.dataset.category, subId = button.dataset.subcategory, uid = button.dataset.uid;
+        await ensureEditableData();
         if (action === 'add-formula') return openFormulaEditor(catId, subId, null);
         var ref = uid ? findFormula(catId, subId, uid) : null;
         if (action === 'edit-formula' && ref) return openFormulaEditor(catId, subId, ref.formula);
@@ -340,7 +377,7 @@
         if (!ref) return;
         if (action === 'delete-formula') { if (!window.confirm('确定删除这条公式卡吗？')) return; ref.subcat.formulas.splice(ref.index, 1); }
         if (action === 'toggle-learned') ref.formula.learned = !ref.formula.learned;
-        await WS.put(activeWorkspace); renderCategory(catId);
+        await persistCurrentData(); renderCategory(catId);
     }
 
     async function handleWorkspaceManagerClick(e) {
@@ -351,15 +388,23 @@
             if (id === 'workspace-new') return createWorkspace();
             if (id === 'workspace-import') return document.getElementById('workspace-file').click();
             if (id === 'workspace-export' && activeWorkspace) return WS.exportFile(activeWorkspace);
+            if (id === 'workspace-public-export' && publicCopy) return WS.exportFile(publicCopy);
+            if (id === 'workspace-public-reset' && publicCopy) {
+                if (!window.confirm('删除本地公开副本并恢复最新公开数据？')) return;
+                await WS.resetPublicCopy(); publicCopy = null;
+                if (!activeWorkspace) router();
+                await refreshWorkspaceList();
+                return;
+            }
             if (id === 'workspace-rename' && activeWorkspace) { var name = window.prompt('新的工作区名称', activeWorkspace.name); if (name && name.trim()) { activeWorkspace.name = name.trim(); await WS.put(activeWorkspace); await refreshWorkspaceList(); } return; }
-            if (id === 'workspace-delete' && activeWorkspace) { if (!window.confirm('删除当前工作区？导出的 .zbll 文件不受影响。')) return; await WS.remove(activeWorkspace.id); var all = await WS.list(); activeWorkspace = all[0] || null; await WS.activate(activeWorkspace ? activeWorkspace.id : null); showOverlay('workspace-overlay', false); router(); return; }
+            if (id === 'workspace-delete' && activeWorkspace) { if (!window.confirm('删除当前工作区？导出的 .zbll 文件不受影响。')) return; await WS.remove(activeWorkspace.id); activeWorkspace = null; publicCopy = await WS.getPublicCopy(); await WS.activate(null); showOverlay('workspace-overlay', false); router(); return; }
             if (id === 'workspace-exit') { await activateWorkspace(null); showOverlay('workspace-overlay', false); return; }
             if (id === 'workspace-close') return showOverlay('workspace-overlay', false);
         } catch (error) { setWorkspaceMessage(error.message || '工作区操作失败', true); }
     }
     async function importWorkspaceFile(e) {
         var file = e.target.files && e.target.files[0]; e.target.value = ''; if (!file) return;
-        try { activeWorkspace = await WS.importFile(file); showOverlay('workspace-overlay', false); router(); }
+        try { publicCopy = null; activeWorkspace = await WS.importFile(file); showOverlay('workspace-overlay', false); router(); }
         catch (error) { showOverlay('workspace-overlay', true); setWorkspaceMessage(error.message || '导入失败：文件格式无效', true); }
     }
 
@@ -367,10 +412,10 @@
         var hash = location.hash || '#/', match = hash.match(/^#\/category\/([A-Za-z]+)$/), nextView = match ? 'cat:' + match[1] : 'home';
         saveScroll(); if (match) renderCategory(match[1]); else renderHome(); currentView = nextView;
         requestAnimationFrame(function () { restoreScroll(nextView); });
-        var nav = document.getElementById('workspace-open'); if (nav) nav.textContent = activeWorkspace ? '工作区：' + activeWorkspace.name : '本地工作区';
+        updateWorkspaceNav();
     }
     function initWorkspace() {
-        return WS.ready.then(async function () { var id = WS.activeId(); activeWorkspace = id ? await WS.get(id) : null; if (id && !activeWorkspace) await WS.activate(null); router(); }).catch(function (error) { console.warn(error); router(); });
+        return WS.ready.then(async function () { var id = WS.activeId(); activeWorkspace = id ? await WS.get(id) : null; if (activeWorkspace) publicCopy = null; else { if (id) await WS.activate(null); publicCopy = await WS.getPublicCopy(); } router(); }).catch(function (error) { console.warn(error); router(); });
     }
 
     document.addEventListener('click', function (e) {
@@ -378,7 +423,7 @@
         if (header && header.dataset.subcat) { toggleSubcategory(header.dataset.subcat); return; }
         if (e.target.closest('#toggle-all-subcategories')) { toggleAllSubcategories(); return; }
         var action = e.target.closest('.workspace-action'); if (action) { handleWorkspaceAction(action); return; }
-        var add = e.target.closest('.workspace-add'); if (add) { openFormulaEditor(add.dataset.category, add.dataset.subcategory, null); return; }
+        var add = e.target.closest('.workspace-add'); if (add) { handleWorkspaceAction(add); return; }
         if (e.target.id === 'workspace-open') openWorkspaceManager();
         if (e.target.id === 'editor-close' || e.target.id === 'editor-cancel') showOverlay('editor-overlay', false);
     });
@@ -391,7 +436,7 @@
     window.addEventListener('hashchange', router);
     var scrollTimer = null;
     window.addEventListener('scroll', function () { if (scrollTimer) clearTimeout(scrollTimer); scrollTimer = setTimeout(saveScroll, 150); });
-    window.addEventListener('zbll-workspace-changed', function (e) { activeWorkspace = e.detail || null; router(); });
+    window.addEventListener('zbll-workspace-changed', function (e) { activeWorkspace = e.detail || null; if (activeWorkspace) publicCopy = null; else WS.getPublicCopy().then(function (copy) { publicCopy = copy; router(); }); router(); });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { showOverlay('workspace-overlay', false); showOverlay('editor-overlay', false); } });
     initWorkspace();
 })();

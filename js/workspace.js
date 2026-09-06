@@ -6,6 +6,7 @@
     var STORE_NAME = 'workspaces';
     var DB_VERSION = 1;
     var ACTIVE_KEY = 'zbll_active_workspace';
+    var PUBLIC_ID = '__public_copy__';
 
     function makeId() {
         if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
@@ -94,6 +95,41 @@
         };
     }
 
+    function publicCopy(data) {
+        var now = new Date().toISOString();
+        return {
+            format: 'zbll-workspace',
+            version: 1,
+            id: PUBLIC_ID,
+            kind: 'public-copy',
+            name: '公开数据副本',
+            sourceFingerprint: data.meta && data.meta.fingerprint || '',
+            createdAt: now,
+            updatedAt: now,
+            categories: (data.categories || []).map(function (category) {
+                return {
+                    id: category.id,
+                    subcategories: (category.subcategories || []).map(function (subcat) {
+                        return {
+                            id: subcat.id,
+                            formulas: (subcat.formulas || []).map(function (formula) {
+                                var copied = clone(formula);
+                                // 公开 data.js 可能没有 uid；沿用稳定的公式 id，避免首次编辑时找不到对应卡片。
+                                copied.uid = copied.uid || copied.id || makeId();
+                                copied.id = typeof copied.id === 'string' ? copied.id : copied.uid;
+                                copied.image = typeof copied.image === 'string' ? copied.image : '';
+                                copied.notes = typeof copied.notes === 'string' ? copied.notes : '';
+                                copied.lines = Array.isArray(copied.lines) ? copied.lines : [];
+                                copied.learned = copied.learned === true;
+                                return copied;
+                            })
+                        };
+                    })
+                };
+            })
+        };
+    }
+
     function validLine(line) {
         return line && typeof line === 'object' && typeof line.alg === 'string' &&
             Array.isArray(line.marks) && line.marks.every(function (mark) { return typeof mark === 'string'; });
@@ -151,6 +187,26 @@
             var db = await dbPromise;
             return requestResult(db.transaction(STORE_NAME, 'readonly').objectStore(STORE_NAME).get(id));
         },
+        async getPublicCopy() { return this.get(PUBLIC_ID); },
+        async hasPublicCopy() { return !!(await this.getPublicCopy()); },
+        async ensurePublicCopy(data) {
+            var existing = await this.getPublicCopy();
+            if (existing) return existing;
+            var copy = publicCopy(data);
+            await this.put(copy);
+            return copy;
+        },
+        async putPublicCopy(copy) {
+            copy.id = PUBLIC_ID;
+            copy.kind = 'public-copy';
+            copy.name = '公开数据副本';
+            await this.put(copy);
+            return copy;
+        },
+        async resetPublicCopy() {
+            var db = await dbPromise;
+            await transaction(db, 'readwrite', function (store) { store.delete(PUBLIC_ID); });
+        },
         async put(workspace) {
             workspace.updatedAt = new Date().toISOString();
             var db = await dbPromise;
@@ -178,7 +234,7 @@
         async importFile(file) {
             var text = await file.text();
             var workspace = normalizeImported(JSON.parse(text));
-            var existing = await this.list();
+            var existing = (await this.list()).filter(function (item) { return item.id !== PUBLIC_ID; });
             var baseName = workspace.name;
             var suffix = 2;
             while (existing.some(function (item) { return item.name === workspace.name; })) workspace.name = baseName + ' ' + suffix++;
