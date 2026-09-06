@@ -270,7 +270,7 @@
             document.body.style.scrollBehavior = 'auto';
             window.scrollBy(0, step);
         }
-        scrollRafId = window.setTimeout(edgeScrollWhileDragging, 16);
+        scrollRafId = window.requestAnimationFrame(edgeScrollWhileDragging);
     }
 
     function bindSorting() {
@@ -320,7 +320,7 @@
                         dragMouseY = evt.originalEvent.clientY;
                     }
                     document.documentElement.style.scrollBehavior = 'auto';
-                    if (scrollRafId) window.clearTimeout(scrollRafId);
+                    if (scrollRafId) window.cancelAnimationFrame(scrollRafId);
                     edgeScrollWhileDragging();
                     if (!activeWorkspace && !publicCopy) ensureEditableData();
                 },
@@ -333,7 +333,7 @@
                 },
                 onEnd: async function (evt) {
                     isDraggingFormula = false;
-                    if (scrollRafId) window.clearTimeout(scrollRafId);
+                    if (scrollRafId) window.cancelAnimationFrame(scrollRafId);
                     scrollRafId = null;
                     document.documentElement.style.scrollBehavior = '';
                     var order = Array.prototype.map.call(evt.to.children, function (item) { return item.dataset.uid; });
