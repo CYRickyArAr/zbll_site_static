@@ -291,10 +291,9 @@
                 handle: '.drag-handle',
                 forceFallback: true,
                 fallbackOnBody: true,
-                fallbackTolerance: 0,
                 scroll: false,
                 invertSwap: false,
-                swapThreshold: 0.65,
+                swapThreshold: 6,
                 onStart: function () {
                     isDraggingFormula = true;
                     dragMouseY = -1;
@@ -308,7 +307,6 @@
                     if (scrollRafId) window.cancelAnimationFrame(scrollRafId);
                     scrollRafId = null;
                     document.documentElement.style.scrollBehavior = '';
-                    document.body.style.scrollBehavior = '';
                     var order = Array.prototype.map.call(evt.to.children, function (item) { return item.dataset.uid; });
                     await ensureEditableData();
                     var cat = findCategory(evt.to.dataset.category), sub = cat && cat.subcategories.filter(function (s) { return s.id === evt.to.dataset.subcategory; })[0];
