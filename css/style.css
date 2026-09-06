@@ -805,21 +805,22 @@ html[data-theme="dark"] .form-check-label {
 .workspace-nav-btn {
     border: 0;
     border-radius: 6px;
-    background: rgba(255, 255, 255, 0.1);
+    background: transparent;
     color: #fff;
     box-sizing: border-box !important;
-    padding: 5px 0;
+    padding: 5px 0.1em;
     font-size: .86rem;
-    width: 5.4em;
-    min-width: 5.4em;
-    max-width: 5.4em;
-    flex: 0 0 5.4em !important;
+    width: 5.6em;
+    min-width: 5.6em;
+    max-width: 5.6em;
+    flex: 0 0 5.6em !important;
     overflow: hidden;
     white-space: nowrap;
     cursor: pointer;
+    transition: background-color .15s;
 }
 .workspace-nav-btn:hover,
-.workspace-nav-btn:focus-visible { background: transparent; color: #fff; }
+.workspace-nav-btn:focus-visible { background: rgba(255, 255, 255, 0.12); color: #fff; }
 .workspace-nav-label {
     display: block;
     width: max-content;
@@ -981,7 +982,7 @@ html[data-theme="dark"] .variant-add-form {
 }
 
 @media (max-width: 600px) {
-    .workspace-nav-btn { padding: 4px 7px; font-size: .76rem; }
+    .workspace-nav-btn { padding: 4px 0.1em; font-size: .76rem; }
     .workspace-dialog { padding: 16px; }
     .workspace-list-item { align-items: flex-start; flex-direction: column; gap: 3px; }
     .workspace-learn-btn { margin-left: 0; }
@@ -1100,12 +1101,12 @@ html[data-theme="dark"] .sortable-ghost { background: #303840; border-color: #4e
         flex-basis: 26px;
     }
     .workspace-nav-btn {
-        width: 5.4em;
-        min-width: 5.4em;
-        max-width: 5.4em;
-        flex: 0 0 5.4em !important;
+        width: 5.6em;
+        min-width: 5.6em;
+        max-width: 5.6em;
+        flex: 0 0 5.6em !important;
         overflow: hidden;
-        padding: 4px 0;
+        padding: 4px 0.1em;
         font-size: .68rem;
     }
 }
@@ -1128,10 +1129,10 @@ html[data-theme="dark"] .sortable-ghost { background: #303840; border-color: #4e
         padding-right: 1px;
     }
     .workspace-nav-btn {
-        width: 5.4em;
-        min-width: 5.4em;
-        max-width: 5.4em;
-        flex: 0 0 5.4em !important;
+        width: 5.6em;
+        min-width: 5.6em;
+        max-width: 5.6em;
+        flex: 0 0 5.6em !important;
         font-size: .58rem;
     }
 }
