@@ -118,11 +118,11 @@
         } else html += '<div class="workspace-mode-hint">当前工作区：' + escapeHtml(activeWorkspace.name) + '</div>';
         html += '<div class="row row-cols-1 row-cols-md-3 g-4">';
         (data.categories || []).forEach(function (cat) {
-            var total = 0;
-            (cat.subcategories || []).forEach(function (sub) { total += sub.formulas.length; });
+            var total = 0, learned = 0;
+            (cat.subcategories || []).forEach(function (sub) { total += sub.formulas.length; sub.formulas.forEach(function (formula) { if (formula.learned) learned++; }); });
             html += '<div class="col"><a href="#/category/' + encodeURIComponent(cat.id) + '" class="category-card"><div class="card"><div class="card-body text-center">';
             html += '<h2 class="card-title">' + escapeHtml(cat.id) + '</h2><img src="images/' + encodeURIComponent(cat.id) + '.svg" class="category-thumb" alt="' + escapeHtml(cat.id) + '">';
-            html += '<p class="card-text">' + total + '个情况</p><span class="badge ' + (CAT_BADGE[cat.id] || 'bg-secondary') + '">' + escapeHtml(subcatRange(cat)) + '</span>';
+            html += '<p class="card-text">' + (isWorkspace() ? '已学 ' + learned + '/' + total + '个情况' : total + '个情况') + '</p><span class="badge ' + (CAT_BADGE[cat.id] || 'bg-secondary') + '">' + escapeHtml(subcatRange(cat)) + '</span>';
             html += '</div></div></a></div>';
         });
         html += '</div></div>';
@@ -135,8 +135,8 @@
         var html = '<div class="container"><nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="#/">首页</a></li><li class="breadcrumb-item active">' + escapeHtml(cat.id) + ' Case</li></ol></nav>';
         html += '<h1 class="category-title">' + escapeHtml(cat.id) + ' Case</h1>';
         (cat.subcategories || []).forEach(function (sub) {
-            var total = sub.formulas.length;
-            html += '<div class="subcategory-card" id="card-' + escapeHtml(sub.id) + '"><div class="sticky-header" id="header-' + escapeHtml(sub.id) + '" data-subcat="' + escapeHtml(sub.id) + '"><div class="d-flex justify-content-between align-items-center"><div class="d-flex align-items-center"><h3>' + escapeHtml(sub.id) + '</h3><img src="images/' + encodeURIComponent(sub.id) + '.svg" class="subcat-thumb" alt="' + escapeHtml(sub.id) + '"><span class="badge bg-secondary">' + total + '个情况</span></div><div class="d-flex align-items-center"><span class="toggle-icon" id="icon-' + escapeHtml(sub.id) + '">▼</span></div></div></div>';
+            var total = sub.formulas.length, learned = sub.formulas.filter(function (formula) { return formula.learned; }).length;
+            html += '<div class="subcategory-card" id="card-' + escapeHtml(sub.id) + '"><div class="sticky-header" id="header-' + escapeHtml(sub.id) + '" data-subcat="' + escapeHtml(sub.id) + '"><div class="d-flex justify-content-between align-items-center"><div class="d-flex align-items-center"><h3>' + escapeHtml(sub.id) + '</h3><img src="images/' + encodeURIComponent(sub.id) + '.svg" class="subcat-thumb" alt="' + escapeHtml(sub.id) + '"><span class="badge bg-secondary">' + (isWorkspace() ? '已学 ' + learned + '/' + total + '个情况' : total + '个情况') + '</span></div><div class="d-flex align-items-center"><span class="toggle-icon" id="icon-' + escapeHtml(sub.id) + '">▼</span></div></div></div>';
             html += '<div class="formula-grid" id="subcat-' + escapeHtml(sub.id) + '">';
             if (sub.formulas.length) {
                 html += '<div class="sortable-container" data-category="' + escapeHtml(cat.id) + '" data-subcategory="' + escapeHtml(sub.id) + '">';
