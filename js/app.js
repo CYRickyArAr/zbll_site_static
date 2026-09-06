@@ -482,9 +482,9 @@
         setWorkspaceMessage('请先在右上角选择或新建一个自定义工作区。', true);
     }
     async function createWorkspace() {
-        var name = window.prompt('请输入工作区名称', '我的 ZBLL 工作区');
+        var name = window.prompt('请输入工作区名称', '我的zbll公式库');
         if (name === null) return;
-        name = name.trim() || '我的 ZBLL 工作区';
+        name = name.trim() || '我的zbll公式库';
         publicCopy = null; activeWorkspace = await WS.create(DATA, name);
         try { localStorage.setItem(selectedWorkspaceKey, activeWorkspace.id); } catch (e) {}
         showOverlay('workspace-overlay', false); router();

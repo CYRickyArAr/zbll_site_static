@@ -68,7 +68,7 @@
             format: 'zbll-workspace',
             version: 1,
             id: makeId(),
-            name: name || '我的 ZBLL 工作区',
+            name: name || '我的zbll公式库',
             sourceFingerprint: data.meta && data.meta.fingerprint || '',
             createdAt: now,
             updatedAt: now,
