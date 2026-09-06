@@ -43,7 +43,7 @@
         var nav = document.getElementById('workspace-open');
         var publicBtn = document.getElementById('nav-public-mode');
         var workspaceBtn = document.getElementById('nav-workspace-mode');
-        var publicLabel = publicCopy ? '公开数据（本地副本）' : '公开数据';
+        var publicLabel = publicCopy ? '公开数据（已编辑）' : '公开数据';
         if (nav) nav.textContent = activeWorkspace ? '工作区：' + activeWorkspace.name : publicLabel;
         if (publicBtn) publicBtn.classList.toggle('active', !activeWorkspace);
         if (workspaceBtn) {
@@ -223,7 +223,7 @@
             });
             html += '</div>';
         } else html += '<div class="workspace-mode-hint">当前工作区：' + escapeHtml(activeWorkspace.name) + '</div>';
-        if (isPublicCopy()) html += '<div class="workspace-mode-hint">当前为公开数据本地副本，修改只保存在本浏览器</div>';
+        if (isPublicCopy()) html += '<div class="workspace-mode-hint">当前为公开数据（已编辑），修改只保存在本浏览器</div>';
         html += '<div class="row row-cols-1 row-cols-md-3 g-4">';
         (data.categories || []).forEach(function (cat) {
             var total = 0;
@@ -442,13 +442,13 @@
         try { selectedId = localStorage.getItem(selectedWorkspaceKey) || ''; } catch (e) {}
         var selected = list.find(function (item) { return item.id === selectedId; });
         currentEl.textContent = activeWorkspace ? '当前：' + activeWorkspace.name :
-            (publicCopy ? '当前：公开数据副本' : '当前：公开数据') + (selected ? '；自定义：' + selected.name : '');
+            (publicCopy ? '当前：公开数据（已编辑）' : '当前：公开数据') + (selected ? '；自定义：' + selected.name : '');
         listEl.innerHTML = list.length ? list.map(function (item) {
             return '<button type="button" class="workspace-list-item' + ((activeWorkspace && activeWorkspace.id === item.id) || (!activeWorkspace && selectedId === item.id) ? ' active' : '') + '" data-workspace-id="' + escapeHtml(item.id) + '"><span>' + escapeHtml(item.name) + '</span><small>' + escapeHtml(new Date(item.updatedAt).toLocaleString()) + '</small></button>';
         }).join('') : '<div class="workspace-empty">还没有本地工作区</div>';
         ['workspace-export', 'workspace-rename', 'workspace-delete'].forEach(function (id) { var button = document.getElementById(id); if (button) button.disabled = !activeWorkspace; });
         var publicStatus = document.getElementById('workspace-public-status');
-        if (publicStatus) publicStatus.textContent = publicCopy ? '已创建：当前公开页面使用本地副本' : '尚未创建：当前使用最新公开数据';
+        if (publicStatus) publicStatus.textContent = publicCopy ? '已编辑：当前公开页面使用浏览器内保存的数据' : '未编辑：当前使用最新公开数据';
         ['workspace-public-export', 'workspace-public-reset'].forEach(function (id) { var button = document.getElementById(id); if (button) button.disabled = !publicCopy; });
         updateWorkspaceNav();
     }
