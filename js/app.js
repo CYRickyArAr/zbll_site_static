@@ -681,6 +681,7 @@
                 await WS.resetPublicCopy(); publicCopy = null;
                 if (!activeWorkspace) router();
                 await refreshWorkspaceList();
+                showOverlay('workspace-overlay', false);
                 return;
             }
             if (id === 'workspace-rename' && activeWorkspace) { var name = window.prompt('新的工作区名称', activeWorkspace.name); if (name && name.trim()) { activeWorkspace.name = name.trim(); await WS.put(activeWorkspace); await refreshWorkspaceList(); } return; }
