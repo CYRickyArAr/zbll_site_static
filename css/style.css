@@ -841,8 +841,8 @@ html[data-theme="dark"] .form-check-label {
     animation: workspaceNavMarquee var(--workspace-marquee-duration, 6s) linear infinite;
 }
 @keyframes workspaceNavMarquee {
-    from { transform: translateX(calc(-1 * var(--workspace-marquee-shift, 50%))); }
-    to { transform: translateX(0); }
+    from { transform: translateX(0); }
+    to { transform: translateX(calc(-1 * var(--workspace-marquee-shift, 50%))); }
 }
 .workspace-overlay {
     position: fixed;
