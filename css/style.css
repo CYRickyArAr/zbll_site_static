@@ -833,7 +833,7 @@ html[data-theme="dark"] .form-check-label {
 }
 .workspace-nav-btn.is-overflow:hover .workspace-nav-label,
 .workspace-nav-btn.is-overflow:focus-visible .workspace-nav-label {
-    animation: workspaceNavMarquee 4s linear infinite alternate;
+    animation: workspaceNavMarquee 2s linear infinite alternate;
 }
 @keyframes workspaceNavMarquee {
     from { transform: translateX(0); }
