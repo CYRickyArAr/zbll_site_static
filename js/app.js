@@ -51,16 +51,24 @@
                 nav.textContent = '';
                 label = document.createElement('span');
                 label.className = 'workspace-nav-label';
-                nav.appendChild(label);
+                var clip = nav.querySelector('.workspace-nav-clip');
+                (clip || nav).appendChild(label);
             }
             label.textContent = navText;
             nav.title = activeWorkspace ? activeWorkspace.name : publicLabel;
             requestAnimationFrame(function () {
                 var navStyle = window.getComputedStyle(nav);
                 var contentWidth = nav.clientWidth - parseFloat(navStyle.paddingLeft) - parseFloat(navStyle.paddingRight);
-                var overflow = Math.max(0, label.scrollWidth - contentWidth);
-                nav.classList.toggle('is-overflow', overflow > 1);
-                label.style.setProperty('--workspace-scroll-distance', overflow > 1 ? '-' + overflow + 'px' : '0px');
+                var singleWidth = label.scrollWidth;
+                var overflow = singleWidth > contentWidth + 1;
+                if (overflow) {
+                    label.textContent = navText + ' ' + navText;
+                    var spaceWidth = label.scrollWidth - 2 * singleWidth;
+                    var shift = singleWidth + spaceWidth;
+                    nav.style.setProperty('--workspace-marquee-shift', shift.toFixed(1) + 'px');
+                    nav.style.setProperty('--workspace-marquee-duration', Math.max(3, shift / 40).toFixed(1) + 's');
+                }
+                nav.classList.toggle('is-overflow', overflow);
             });
         }
         if (publicBtn) publicBtn.classList.toggle('active', !activeWorkspace);
