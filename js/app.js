@@ -62,11 +62,29 @@
         if (publicCopy) return WS.putPublicCopy(publicCopy);
     }
     function getPlayerStats(data) {
-        if (data === DATA) return DATA.meta.playerStats || [];
-        var counts = {}, order = {};
-        (DATA.meta.playerStats || []).forEach(function (item, index) { counts[item.label] = 0; order[item.label] = index; });
-        (data.categories || []).forEach(function (cat) { (cat.subcategories || []).forEach(function (sub) { (sub.formulas || []).forEach(function (formula) { (formula.lines || []).forEach(function (line) { (line.marks || []).forEach(function (mark) { counts[mark] = (counts[mark] || 0) + 1; if (order[mark] === undefined) order[mark] = 1000 + Object.keys(order).length; }); }); }); }); });
-        return Object.keys(counts).map(function (label) { var base = (DATA.meta.playerStats || []).find(function (item) { return item.label === label; }) || {}; return { label: label, count: counts[label], wca: base.wca || '' }; }).filter(function (item) { return item.count > 0; }).sort(function (a, b) { return b.count - a.count || order[a.label] - order[b.label]; });
+        var counts = {}, order = {}, wcaMap = {};
+        (DATA.meta.playerStats || []).forEach(function (item, index) {
+            counts[item.label] = 0;
+            order[item.label] = index;
+            wcaMap[item.label] = item.wca || '';
+        });
+        (data.categories || []).forEach(function (cat) {
+            (cat.subcategories || []).forEach(function (sub) {
+                (sub.formulas || []).forEach(function (formula) {
+                    var caseMarks = {};
+                    (formula.lines || []).forEach(function (line) {
+                        (line.marks || []).forEach(function (mark) {
+                            caseMarks[mark] = true;
+                            if (order[mark] === undefined) order[mark] = 1000 + Object.keys(order).length;
+                        });
+                    });
+                    Object.keys(caseMarks).forEach(function (mark) {
+                        counts[mark] = (counts[mark] || 0) + 1;
+                    });
+                });
+            });
+        });
+        return Object.keys(counts).map(function (label) { return { label: label, count: counts[label], wca: wcaMap[label] || '' }; }).filter(function (item) { return item.count > 0; }).sort(function (a, b) { return b.count - a.count || order[a.label] - order[b.label]; });
     }
     function systemTheme() {
         return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -102,9 +120,10 @@
     }
     function applyZbllFilter(filter) {
         filter = filter === 'learned' || filter === 'unlearned' ? filter : 'all';
-        document.documentElement.setAttribute('data-zbll-filter', filter);
+        var actualFilter = usesLearnedStats() ? filter : 'all';
+        document.documentElement.setAttribute('data-zbll-filter', actualFilter);
         document.querySelectorAll('.zbll-filter-btn').forEach(function (btn) {
-            btn.classList.toggle('active', btn.getAttribute('data-filter') === filter);
+            btn.classList.toggle('active', btn.getAttribute('data-filter') === actualFilter);
         });
     }
     function setZbllFilter(filter) {
@@ -236,7 +255,7 @@
                 sub.formulas.forEach(function (formula, index) { html += renderFormulaCard(cat.id, sub.id, formula, index); });
                 html += '</div>';
             } else if (!isEditableView()) html += '<div class="empty-state"><p class="mb-0">该子分类下暂无公式</p></div>';
-            if (isEditableView()) html += '<button type="button" class="workspace-add" data-action="add-formula" data-category="' + escapeHtml(cat.id) + '" data-subcategory="' + escapeHtml(sub.id) + '">＋</button>';
+            if (isEditableView() && getZbllFilter() === 'all') html += '<button type="button" class="workspace-add" data-action="add-formula" data-category="' + escapeHtml(cat.id) + '" data-subcategory="' + escapeHtml(sub.id) + '">＋</button>';
             html += '</div></div>';
         });
         html += '</div>';
