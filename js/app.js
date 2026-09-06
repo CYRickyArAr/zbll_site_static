@@ -223,7 +223,6 @@
             });
             html += '</div>';
         } else html += '<div class="workspace-mode-hint">当前工作区：' + escapeHtml(activeWorkspace.name) + '</div>';
-        if (isPublicCopy()) html += '<div class="workspace-mode-hint">当前为大神版（已编辑），修改只保存在本浏览器</div>';
         html += '<div class="row row-cols-1 row-cols-md-3 g-4">';
         (data.categories || []).forEach(function (cat) {
             var total = 0;
@@ -450,7 +449,7 @@
         if (exportButton) exportButton.disabled = !(activeWorkspace || publicCopy);
         ['workspace-rename', 'workspace-delete'].forEach(function (id) { var button = document.getElementById(id); if (button) button.disabled = !activeWorkspace; });
         var publicStatus = document.getElementById('workspace-public-status');
-        if (publicStatus) publicStatus.textContent = publicCopy ? '已编辑' : '未编辑：当前使用最新大神版公式库';
+        if (publicStatus) publicStatus.textContent = publicCopy ? '已编辑，修改只保存在本浏览器' : '未编辑：当前使用最新大神版公式库';
         var resetButton = document.getElementById('workspace-public-reset');
         if (resetButton) resetButton.disabled = !publicCopy;
         updateWorkspaceNav();
