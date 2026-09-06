@@ -261,7 +261,7 @@
     function edgeScrollWhileDragging() {
         if (!isDraggingFormula) return;
         var threshold = 60, speed = 15, step = 0;
-        if (dragMouseY >= 0) {
+        if (dragMouseY !== -1) {
             if (dragMouseY < threshold) step = -speed;
             else if (dragMouseY > window.innerHeight - threshold) step = speed;
         }
@@ -270,7 +270,7 @@
             document.body.style.scrollBehavior = 'auto';
             window.scrollBy(0, step);
         }
-        scrollRafId = window.requestAnimationFrame(edgeScrollWhileDragging);
+        scrollRafId = window.setTimeout(edgeScrollWhileDragging, 16);
     }
 
     function bindSorting() {
@@ -279,21 +279,28 @@
         if (!sortingScrollBound) {
             function trackDragPointer(e) {
                 if (!isDraggingFormula) return;
+                if (typeof e.clientY !== 'number') return;
                 if (e.clientY <= 4) dragMouseY = -10;
                 else if (e.clientY >= window.innerHeight - 4) dragMouseY = window.innerHeight + 10;
                 else dragMouseY = e.clientY;
             }
-            document.addEventListener('mousemove', trackDragPointer);
-            document.addEventListener('pointermove', trackDragPointer);
-            document.addEventListener('mouseleave', function (e) {
-                if (!isDraggingFormula) return;
-                dragMouseY = e.clientY <= 0 ? -10 : (e.clientY >= window.innerHeight ? window.innerHeight + 10 : e.clientY);
-            });
-            window.addEventListener('mouseout', function (e) {
-                if (!isDraggingFormula || e.relatedTarget) return;
+            function trackDragLeave(e) {
+                if (!isDraggingFormula || typeof e.clientY !== 'number') return;
                 if (e.clientY <= 0) dragMouseY = -10;
                 else if (e.clientY >= window.innerHeight) dragMouseY = window.innerHeight + 10;
-            });
+            }
+            document.addEventListener('mousemove', trackDragPointer, true);
+            document.addEventListener('pointermove', trackDragPointer, true);
+            document.addEventListener('dragover', trackDragPointer, true);
+            window.addEventListener('mousemove', trackDragPointer, true);
+            window.addEventListener('pointermove', trackDragPointer, true);
+            document.addEventListener('mouseleave', function (e) {
+                trackDragLeave(e);
+            }, true);
+            window.addEventListener('mouseout', function (e) {
+                if (!isDraggingFormula || e.relatedTarget) return;
+                trackDragLeave(e);
+            }, true);
             sortingScrollBound = true;
         }
         document.querySelectorAll('.sortable-container').forEach(function (container) {
@@ -306,17 +313,27 @@
                 scroll: false,
                 invertSwap: false,
                 swapThreshold: 6,
-                onStart: function () {
+                onStart: function (evt) {
                     isDraggingFormula = true;
                     dragMouseY = -1;
+                    if (evt && evt.originalEvent && typeof evt.originalEvent.clientY === 'number') {
+                        dragMouseY = evt.originalEvent.clientY;
+                    }
                     document.documentElement.style.scrollBehavior = 'auto';
-                    if (scrollRafId) window.cancelAnimationFrame(scrollRafId);
+                    if (scrollRafId) window.clearTimeout(scrollRafId);
                     edgeScrollWhileDragging();
                     if (!activeWorkspace && !publicCopy) ensureEditableData();
                 },
+                onMove: function (evt, originalEvent) {
+                    if (originalEvent && typeof originalEvent.clientY === 'number') {
+                        if (originalEvent.clientY <= 4) dragMouseY = -10;
+                        else if (originalEvent.clientY >= window.innerHeight - 4) dragMouseY = window.innerHeight + 10;
+                        else dragMouseY = originalEvent.clientY;
+                    }
+                },
                 onEnd: async function (evt) {
                     isDraggingFormula = false;
-                    if (scrollRafId) window.cancelAnimationFrame(scrollRafId);
+                    if (scrollRafId) window.clearTimeout(scrollRafId);
                     scrollRafId = null;
                     document.documentElement.style.scrollBehavior = '';
                     var order = Array.prototype.map.call(evt.to.children, function (item) { return item.dataset.uid; });
