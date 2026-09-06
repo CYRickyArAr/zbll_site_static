@@ -37,7 +37,7 @@
         </div>
         <div class="navbar-center">
             <div class="view-mode-switch" role="group" aria-label="数据模式">
-                <button type="button" class="view-mode-btn active" id="nav-public-mode">公开数据</button>
+                <button type="button" class="view-mode-btn active" id="nav-public-mode">大神版</button>
                 <button type="button" class="view-mode-btn" id="nav-workspace-mode">自定义</button>
             </div>
             <div class="zbll-filter" role="group" aria-label="公式筛选">
@@ -82,14 +82,14 @@
             <p class="workspace-help">数据只保存在当前浏览器；导出 <code>.zbll</code> 文件即可跨设备继续编辑。</p>
             <div id="workspace-current" class="workspace-current"></div>
             <section class="workspace-public-section" aria-labelledby="workspace-public-title">
-                <h3 id="workspace-public-title" class="workspace-public-title">公开数据编辑</h3>
+                <h3 id="workspace-public-title" class="workspace-public-title">大神版公式库</h3>
                 <div id="workspace-public-status" class="workspace-public-status"></div>
                 <div class="workspace-public-actions">
                     <button type="button" class="btn btn-outline-primary" id="workspace-public-export" disabled>导出公开副本</button>
                     <button type="button" class="btn btn-outline-danger" id="workspace-public-reset" disabled>重置公开副本</button>
                 </div>
             </section>
-            <h3 class="workspace-list-title">命名工作区</h3>
+            <h3 class="workspace-list-title">自定义公式库</h3>
             <div id="workspace-list" class="workspace-list"></div>
             <div class="workspace-actions">
                 <button type="button" class="btn btn-primary" id="workspace-new">新建空工作区</button>
@@ -98,7 +98,7 @@
                 <button type="button" class="btn btn-outline-secondary" id="workspace-export" disabled>导出当前</button>
                 <button type="button" class="btn btn-outline-secondary" id="workspace-rename" disabled>重命名</button>
                 <button type="button" class="btn btn-outline-danger" id="workspace-delete" disabled>删除</button>
-                <button type="button" class="btn btn-secondary" id="workspace-exit">返回公开数据</button>
+                <button type="button" class="btn btn-secondary" id="workspace-exit">返回大神版</button>
             </div>
             <div id="workspace-message" class="workspace-message" role="status"></div>
         </div>
@@ -151,6 +151,6 @@
     <script src="data.js?v=62"></script>
     <script src="js/workspace.js?v=4"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-    <script src="js/app.js?v=53"></script>
+    <script src="js/app.js?v=54"></script>
 </body>
 </html>
