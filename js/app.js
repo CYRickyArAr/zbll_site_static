@@ -743,7 +743,7 @@
         if (e.target.closest('#nav-workspace-mode')) { activateSelectedWorkspace(); return; }
         var action = e.target.closest('.workspace-action'); if (action) { handleWorkspaceAction(action); return; }
         var add = e.target.closest('.workspace-add'); if (add) { handleWorkspaceAction(add); return; }
-        if (e.target.id === 'workspace-open') openWorkspaceManager();
+        if (e.target.closest('#workspace-open')) { openWorkspaceManager(); return; }
         if (e.target.id === 'editor-close' || e.target.id === 'editor-cancel') showOverlay('editor-overlay', false);
     });
     document.getElementById('workspace-overlay').addEventListener('click', function (e) { if (e.target === this) showOverlay('workspace-overlay', false); });
