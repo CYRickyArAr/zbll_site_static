@@ -25,6 +25,8 @@
     var activeWorkspace = null;
     var publicCopy = null;
     var themeKey = 'zbll_theme';
+    var filterKey = 'zbll_filter';
+    var editorSelectedImage = null;
 
     function escapeHtml(value) {
         if (value === null || value === undefined) return '';
@@ -38,7 +40,16 @@
     function usesLearnedStats() { return isWorkspace() || isPublicCopy(); }
     function updateWorkspaceNav() {
         var nav = document.getElementById('workspace-open');
-        if (nav) nav.textContent = activeWorkspace ? '工作区：' + activeWorkspace.name : (publicCopy ? '公开数据（本地副本）' : '公开数据');
+        var publicBtn = document.getElementById('nav-public-mode');
+        var workspaceBtn = document.getElementById('nav-workspace-mode');
+        var publicLabel = publicCopy ? '公开数据（本地副本）' : '公开数据';
+        if (nav) nav.textContent = activeWorkspace ? '工作区：' + activeWorkspace.name : publicLabel;
+        if (publicBtn) publicBtn.classList.toggle('active', !activeWorkspace);
+        if (workspaceBtn) {
+            workspaceBtn.classList.toggle('active', !!activeWorkspace);
+            workspaceBtn.textContent = activeWorkspace ? '本地工作区' : '本地工作区';
+            workspaceBtn.title = activeWorkspace ? activeWorkspace.name : '打开本地工作区';
+        }
     }
     async function ensureEditableData() {
         if (activeWorkspace) return activeWorkspace;
@@ -66,8 +77,6 @@
         var button = document.getElementById('theme-toggle');
         if (!button) return;
         var dark = theme === 'dark';
-        var icon = button.querySelector('.theme-toggle-icon');
-        if (icon) icon.textContent = dark ? '☀' : '☾';
         var label = dark ? '切换到浅色模式' : '切换到深色模式';
         button.setAttribute('aria-label', label);
         button.setAttribute('title', label);
@@ -85,16 +94,61 @@
     }
     initTheme();
 
+    function getZbllFilter() {
+        var filter = 'all';
+        try { filter = localStorage.getItem(filterKey) || 'all'; } catch (e) {}
+        return filter === 'learned' || filter === 'unlearned' ? filter : 'all';
+    }
+    function applyZbllFilter(filter) {
+        filter = filter === 'learned' || filter === 'unlearned' ? filter : 'all';
+        document.documentElement.setAttribute('data-zbll-filter', filter);
+        document.querySelectorAll('.zbll-filter-btn').forEach(function (btn) {
+            btn.classList.toggle('active', btn.getAttribute('data-filter') === filter);
+        });
+    }
+    function setZbllFilter(filter) {
+        filter = filter === 'learned' || filter === 'unlearned' ? filter : 'all';
+        try { localStorage.setItem(filterKey, filter); } catch (e) {}
+        applyZbllFilter(filter);
+        saveScroll();
+    }
+    applyZbllFilter(getZbllFilter());
+
     function getScrollKey(view) { return 'zbll_scroll_' + view; }
+    function navOffset() {
+        var nav = document.querySelector('.navbar');
+        return (nav ? nav.offsetHeight : 60) + 8;
+    }
+    function firstVisibleAnchor() {
+        var candidates = document.querySelectorAll('.sortable-item[id], .sticky-header[id]');
+        var offset = navOffset();
+        for (var i = 0; i < candidates.length; i++) {
+            var rect = candidates[i].getBoundingClientRect();
+            if (rect.bottom > offset && rect.top < window.innerHeight) return candidates[i].id;
+        }
+        return '';
+    }
     function saveScroll() {
-        try { localStorage.setItem(getScrollKey(currentView), String(window.pageYOffset || window.scrollY || 0)); } catch (e) {}
+        try {
+            var key = getScrollKey(currentView);
+            localStorage.setItem(key, String(window.pageYOffset || window.scrollY || 0));
+            var anchor = firstVisibleAnchor();
+            if (anchor) localStorage.setItem(key + '_anchor', anchor);
+        } catch (e) {}
     }
     function restoreScroll(view) {
-        var y = 0;
-        try { y = parseInt(localStorage.getItem(getScrollKey(view)), 10) || 0; } catch (e) {}
+        var y = 0, anchor = '';
+        try {
+            var key = getScrollKey(view);
+            y = parseInt(localStorage.getItem(key), 10) || 0;
+            anchor = localStorage.getItem(key + '_anchor') || '';
+        } catch (e) {}
         document.documentElement.style.scrollBehavior = 'auto';
         document.body.style.scrollBehavior = 'auto';
-        window.scrollTo(0, y);
+        var anchorEl = anchor ? document.getElementById(anchor) : null;
+        if (anchorEl) window.scrollTo(0, Math.max(0, window.pageYOffset + anchorEl.getBoundingClientRect().top - navOffset()));
+        else window.scrollTo(0, y);
+        document.documentElement.removeAttribute('data-scroll-restore');
     }
     function findCategory(catId) {
         var cats = viewData().categories || [];
@@ -129,7 +183,16 @@
 
     function renderHome() {
         var data = viewData();
-        var html = '<div class="container mt-5"><h1 class="text-center mb-5">ZBLL 公式数据库</h1>';
+        var totalCases = 0, learnedCases = 0;
+        (data.categories || []).forEach(function (cat) {
+            (cat.subcategories || []).forEach(function (sub) {
+                totalCases += sub.formulas.length;
+                learnedCases += sub.formulas.filter(function (formula) { return formula.learned; }).length;
+            });
+        });
+        var html = '<div class="container mt-5">';
+        if (usesLearnedStats()) html += '<div class="index-title-wrap"><h1 class="text-center mb-5">ZBLL 公式数据库</h1><span class="index-learned-badge">已学习 ' + learnedCases + '/' + totalCases + '个情况</span></div>';
+        else html += '<h1 class="text-center mb-5">ZBLL 公式数据库</h1>';
         if (!isWorkspace()) {
             html += '<div class="player-stats">';
             getPlayerStats(data).forEach(function (p) {
@@ -163,8 +226,10 @@
         html += '<div class="category-title-row"><h1 class="category-title">' + escapeHtml(cat.id) + ' Case</h1><button type="button" class="btn btn-outline-secondary collapse-all-btn" id="toggle-all-subcategories">全部展开</button></div>';
         (cat.subcategories || []).forEach(function (sub) {
             var total = sub.formulas.length, learned = sub.formulas.filter(function (formula) { return formula.learned; }).length;
-            html += '<div class="subcategory-card" id="card-' + escapeHtml(sub.id) + '"><div class="sticky-header" id="header-' + escapeHtml(sub.id) + '" data-subcat="' + escapeHtml(sub.id) + '"><div class="d-flex justify-content-between align-items-center"><div class="d-flex align-items-center"><h3>' + escapeHtml(sub.id) + '</h3><img src="images/' + encodeURIComponent(sub.id) + '.svg" class="subcat-thumb" alt="' + escapeHtml(sub.id) + '"><span class="badge bg-secondary">' + (usesLearnedStats() ? '已学 ' + learned + '/' + total + '个情况' : total + '个情况') + '</span></div><div class="d-flex align-items-center"><span class="toggle-icon" id="icon-' + escapeHtml(sub.id) + '">▼</span></div></div></div>';
-            html += '<div class="formula-grid" id="subcat-' + escapeHtml(sub.id) + '">';
+            var saved = null; try { saved = localStorage.getItem('subcat_' + sub.id); } catch (e) {}
+            var open = saved === 'open';
+            html += '<div class="subcategory-card" id="card-' + escapeHtml(sub.id) + '"><div class="sticky-header' + (open ? '' : ' sticky-header-collapsed') + '" id="header-' + escapeHtml(sub.id) + '" data-subcat="' + escapeHtml(sub.id) + '"><div class="d-flex justify-content-between align-items-center"><div class="d-flex align-items-center"><h3>' + escapeHtml(sub.id) + '</h3><img src="images/' + encodeURIComponent(sub.id) + '.svg" class="subcat-thumb" alt="' + escapeHtml(sub.id) + '"><span class="badge bg-secondary">' + (usesLearnedStats() ? '已学 ' + learned + '/' + total + '个情况' : total + '个情况') + '</span></div><div class="d-flex align-items-center"><span class="toggle-icon" id="icon-' + escapeHtml(sub.id) + '">' + (open ? '▼' : '▶') + '</span></div></div></div>';
+            html += '<div class="formula-grid" id="subcat-' + escapeHtml(sub.id) + '" style="display:' + (open ? 'block' : 'none') + '">';
             if (sub.formulas.length) {
                 html += '<div class="sortable-container" data-category="' + escapeHtml(cat.id) + '" data-subcategory="' + escapeHtml(sub.id) + '">';
                 sub.formulas.forEach(function (formula, index) { html += renderFormulaCard(cat.id, sub.id, formula, index); });
@@ -175,7 +240,8 @@
         });
         html += '</div>';
         appEl.innerHTML = html;
-        restoreSubcategoryState(cat);
+        updateToggleAllButton();
+        applyZbllFilter(getZbllFilter());
         if (isEditableView()) bindSorting();
     }
 
@@ -204,7 +270,7 @@
                 html += '</div>';
             });
             html += '</div>';
-        } else if (isEditableView()) html += '<div class="workspace-empty">暂无公式</div>';
+        }
         if (isEditableView()) {
             html += '<div class="action-buttons">';
             html += '<button type="button" class="add-variant-btn workspace-action" title="添加一行变体" aria-label="添加一行变体" data-action="add-variant" data-category="' + escapeHtml(catId) + '" data-subcategory="' + escapeHtml(subId) + '" data-uid="' + escapeHtml(uid) + '">＋</button>';
@@ -242,16 +308,6 @@
         });
         updateToggleAllButton();
     }
-    function restoreSubcategoryState(cat) {
-        (cat.subcategories || []).forEach(function (sub) {
-            var content = document.getElementById('subcat-' + sub.id), icon = document.getElementById('icon-' + sub.id), header = document.getElementById('header-' + sub.id);
-            var saved = null; try { saved = localStorage.getItem('subcat_' + sub.id); } catch (e) {}
-            var open = saved === 'open';
-            content.style.display = open ? 'block' : 'none'; icon.textContent = open ? '▼' : '▶'; header.classList.toggle('sticky-header-collapsed', !open);
-        });
-        updateToggleAllButton();
-    }
-
     var sortableInstances = [];
     var isDraggingFormula = false;
     var dragMouseY = -1;
@@ -397,6 +453,33 @@
             return line ? { alg: line, marks: marks } : null;
         }).filter(Boolean);
     }
+    function resetEditorImageUI(currentImage) {
+        editorSelectedImage = null;
+        var input = document.getElementById('editor-image');
+        var currentContainer = document.getElementById('editor-current-image-container');
+        var current = document.getElementById('editor-current-image');
+        var previewContainer = document.getElementById('editor-preview-container');
+        var preview = document.getElementById('editor-preview');
+        var fileInfo = document.getElementById('editor-file-info');
+        var prompt = document.getElementById('editor-upload-prompt');
+        var clearButton = document.getElementById('editor-clear-image');
+        if (input) input.value = '';
+        if (preview) preview.removeAttribute('src');
+        if (fileInfo) fileInfo.textContent = '';
+        if (previewContainer) previewContainer.hidden = true;
+        if (currentImage) {
+            current.src = currentImage;
+            currentContainer.hidden = false;
+            if (prompt) prompt.style.display = 'none';
+            if (clearButton) clearButton.textContent = '清除图片';
+        } else {
+            if (current) current.removeAttribute('src');
+            if (currentContainer) currentContainer.hidden = true;
+            if (prompt) prompt.style.display = 'block';
+            if (clearButton) clearButton.textContent = '清除图片';
+        }
+        if (clearButton) clearButton.dataset.cleared = 'false';
+    }
     function openFormulaEditor(catId, subId, formula) {
         var cat = findCategory(catId), sub = cat && cat.subcategories.filter(function (s) { return s.id === subId; })[0];
         if (!sub) return;
@@ -407,8 +490,7 @@
         var note = splitNotes(formula && formula.notes, formula, subId);
         document.getElementById('editor-note-header').textContent = note.header;
         document.getElementById('editor-note-body').value = note.body;
-        document.getElementById('editor-image').value = '';
-        document.getElementById('editor-clear-image').checked = false;
+        resetEditorImageUI(formula && formula.image ? formula.image : '');
         document.getElementById('editor-overlay').dataset.category = catId;
         document.getElementById('editor-overlay').dataset.isNew = isNew ? '1' : '0';
         document.getElementById('editor-title').textContent = isNew ? '添加公式' : '编辑公式';
@@ -425,19 +507,97 @@
         var formula = uid ? sub.formulas.find(function (f) { return f.uid === uid; }) : null;
         var notes = document.getElementById('editor-note-header').textContent, body = document.getElementById('editor-note-body').value.replace(/^\s+|\s+$/g, '');
         if (body) notes += '\n' + body;
-        var input = document.getElementById('editor-image'), image = document.getElementById('editor-clear-image').checked ? '' : (formula ? formula.image : '');
-        if (input.files && input.files[0]) image = await readFileData(input.files[0]);
+        var input = document.getElementById('editor-image'), clearButton = document.getElementById('editor-clear-image');
+        var image = clearButton && clearButton.dataset.cleared === 'true' ? '' : (formula ? formula.image : '');
+        if (editorSelectedImage) image = editorSelectedImage;
+        else if (input.files && input.files[0]) image = await readFileData(input.files[0]);
         if (!formula) { formula = { uid: 'f-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2), id: 'new-' + Date.now(), image: image || '', notes: notes, lines: [], learned: false }; sub.formulas.push(formula); }
         formula.lines = parseFormulaLines(document.getElementById('editor-formula').value); formula.notes = notes; formula.image = image || ''; formula.learned = !!formula.learned;
         await persistCurrentData(); showOverlay('editor-overlay', false); renderCategory(catId);
     }
-    async function addVariant(catId, subId, uid) {
+    function updateEditorImagePreview(file) {
+        if (!file) return;
+        readFileData(file).then(function (dataUrl) {
+            editorSelectedImage = dataUrl;
+            var currentContainer = document.getElementById('editor-current-image-container');
+            var previewContainer = document.getElementById('editor-preview-container');
+            var preview = document.getElementById('editor-preview');
+            var fileInfo = document.getElementById('editor-file-info');
+            var prompt = document.getElementById('editor-upload-prompt');
+            var clearButton = document.getElementById('editor-clear-image');
+            if (preview) preview.src = dataUrl;
+            if (fileInfo) fileInfo.textContent = file.name + ' · ' + Math.ceil(file.size / 1024) + ' KB';
+            if (previewContainer) previewContainer.hidden = false;
+            if (currentContainer) currentContainer.hidden = true;
+            if (prompt) prompt.style.display = 'none';
+            if (clearButton) clearButton.dataset.cleared = 'false';
+        }).catch(function () { window.alert('图片读取失败'); });
+    }
+    function clearEditorImage() {
+        editorSelectedImage = null;
+        var input = document.getElementById('editor-image');
+        var currentContainer = document.getElementById('editor-current-image-container');
+        var previewContainer = document.getElementById('editor-preview-container');
+        var prompt = document.getElementById('editor-upload-prompt');
+        var clearButton = document.getElementById('editor-clear-image');
+        if (input) input.value = '';
+        if (currentContainer) currentContainer.hidden = true;
+        if (previewContainer) previewContainer.hidden = true;
+        if (prompt) prompt.style.display = 'block';
+        if (clearButton) clearButton.dataset.cleared = 'true';
+    }
+    function bindEditorImageDrop() {
+        var dragArea = document.getElementById('editor-drag-area');
+        var input = document.getElementById('editor-image');
+        if (!dragArea || !input) return;
+        dragArea.addEventListener('click', function () { input.click(); });
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(function (name) {
+            dragArea.addEventListener(name, function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            });
+        });
+        ['dragenter', 'dragover'].forEach(function (name) {
+            dragArea.addEventListener(name, function () { dragArea.classList.add('highlight'); });
+        });
+        ['dragleave', 'drop'].forEach(function (name) {
+            dragArea.addEventListener(name, function () { dragArea.classList.remove('highlight'); });
+        });
+        dragArea.addEventListener('drop', function (e) {
+            var files = e.dataTransfer && e.dataTransfer.files;
+            if (files && files[0]) updateEditorImagePreview(files[0]);
+        });
+        input.addEventListener('change', function () {
+            if (input.files && input.files[0]) updateEditorImagePreview(input.files[0]);
+        });
+    }
+    async function addVariant(catId, subId, uid, card) {
         await ensureEditableData();
         var ref = findFormula(catId, subId, uid); if (!ref) return;
-        var alg = window.prompt('输入新公式（只输入一行）'); if (alg === null || !alg.trim()) return;
-        var markText = window.prompt('标注（可选，多个用空格分隔），如：耿 Tymon', ''); if (markText === null) return;
-        ref.formula.lines = ref.formula.lines || []; ref.formula.lines.push({ alg: alg.trim(), marks: markText.trim().split(/[\s,，]+/).filter(Boolean) });
-        await persistCurrentData(); renderCategory(catId);
+        card = card || document.querySelector('.sortable-item[data-uid="' + CSS.escape(uid) + '"] .formula-card');
+        if (!card) return;
+        var old = card.querySelector('.variant-add-form');
+        if (old) { old.remove(); return; }
+        var form = document.createElement('div');
+        form.className = 'variant-add-form';
+        form.innerHTML = '<input type="text" class="form-control form-control-sm mb-2 variant-alg-input" placeholder="输入公式">' +
+            '<input type="text" class="form-control form-control-sm mb-2 variant-note-input" placeholder="输入公式备注">' +
+            '<div class="d-flex gap-2"><button type="button" class="btn btn-primary btn-sm variant-submit">添加</button>' +
+            '<button type="button" class="btn btn-outline-secondary btn-sm variant-cancel">取消</button></div>';
+        var actions = card.querySelector('.action-buttons');
+        if (actions) card.insertBefore(form, actions);
+        else card.appendChild(form);
+        form.querySelector('.variant-alg-input').focus();
+        form.querySelector('.variant-cancel').addEventListener('click', function () { form.remove(); });
+        form.querySelector('.variant-submit').addEventListener('click', async function () {
+            var alg = form.querySelector('.variant-alg-input').value.trim();
+            var note = form.querySelector('.variant-note-input').value.trim();
+            if (!alg) { form.querySelector('.variant-alg-input').focus(); return; }
+            ref.formula.lines = ref.formula.lines || [];
+            ref.formula.lines.push({ alg: alg, marks: note.split(/[\s,，]+/).filter(Boolean) });
+            await persistCurrentData();
+            renderCategory(catId);
+        });
     }
     async function deleteFromEditor() {
         await ensureEditableData();
@@ -452,7 +612,7 @@
         if (action === 'add-formula') return openFormulaEditor(catId, subId, null);
         var ref = uid ? findFormula(catId, subId, uid) : null;
         if (action === 'edit-formula' && ref) return openFormulaEditor(catId, subId, ref.formula);
-        if (action === 'add-variant') return addVariant(catId, subId, uid);
+        if (action === 'add-variant') return addVariant(catId, subId, uid, button.closest('.formula-card'));
         if (!ref) return;
         if (action === 'delete-formula') { if (!window.confirm('确定删除这条公式卡吗？')) return; ref.subcat.formulas.splice(ref.index, 1); }
         if (action === 'toggle-learned') ref.formula.learned = !ref.formula.learned;
@@ -501,6 +661,10 @@
         var header = e.target.closest('.sticky-header');
         if (header && header.dataset.subcat) { toggleSubcategory(header.dataset.subcat); return; }
         if (e.target.closest('#toggle-all-subcategories')) { toggleAllSubcategories(); return; }
+        var filterButton = e.target.closest('.zbll-filter-btn');
+        if (filterButton) { setZbllFilter(filterButton.getAttribute('data-filter')); return; }
+        if (e.target.closest('#nav-public-mode')) { activateWorkspace(null); return; }
+        if (e.target.closest('#nav-workspace-mode')) { openWorkspaceManager(); return; }
         var action = e.target.closest('.workspace-action'); if (action) { handleWorkspaceAction(action); return; }
         var add = e.target.closest('.workspace-add'); if (add) { handleWorkspaceAction(add); return; }
         if (e.target.id === 'workspace-open') openWorkspaceManager();
@@ -510,8 +674,10 @@
     document.getElementById('editor-overlay').addEventListener('click', function (e) { if (e.target === this) showOverlay('editor-overlay', false); });
     document.getElementById('formula-editor-form').addEventListener('submit', saveFormulaEditor);
     document.getElementById('editor-delete').addEventListener('click', deleteFromEditor);
+    document.getElementById('editor-clear-image').addEventListener('click', clearEditorImage);
     document.getElementById('workspace-file').addEventListener('change', importWorkspaceFile);
     document.getElementById('workspace-overlay').addEventListener('click', handleWorkspaceManagerClick);
+    bindEditorImageDrop();
     window.addEventListener('hashchange', router);
     var scrollTimer = null;
     window.addEventListener('scroll', function () { if (scrollTimer) clearTimeout(scrollTimer); scrollTimer = setTimeout(saveScroll, 150); });
