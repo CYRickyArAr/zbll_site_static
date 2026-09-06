@@ -157,7 +157,7 @@ body {
     justify-content: center;
     border: 1px solid rgba(255, 255, 255, 0.35);
     border-radius: 6px;
-    background: rgba(255, 255, 255, 0.1);
+    background: transparent;
     color: #fff;
     font-size: 1rem;
     line-height: 1;
@@ -819,7 +819,7 @@ html[data-theme="dark"] .form-check-label {
     cursor: pointer;
 }
 .workspace-nav-btn:hover,
-.workspace-nav-btn:focus-visible { background: rgba(255, 255, 255, .25); color: #fff; }
+.workspace-nav-btn:focus-visible { background: transparent; color: #fff; }
 .workspace-nav-label {
     display: block;
     width: max-content;
