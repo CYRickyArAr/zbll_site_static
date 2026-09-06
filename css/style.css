@@ -346,7 +346,19 @@ body {
     width: calc((100% - 20px) / 2);
     box-sizing: border-box;
     position: relative;
-    transition: opacity 0.2s;
+    transition: opacity 0.2s, transform 0.05s ease;
+}
+
+/* 与 6.0 的 SortableJS 拖动反馈一致：占位虚线、拖动卡片阴影和半透明效果。 */
+.sortable-ghost {
+    opacity: .3;
+    background: #e9ecef;
+    border: 2px dashed #007bff;
+    border-radius: 8px;
+}
+.sortable-drag {
+    opacity: .8;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, .2);
 }
 
 .formula-card {
@@ -784,6 +796,7 @@ html[data-theme="dark"] .formula-card.learned { background: #173b27; }
 html[data-theme="dark"] .learn-btn { background: var(--surface-muted); }
 html[data-theme="dark"] .learn-btn.learned { background: #198754; }
 html[data-theme="dark"] .drag-handle { color: #9ca6b0; }
+html[data-theme="dark"] .sortable-ghost { background: #303840; border-color: #4e9cff; }
 
 @media (max-width: 768px) {
     .formula-card > .row { gap: 12px; }

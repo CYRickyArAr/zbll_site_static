@@ -251,26 +251,76 @@
         updateToggleAllButton();
     }
 
+    var sortableInstances = [];
+    var isDraggingFormula = false;
+    var dragMouseY = -1;
+    var scrollRafId = null;
+    var sortingScrollBound = false;
+
+    function edgeScrollWhileDragging() {
+        if (!isDraggingFormula) return;
+        var threshold = 60, speed = 15, step = 0;
+        if (dragMouseY >= 0) {
+            if (dragMouseY < threshold) step = -speed;
+            else if (dragMouseY > window.innerHeight - threshold) step = speed;
+        }
+        if (step) {
+            document.documentElement.style.scrollBehavior = 'auto';
+            document.body.style.scrollBehavior = 'auto';
+            window.scrollBy(0, step);
+        }
+        scrollRafId = window.requestAnimationFrame(edgeScrollWhileDragging);
+    }
+
     function bindSorting() {
-        document.querySelectorAll('.sortable-container').forEach(function (container) {
-            var dragged = null;
-            container.querySelectorAll('.sortable-item').forEach(function (item) {
-                item.addEventListener('dragstart', function (e) { dragged = item; item.classList.add('workspace-dragging'); e.dataTransfer.effectAllowed = 'move'; });
-                item.addEventListener('dragend', function () { item.classList.remove('workspace-dragging'); dragged = null; });
-                item.addEventListener('dragover', function (e) { if (dragged && dragged !== item) { e.preventDefault(); item.classList.add('workspace-drag-over'); } });
-                item.addEventListener('dragleave', function () { item.classList.remove('workspace-drag-over'); });
-                item.addEventListener('drop', async function (e) {
-                    e.preventDefault(); item.classList.remove('workspace-drag-over');
-                    if (!dragged || dragged === item) return;
-                    await ensureEditableData();
-                    var cat = findCategory(container.dataset.category), sub = cat && cat.subcategories.filter(function (s) { return s.id === container.dataset.subcategory; })[0];
-                    if (!sub) return;
-                    var from = sub.formulas.findIndex(function (f) { return f.uid === dragged.dataset.uid; }), to = sub.formulas.findIndex(function (f) { return f.uid === item.dataset.uid; });
-                    if (from < 0 || to < 0) return;
-                    var moved = sub.formulas.splice(from, 1)[0]; sub.formulas.splice(to, 0, moved);
-                    await persistCurrentData(); renderCategory(container.dataset.category);
-                });
+        sortableInstances.forEach(function (instance) { instance.destroy(); });
+        sortableInstances = [];
+        if (!sortingScrollBound) {
+            document.addEventListener('mousemove', function (e) { if (isDraggingFormula) dragMouseY = e.clientY; });
+            document.addEventListener('mouseleave', function (e) {
+                if (!isDraggingFormula) return;
+                dragMouseY = e.clientY <= 0 ? -10 : (e.clientY >= window.innerHeight ? window.innerHeight + 10 : e.clientY);
             });
+            sortingScrollBound = true;
+        }
+        document.querySelectorAll('.sortable-container').forEach(function (container) {
+            if (!window.Sortable) return;
+            var sortable = new window.Sortable(container, {
+                animation: 50,
+                handle: '.drag-handle',
+                forceFallback: true,
+                fallbackOnBody: true,
+                scroll: false,
+                invertSwap: false,
+                swapThreshold: 0.65,
+                onStart: function () {
+                    isDraggingFormula = true;
+                    dragMouseY = -1;
+                    document.documentElement.style.scrollBehavior = 'auto';
+                    if (scrollRafId) window.cancelAnimationFrame(scrollRafId);
+                    edgeScrollWhileDragging();
+                    if (!activeWorkspace && !publicCopy) ensureEditableData();
+                },
+                onEnd: async function (evt) {
+                    isDraggingFormula = false;
+                    if (scrollRafId) window.cancelAnimationFrame(scrollRafId);
+                    scrollRafId = null;
+                    document.documentElement.style.scrollBehavior = '';
+                    document.body.style.scrollBehavior = '';
+                    var order = Array.prototype.map.call(evt.to.children, function (item) { return item.dataset.uid; });
+                    await ensureEditableData();
+                    var cat = findCategory(evt.to.dataset.category), sub = cat && cat.subcategories.filter(function (s) { return s.id === evt.to.dataset.subcategory; })[0];
+                    if (!sub) return;
+                    var byUid = {}; sub.formulas.forEach(function (formula) { byUid[formula.uid] = formula; });
+                    var reordered = order.map(function (uid) { return byUid[uid]; }).filter(Boolean);
+                    if (reordered.length === sub.formulas.length) {
+                        sub.formulas = reordered;
+                        await persistCurrentData();
+                        renderCategory(evt.to.dataset.category);
+                    }
+                }
+            });
+            sortableInstances.push(sortable);
         });
     }
 
