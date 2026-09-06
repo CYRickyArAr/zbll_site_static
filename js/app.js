@@ -38,7 +38,7 @@
     function usesLearnedStats() { return isWorkspace() || isPublicCopy(); }
     function updateWorkspaceNav() {
         var nav = document.getElementById('workspace-open');
-        if (nav) nav.textContent = activeWorkspace ? '工作区：' + activeWorkspace.name : (publicCopy ? '公开数据（本地副本）' : '本地工作区');
+        if (nav) nav.textContent = activeWorkspace ? '工作区：' + activeWorkspace.name : (publicCopy ? '公开数据（本地副本）' : '公开数据');
     }
     async function ensureEditableData() {
         if (activeWorkspace) return activeWorkspace;
