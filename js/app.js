@@ -26,6 +26,7 @@
     var publicCopy = null;
     var themeKey = 'zbll_theme';
     var filterKey = 'zbll_filter';
+    var selectedWorkspaceKey = 'zbll_selected_workspace';
     var editorSelectedImage = null;
 
     function escapeHtml(value) {
@@ -47,8 +48,8 @@
         if (publicBtn) publicBtn.classList.toggle('active', !activeWorkspace);
         if (workspaceBtn) {
             workspaceBtn.classList.toggle('active', !!activeWorkspace);
-            workspaceBtn.textContent = activeWorkspace ? '本地工作区' : '本地工作区';
-            workspaceBtn.title = activeWorkspace ? activeWorkspace.name : '打开本地工作区';
+            workspaceBtn.textContent = '自定义';
+            workspaceBtn.title = activeWorkspace ? activeWorkspace.name : '切换到选定的本地工作区';
         }
     }
     async function ensureEditableData() {
@@ -418,9 +419,13 @@
         var listEl = document.getElementById('workspace-list'), currentEl = document.getElementById('workspace-current');
         if (!listEl) return;
         var list = (await WS.list()).filter(function (item) { return item.id !== '__public_copy__'; });
-        currentEl.textContent = activeWorkspace ? '当前：' + activeWorkspace.name : (publicCopy ? '当前：公开数据副本' : '当前：公开数据');
+        var selectedId = '';
+        try { selectedId = localStorage.getItem(selectedWorkspaceKey) || ''; } catch (e) {}
+        var selected = list.find(function (item) { return item.id === selectedId; });
+        currentEl.textContent = activeWorkspace ? '当前：' + activeWorkspace.name :
+            (publicCopy ? '当前：公开数据副本' : '当前：公开数据') + (selected ? '；自定义：' + selected.name : '');
         listEl.innerHTML = list.length ? list.map(function (item) {
-            return '<button type="button" class="workspace-list-item' + (activeWorkspace && activeWorkspace.id === item.id ? ' active' : '') + '" data-workspace-id="' + escapeHtml(item.id) + '"><span>' + escapeHtml(item.name) + '</span><small>' + escapeHtml(new Date(item.updatedAt).toLocaleString()) + '</small></button>';
+            return '<button type="button" class="workspace-list-item' + ((activeWorkspace && activeWorkspace.id === item.id) || (!activeWorkspace && selectedId === item.id) ? ' active' : '') + '" data-workspace-id="' + escapeHtml(item.id) + '"><span>' + escapeHtml(item.name) + '</span><small>' + escapeHtml(new Date(item.updatedAt).toLocaleString()) + '</small></button>';
         }).join('') : '<div class="workspace-empty">还没有本地工作区</div>';
         ['workspace-export', 'workspace-rename', 'workspace-delete'].forEach(function (id) { var button = document.getElementById(id); if (button) button.disabled = !activeWorkspace; });
         var publicStatus = document.getElementById('workspace-public-status');
@@ -430,15 +435,37 @@
     }
     async function openWorkspaceManager() { setWorkspaceMessage(''); showOverlay('workspace-overlay', true); await refreshWorkspaceList(); }
     async function activateWorkspace(id) {
-        if (id) { publicCopy = null; activeWorkspace = await WS.activate(id); }
+        if (id) {
+            publicCopy = null;
+            activeWorkspace = await WS.activate(id);
+            try { if (activeWorkspace) localStorage.setItem(selectedWorkspaceKey, id); } catch (e) {}
+        }
         else { activeWorkspace = await WS.activate(null); publicCopy = await WS.getPublicCopy(); }
         router(); await refreshWorkspaceList();
+    }
+    async function activateSelectedWorkspace() {
+        if (activeWorkspace) return;
+        var id = '';
+        try { id = localStorage.getItem(selectedWorkspaceKey) || ''; } catch (e) {}
+        var workspace = id ? await WS.get(id) : null;
+        if (!workspace) {
+            var list = (await WS.list()).filter(function (item) { return item.id !== '__public_copy__'; });
+            if (list.length === 1) workspace = list[0];
+        }
+        if (workspace) {
+            await activateWorkspace(workspace.id);
+            return;
+        }
+        await openWorkspaceManager();
+        setWorkspaceMessage('请先在右上角选择或新建一个自定义工作区。', true);
     }
     async function createWorkspace() {
         var name = window.prompt('请输入工作区名称', '我的 ZBLL 工作区');
         if (name === null) return;
         name = name.trim() || '我的 ZBLL 工作区';
-        publicCopy = null; activeWorkspace = await WS.create(DATA, name); showOverlay('workspace-overlay', false); router();
+        publicCopy = null; activeWorkspace = await WS.create(DATA, name);
+        try { localStorage.setItem(selectedWorkspaceKey, activeWorkspace.id); } catch (e) {}
+        showOverlay('workspace-overlay', false); router();
     }
     function splitNotes(notes, formula, subId) {
         var text = String(notes || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n'), parts = text.split('\n');
@@ -636,14 +663,24 @@
                 return;
             }
             if (id === 'workspace-rename' && activeWorkspace) { var name = window.prompt('新的工作区名称', activeWorkspace.name); if (name && name.trim()) { activeWorkspace.name = name.trim(); await WS.put(activeWorkspace); await refreshWorkspaceList(); } return; }
-            if (id === 'workspace-delete' && activeWorkspace) { if (!window.confirm('删除当前工作区？导出的 .zbll 文件不受影响。')) return; await WS.remove(activeWorkspace.id); activeWorkspace = null; publicCopy = await WS.getPublicCopy(); await WS.activate(null); showOverlay('workspace-overlay', false); router(); return; }
+            if (id === 'workspace-delete' && activeWorkspace) {
+                if (!window.confirm('删除当前工作区？导出的 .zbll 文件不受影响。')) return;
+                var removedId = activeWorkspace.id;
+                await WS.remove(removedId);
+                try { if (localStorage.getItem(selectedWorkspaceKey) === removedId) localStorage.removeItem(selectedWorkspaceKey); } catch (e) {}
+                activeWorkspace = null; publicCopy = await WS.getPublicCopy(); await WS.activate(null); showOverlay('workspace-overlay', false); router(); return;
+            }
             if (id === 'workspace-exit') { await activateWorkspace(null); showOverlay('workspace-overlay', false); return; }
             if (id === 'workspace-close') return showOverlay('workspace-overlay', false);
         } catch (error) { setWorkspaceMessage(error.message || '工作区操作失败', true); }
     }
     async function importWorkspaceFile(e) {
         var file = e.target.files && e.target.files[0]; e.target.value = ''; if (!file) return;
-        try { publicCopy = null; activeWorkspace = await WS.importFile(file); showOverlay('workspace-overlay', false); router(); }
+        try {
+            publicCopy = null; activeWorkspace = await WS.importFile(file);
+            try { localStorage.setItem(selectedWorkspaceKey, activeWorkspace.id); } catch (ignore) {}
+            showOverlay('workspace-overlay', false); router();
+        }
         catch (error) { showOverlay('workspace-overlay', true); setWorkspaceMessage(error.message || '导入失败：文件格式无效', true); }
     }
 
@@ -664,7 +701,7 @@
         var filterButton = e.target.closest('.zbll-filter-btn');
         if (filterButton) { setZbllFilter(filterButton.getAttribute('data-filter')); return; }
         if (e.target.closest('#nav-public-mode')) { activateWorkspace(null); return; }
-        if (e.target.closest('#nav-workspace-mode')) { openWorkspaceManager(); return; }
+        if (e.target.closest('#nav-workspace-mode')) { activateSelectedWorkspace(); return; }
         var action = e.target.closest('.workspace-action'); if (action) { handleWorkspaceAction(action); return; }
         var add = e.target.closest('.workspace-add'); if (add) { handleWorkspaceAction(add); return; }
         if (e.target.id === 'workspace-open') openWorkspaceManager();
