@@ -751,3 +751,40 @@ html[data-theme="dark"] .workspace-textarea { background: var(--surface-muted); 
     .workspace-list-item { align-items: flex-start; flex-direction: column; gap: 3px; }
     .workspace-learn-btn { margin-left: 0; }
 }
+
+/* PythonAnywhere category.html 卡片结构的同款规则。工作区和公开卡片共用这套尺寸。 */
+.category-title-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 25px; }
+.category-title-row .category-title { margin-bottom: 0; }
+.collapse-all-btn { position: fixed; top: 72px; right: 24px; z-index: 900; flex-shrink: 0; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.sticky-header .badge { font-size: 1rem; margin-left: 10px; }
+.formula-card > .row { display: flex; flex-wrap: nowrap; gap: 16px; align-items: flex-start; margin: 0; --bs-gutter-x: 0; }
+.formula-card > .row > .col-4 { width: 140px; flex: 0 0 140px; padding: 0; }
+.formula-card > .row > .col-8 { width: auto; flex: 1 1 auto; min-width: 0; padding: 0; }
+.formula-id { margin-bottom: 3px; }
+.formula-note-display { margin-top: 0; }
+.formula-card.learning-enabled:not(.content-editable) { padding-bottom: 52px; }
+.drag-handle { cursor: move; color: #adb5bd; font-size: 1.5rem; line-height: 1; user-select: none; position: absolute; top: 10px; right: 10px; z-index: 10; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 4px; }
+.drag-handle:hover { color: #495057; background: rgba(0,0,0,.05); }
+.action-buttons { margin-top: 6px; padding-right: 44px; display: flex; flex-direction: column; align-items: flex-start; gap: 16px; flex: 1; }
+.action-buttons-row { display: flex; align-items: center; margin-top: auto; }
+.add-variant-btn { border: 1px dashed #86b7fe; background: transparent; color: #0d6efd; border-radius: 4px; padding: 4px 12px; font-size: 1rem; line-height: 1; cursor: pointer; margin-right: 10px; transition: background .15s; }
+.add-variant-btn:hover, .add-variant-btn:focus-visible { background: #eaf3ff; }
+.action-buttons .btn { margin-right: 10px; font-size: 1rem; padding: 8px 16px; border-radius: 5px; }
+.formula-card.learned { outline: 3px solid #198754; outline-offset: -3px; background-color: #f0fdf4; }
+.learn-btn { position: absolute; bottom: 10px; right: 10px; z-index: 5; width: 30px; height: 30px; padding: 0; border-radius: 50%; border: 1.5px solid #adb5bd; background: #fff; color: #adb5bd; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all .15s ease; }
+.learn-btn:hover { border-color: #198754; color: #198754; background: #f0fdf4; }
+.learn-btn.learned { background: #198754; border-color: #198754; color: #fff; }
+
+html[data-theme="dark"] .formula-card.learned { background: #173b27; }
+html[data-theme="dark"] .learn-btn { background: var(--surface-muted); }
+html[data-theme="dark"] .learn-btn.learned { background: #198754; }
+html[data-theme="dark"] .drag-handle { color: #9ca6b0; }
+
+@media (max-width: 768px) {
+    .formula-card > .row { gap: 12px; }
+    .category-title-row { align-items: flex-start; flex-direction: column; }
+    .collapse-all-btn { top: 110px; right: 12px; }
+    .formula-image { height: 140px; }
+    .formula-id { font-size: 1.2rem; }
+    .formula-line-alg { font-size: 1.05rem; }
+}

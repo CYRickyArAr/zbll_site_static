@@ -133,10 +133,10 @@
         var cat = findCategory(catId);
         if (!cat) { appEl.innerHTML = '<div class="container"><div class="empty-state">分类不存在：' + escapeHtml(catId) + '</div></div>'; return; }
         var html = '<div class="container"><nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="#/">首页</a></li><li class="breadcrumb-item active">' + escapeHtml(cat.id) + ' Case</li></ol></nav>';
-        html += '<h1 class="category-title">' + escapeHtml(cat.id) + ' Case</h1>';
+        html += '<div class="category-title-row"><h1 class="category-title">' + escapeHtml(cat.id) + ' Case</h1><button type="button" class="btn btn-outline-secondary collapse-all-btn" id="toggle-all-subcategories">全部展开</button></div>';
         (cat.subcategories || []).forEach(function (sub) {
-            var total = sub.formulas.length;
-            html += '<div class="subcategory-card" id="card-' + escapeHtml(sub.id) + '"><div class="sticky-header" id="header-' + escapeHtml(sub.id) + '" data-subcat="' + escapeHtml(sub.id) + '"><div class="d-flex justify-content-between align-items-center"><div class="d-flex align-items-center"><h3>' + escapeHtml(sub.id) + '</h3><img src="images/' + encodeURIComponent(sub.id) + '.svg" class="subcat-thumb" alt="' + escapeHtml(sub.id) + '"><span class="badge bg-secondary">' + total + '个情况</span></div><div class="d-flex align-items-center"><span class="toggle-icon" id="icon-' + escapeHtml(sub.id) + '">▼</span></div></div></div>';
+            var total = sub.formulas.length, learned = sub.formulas.filter(function (formula) { return formula.learned; }).length;
+            html += '<div class="subcategory-card" id="card-' + escapeHtml(sub.id) + '"><div class="sticky-header" id="header-' + escapeHtml(sub.id) + '" data-subcat="' + escapeHtml(sub.id) + '"><div class="d-flex justify-content-between align-items-center"><div class="d-flex align-items-center"><h3>' + escapeHtml(sub.id) + '</h3><img src="images/' + encodeURIComponent(sub.id) + '.svg" class="subcat-thumb" alt="' + escapeHtml(sub.id) + '"><span class="badge bg-secondary">' + (isWorkspace() ? '已学 ' + learned + '/' + total + '个情况' : total + '个情况') + '</span></div><div class="d-flex align-items-center"><span class="toggle-icon" id="icon-' + escapeHtml(sub.id) + '">▼</span></div></div></div>';
             html += '<div class="formula-grid" id="subcat-' + escapeHtml(sub.id) + '">';
             if (sub.formulas.length) {
                 html += '<div class="sortable-container" data-category="' + escapeHtml(cat.id) + '" data-subcategory="' + escapeHtml(sub.id) + '">';
@@ -155,13 +155,14 @@
     function renderFormulaCard(catId, subId, formula, index) {
         var cat = findCategory(catId), sub = cat.subcategories.filter(function (s) { return s.id === subId; })[0];
         var id = displayFormulaId(sub, formula, index), uid = formula.uid || formula.id || (subId + '-' + index);
-        var html = '<div class="sortable-item" data-uid="' + escapeHtml(uid) + '" draggable="' + (isWorkspace() ? 'true' : 'false') + '"><div class="formula-card' + (formula.learned ? ' formula-card-learned' : '') + '">';
-        if (isWorkspace()) html += '<div class="workspace-drag-handle" title="拖动排序" aria-label="拖动排序">⠿</div>';
-        html += '<div class="formula-top">';
+        var html = '<div class="sortable-item" data-uid="' + escapeHtml(uid) + '" id="formula-' + escapeHtml(uid) + '" draggable="' + (isWorkspace() ? 'true' : 'false') + '">';
+        html += '<div class="formula-card' + (formula.learned ? ' learned' : '') + (isWorkspace() ? ' content-editable learning-enabled' : '') + '">';
+        if (isWorkspace()) html += '<div class="drag-handle" title="拖动排序" aria-label="拖动排序">⋮⋮</div>';
+        html += '<div class="row"><div class="col-4">';
         if (formula.image) html += '<img src="' + escapeHtml(formula.image) + '" class="formula-image" alt="' + escapeHtml(id) + '" loading="lazy">';
         else html += '<div class="formula-image d-flex align-items-center justify-content-center bg-light"><span class="text-muted">无图</span></div>';
-        html += '<div class="formula-info"><div class="formula-id">' + escapeHtml(id) + '</div>';
-        if (formula.notes) html += '<div style="margin-top: 6px;"><pre class="formula-notes">' + escapeHtml(formula.notes) + '</pre></div>';
+        html += '</div><div class="col-8"><div class="formula-id">' + escapeHtml(id) + '</div>';
+        if (formula.notes) html += '<div class="formula-note-display"><pre class="formula-notes">' + escapeHtml(formula.notes) + '</pre></div>';
         html += '</div></div>';
         if (formula.lines && formula.lines.length) {
             html += '<div class="formula-lines">';
@@ -177,12 +178,10 @@
             html += '</div>';
         } else if (isWorkspace()) html += '<div class="workspace-empty">暂无公式</div>';
         if (isWorkspace()) {
-            html += '<div class="workspace-card-actions">';
-            html += '<button type="button" class="btn btn-sm btn-outline-primary workspace-action" data-action="edit-formula" data-category="' + escapeHtml(catId) + '" data-subcategory="' + escapeHtml(subId) + '" data-uid="' + escapeHtml(uid) + '">编辑</button>';
-            html += '<button type="button" class="btn btn-sm btn-outline-secondary workspace-action" data-action="add-variant" data-category="' + escapeHtml(catId) + '" data-subcategory="' + escapeHtml(subId) + '" data-uid="' + escapeHtml(uid) + '">添加变体</button>';
-            html += '<button type="button" class="btn btn-sm btn-outline-danger workspace-action" data-action="delete-formula" data-category="' + escapeHtml(catId) + '" data-subcategory="' + escapeHtml(subId) + '" data-uid="' + escapeHtml(uid) + '">删除</button>';
-            html += '<button type="button" class="btn btn-sm ' + (formula.learned ? 'btn-success' : 'btn-outline-success') + ' workspace-action workspace-learn-btn" data-action="toggle-learned" data-category="' + escapeHtml(catId) + '" data-subcategory="' + escapeHtml(subId) + '" data-uid="' + escapeHtml(uid) + '">' + (formula.learned ? '已学' : '未学') + '</button>';
-            html += '</div>';
+            html += '<div class="action-buttons">';
+            html += '<button type="button" class="add-variant-btn workspace-action" title="添加一行变体" aria-label="添加一行变体" data-action="add-variant" data-category="' + escapeHtml(catId) + '" data-subcategory="' + escapeHtml(subId) + '" data-uid="' + escapeHtml(uid) + '">＋</button>';
+            html += '<div class="action-buttons-row"><button type="button" class="btn btn-outline-secondary btn-sm workspace-action" data-action="edit-formula" data-category="' + escapeHtml(catId) + '" data-subcategory="' + escapeHtml(subId) + '" data-uid="' + escapeHtml(uid) + '">编辑</button></div></div>';
+            html += '<button type="button" class="learn-btn workspace-action' + (formula.learned ? ' learned' : '') + '" data-action="toggle-learned" data-category="' + escapeHtml(catId) + '" data-subcategory="' + escapeHtml(subId) + '" data-uid="' + escapeHtml(uid) + '" title="' + (formula.learned ? '取消已学' : '标记已学') + '" aria-label="' + (formula.learned ? '取消已学' : '标记已学') + '"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg></button>';
         }
         html += '</div></div>';
         return html;
@@ -194,6 +193,26 @@
         var open = content.style.display === 'none';
         content.style.display = open ? 'block' : 'none'; icon.textContent = open ? '▼' : '▶'; header.classList.toggle('sticky-header-collapsed', !open);
         try { localStorage.setItem('subcat_' + subcatId, open ? 'open' : 'closed'); } catch (e) {}
+        updateToggleAllButton();
+    }
+    function updateToggleAllButton() {
+        var button = document.getElementById('toggle-all-subcategories');
+        if (!button) return;
+        var headers = document.querySelectorAll('.sticky-header[id^="header-"]'), openCount = 0;
+        headers.forEach(function (header) { var content = document.getElementById('subcat-' + header.dataset.subcat); if (content && content.style.display !== 'none') openCount++; });
+        button.textContent = headers.length && openCount === headers.length ? '全部折叠' : '全部展开';
+    }
+    function toggleAllSubcategories() {
+        var headers = document.querySelectorAll('.sticky-header[id^="header-"]'), openCount = 0;
+        headers.forEach(function (header) { var content = document.getElementById('subcat-' + header.dataset.subcat); if (content && content.style.display !== 'none') openCount++; });
+        var shouldOpen = openCount !== headers.length;
+        headers.forEach(function (header) {
+            var id = header.dataset.subcat, content = document.getElementById('subcat-' + id), icon = document.getElementById('icon-' + id);
+            if (!content || !icon) return;
+            content.style.display = shouldOpen ? 'block' : 'none'; icon.textContent = shouldOpen ? '▼' : '▶'; header.classList.toggle('sticky-header-collapsed', !shouldOpen);
+            try { localStorage.setItem('subcat_' + id, shouldOpen ? 'open' : 'closed'); } catch (e) {}
+        });
+        updateToggleAllButton();
     }
     function restoreSubcategoryState(cat) {
         (cat.subcategories || []).forEach(function (sub) {
@@ -202,6 +221,7 @@
             var open = saved === 'open';
             content.style.display = open ? 'block' : 'none'; icon.textContent = open ? '▼' : '▶'; header.classList.toggle('sticky-header-collapsed', !open);
         });
+        updateToggleAllButton();
     }
 
     function bindSorting() {
@@ -278,6 +298,7 @@
         document.getElementById('editor-overlay').dataset.category = catId;
         document.getElementById('editor-overlay').dataset.isNew = isNew ? '1' : '0';
         document.getElementById('editor-title').textContent = isNew ? '添加公式' : '编辑公式';
+        document.getElementById('editor-delete').hidden = isNew;
         showOverlay('editor-overlay', true); document.getElementById('editor-formula').focus();
     }
     function readFileData(file) {
@@ -302,6 +323,13 @@
         var markText = window.prompt('标注（可选，多个用空格分隔），如：耿 Tymon', ''); if (markText === null) return;
         ref.formula.lines = ref.formula.lines || []; ref.formula.lines.push({ alg: alg.trim(), marks: markText.trim().split(/[\s,，]+/).filter(Boolean) });
         await WS.put(activeWorkspace); renderCategory(catId);
+    }
+    async function deleteFromEditor() {
+        if (!activeWorkspace) return;
+        var overlay = document.getElementById('editor-overlay'), ref = findFormula(overlay.dataset.category, document.getElementById('editor-subcategory').value, document.getElementById('editor-uid').value);
+        if (!ref || !window.confirm('确定删除这条公式卡吗？')) return;
+        ref.subcat.formulas.splice(ref.index, 1);
+        await WS.put(activeWorkspace); showOverlay('editor-overlay', false); renderCategory(overlay.dataset.category);
     }
     async function handleWorkspaceAction(button) {
         var action = button.dataset.action, catId = button.dataset.category, subId = button.dataset.subcategory, uid = button.dataset.uid;
@@ -348,6 +376,7 @@
     document.addEventListener('click', function (e) {
         var header = e.target.closest('.sticky-header');
         if (header && header.dataset.subcat) { toggleSubcategory(header.dataset.subcat); return; }
+        if (e.target.closest('#toggle-all-subcategories')) { toggleAllSubcategories(); return; }
         var action = e.target.closest('.workspace-action'); if (action) { handleWorkspaceAction(action); return; }
         var add = e.target.closest('.workspace-add'); if (add) { openFormulaEditor(add.dataset.category, add.dataset.subcategory, null); return; }
         if (e.target.id === 'workspace-open') openWorkspaceManager();
@@ -356,6 +385,7 @@
     document.getElementById('workspace-overlay').addEventListener('click', function (e) { if (e.target === this) showOverlay('workspace-overlay', false); });
     document.getElementById('editor-overlay').addEventListener('click', function (e) { if (e.target === this) showOverlay('editor-overlay', false); });
     document.getElementById('formula-editor-form').addEventListener('submit', saveFormulaEditor);
+    document.getElementById('editor-delete').addEventListener('click', deleteFromEditor);
     document.getElementById('workspace-file').addEventListener('change', importWorkspaceFile);
     document.getElementById('workspace-overlay').addEventListener('click', handleWorkspaceManagerClick);
     window.addEventListener('hashchange', router);
