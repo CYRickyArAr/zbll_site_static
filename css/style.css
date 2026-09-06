@@ -821,6 +821,10 @@ html[data-theme="dark"] .form-check-label {
 }
 .workspace-nav-btn:hover,
 .workspace-nav-btn:focus-visible { background: rgba(255, 255, 255, 0.12); color: #fff; }
+.workspace-nav-clip {
+    display: block;
+    overflow: hidden;
+}
 .workspace-nav-label {
     display: block;
     width: max-content;
