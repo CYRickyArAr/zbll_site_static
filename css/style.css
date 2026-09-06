@@ -808,12 +808,12 @@ html[data-theme="dark"] .form-check-label {
     background: transparent;
     color: #fff;
     box-sizing: border-box !important;
-    padding: 5px 0.1em;
+    padding: 5px 0.5em;
     font-size: .86rem;
-    width: 5.6em;
-    min-width: 5.6em;
-    max-width: 5.6em;
-    flex: 0 0 5.6em !important;
+    width: 6.4em;
+    min-width: 6.4em;
+    max-width: 6.4em;
+    flex: 0 0 6.4em !important;
     overflow: hidden;
     white-space: nowrap;
     cursor: pointer;
@@ -982,7 +982,7 @@ html[data-theme="dark"] .variant-add-form {
 }
 
 @media (max-width: 600px) {
-    .workspace-nav-btn { padding: 4px 0.1em; font-size: .76rem; }
+    .workspace-nav-btn { padding: 4px 0.5em; font-size: .76rem; }
     .workspace-dialog { padding: 16px; }
     .workspace-list-item { align-items: flex-start; flex-direction: column; gap: 3px; }
     .workspace-learn-btn { margin-left: 0; }
@@ -1101,12 +1101,12 @@ html[data-theme="dark"] .sortable-ghost { background: #303840; border-color: #4e
         flex-basis: 26px;
     }
     .workspace-nav-btn {
-        width: 5.6em;
-        min-width: 5.6em;
-        max-width: 5.6em;
-        flex: 0 0 5.6em !important;
+        width: 6.4em;
+        min-width: 6.4em;
+        max-width: 6.4em;
+        flex: 0 0 6.4em !important;
         overflow: hidden;
-        padding: 4px 0.1em;
+        padding: 4px 0.5em;
         font-size: .68rem;
     }
 }
@@ -1129,10 +1129,10 @@ html[data-theme="dark"] .sortable-ghost { background: #303840; border-color: #4e
         padding-right: 1px;
     }
     .workspace-nav-btn {
-        width: 5.6em;
-        min-width: 5.6em;
-        max-width: 5.6em;
-        flex: 0 0 5.6em !important;
+        width: 6.4em;
+        min-width: 6.4em;
+        max-width: 6.4em;
+        flex: 0 0 6.4em !important;
         font-size: .58rem;
     }
 }
