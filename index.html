@@ -47,6 +47,7 @@
             <button type="button" class="theme-toggle" id="theme-toggle" aria-label="切换到深色模式" title="切换到深色模式" aria-pressed="false">
                 <span class="theme-toggle-icon" aria-hidden="true">☾</span>
             </button>
+            <button type="button" class="workspace-nav-btn" id="workspace-open" title="打开本地工作区">本地工作区</button>
         </div>
     </div>
 
@@ -55,8 +56,56 @@
         <div id="app"></div>
     </div>
 
+    <div class="workspace-overlay" id="workspace-overlay" hidden>
+        <div class="workspace-dialog" role="dialog" aria-modal="true" aria-labelledby="workspace-dialog-title">
+            <div class="workspace-dialog-header">
+                <h2 id="workspace-dialog-title">本地工作区</h2>
+                <button type="button" class="workspace-close" id="workspace-close" aria-label="关闭">×</button>
+            </div>
+            <p class="workspace-help">数据只保存在当前浏览器；导出 <code>.zbll</code> 文件即可跨设备继续编辑。</p>
+            <div id="workspace-current" class="workspace-current"></div>
+            <div id="workspace-list" class="workspace-list"></div>
+            <div class="workspace-actions">
+                <button type="button" class="btn btn-primary" id="workspace-new">新建空工作区</button>
+                <button type="button" class="btn btn-outline-primary" id="workspace-import">导入 .zbll</button>
+                <input type="file" id="workspace-file" accept=".zbll,.json,application/json" hidden>
+                <button type="button" class="btn btn-outline-secondary" id="workspace-export" disabled>导出当前</button>
+                <button type="button" class="btn btn-outline-secondary" id="workspace-rename" disabled>重命名</button>
+                <button type="button" class="btn btn-outline-danger" id="workspace-delete" disabled>删除</button>
+                <button type="button" class="btn btn-secondary" id="workspace-exit">返回公开数据</button>
+            </div>
+            <div id="workspace-message" class="workspace-message" role="status"></div>
+        </div>
+    </div>
+
+    <div class="workspace-overlay" id="editor-overlay" hidden>
+        <div class="workspace-dialog workspace-editor" role="dialog" aria-modal="true" aria-labelledby="editor-title">
+            <div class="workspace-dialog-header">
+                <h2 id="editor-title">编辑公式</h2>
+                <button type="button" class="workspace-close" id="editor-close" aria-label="关闭">×</button>
+            </div>
+            <form id="formula-editor-form">
+                <input type="hidden" id="editor-subcategory">
+                <input type="hidden" id="editor-uid">
+                <label class="workspace-label" for="editor-formula">公式（每行一条，可在行末写（耿 Tymon））</label>
+                <textarea id="editor-formula" class="workspace-textarea" rows="6" placeholder="输入公式"></textarea>
+                <label class="workspace-label" for="editor-note-body">备注正文（第一行固定）</label>
+                <div id="editor-note-header" class="workspace-note-header"></div>
+                <textarea id="editor-note-body" class="workspace-textarea" rows="3" placeholder="输入公式备注"></textarea>
+                <label class="workspace-label" for="editor-image">图片（选填）</label>
+                <input type="file" id="editor-image" accept="image/png,image/jpeg,image/gif,image/svg+xml">
+                <label class="workspace-check"><input type="checkbox" id="editor-clear-image"> 删除当前图片</label>
+                <div class="workspace-editor-actions">
+                    <button type="button" class="btn btn-secondary" id="editor-cancel">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- 数据 + 逻辑 -->
     <script src="data.js?v=62"></script>
-    <script src="js/app.js?v=32"></script>
+    <script src="js/workspace.js?v=2"></script>
+    <script src="js/app.js?v=34"></script>
 </body>
 </html>
