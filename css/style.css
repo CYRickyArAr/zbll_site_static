@@ -808,7 +808,7 @@ html[data-theme="dark"] .form-check-label {
     background: rgba(255, 255, 255, 0.1);
     color: #fff;
     box-sizing: border-box !important;
-    padding: 5px 10px;
+    padding: 5px 6px;
     font-size: .86rem;
     width: 5.4em;
     min-width: 5.4em;
@@ -1105,7 +1105,7 @@ html[data-theme="dark"] .sortable-ghost { background: #303840; border-color: #4e
         max-width: 5.4em;
         flex: 0 0 5.4em !important;
         overflow: hidden;
-        padding: 4px 5px;
+        padding: 4px 4px;
         font-size: .68rem;
     }
 }

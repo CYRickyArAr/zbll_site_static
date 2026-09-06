@@ -56,7 +56,9 @@
             label.textContent = navText;
             nav.title = activeWorkspace ? activeWorkspace.name : publicLabel;
             requestAnimationFrame(function () {
-                var overflow = Math.max(0, label.scrollWidth - nav.clientWidth + 2);
+                var navStyle = window.getComputedStyle(nav);
+                var contentWidth = nav.clientWidth - parseFloat(navStyle.paddingLeft) - parseFloat(navStyle.paddingRight);
+                var overflow = Math.max(0, label.scrollWidth - contentWidth);
                 nav.classList.toggle('is-overflow', overflow > 1);
                 label.style.setProperty('--workspace-scroll-distance', overflow > 1 ? '-' + overflow + 'px' : '0px');
             });
