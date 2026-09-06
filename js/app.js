@@ -155,13 +155,13 @@
     function renderFormulaCard(catId, subId, formula, index) {
         var cat = findCategory(catId), sub = cat.subcategories.filter(function (s) { return s.id === subId; })[0];
         var id = displayFormulaId(sub, formula, index), uid = formula.uid || formula.id || (subId + '-' + index);
-        var html = '<div class="sortable-item" data-uid="' + escapeHtml(uid) + '" draggable="' + (isWorkspace() ? 'true' : 'false') + '"><div class="formula-card' + (formula.learned ? ' formula-card-learned' : '') + '">';
-        if (isWorkspace()) html += '<div class="workspace-drag-handle" title="拖动排序" aria-label="拖动排序">⠿</div>';
+        var html = '<div class="sortable-item" data-uid="' + escapeHtml(uid) + '" draggable="' + (isWorkspace() ? 'true' : 'false') + '"><div class="formula-card' + (formula.learned ? ' learned' : '') + (isWorkspace() ? ' learning-enabled content-editable' : '') + '">';
+        if (isWorkspace()) html += '<div class="drag-handle" title="拖动排序" aria-label="拖动排序">⋮⋮</div>';
         html += '<div class="formula-top">';
         if (formula.image) html += '<img src="' + escapeHtml(formula.image) + '" class="formula-image" alt="' + escapeHtml(id) + '" loading="lazy">';
         else html += '<div class="formula-image d-flex align-items-center justify-content-center bg-light"><span class="text-muted">无图</span></div>';
         html += '<div class="formula-info"><div class="formula-id">' + escapeHtml(id) + '</div>';
-        if (formula.notes) html += '<div style="margin-top: 6px;"><pre class="formula-notes">' + escapeHtml(formula.notes) + '</pre></div>';
+        if (formula.notes) html += '<div class="formula-note-display"><pre class="formula-notes">' + escapeHtml(formula.notes) + '</pre></div>';
         html += '</div></div>';
         if (formula.lines && formula.lines.length) {
             html += '<div class="formula-lines">';
@@ -177,12 +177,13 @@
             html += '</div>';
         } else if (isWorkspace()) html += '<div class="workspace-empty">暂无公式</div>';
         if (isWorkspace()) {
-            html += '<div class="workspace-card-actions">';
-            html += '<button type="button" class="btn btn-sm btn-outline-primary workspace-action" data-action="edit-formula" data-category="' + escapeHtml(catId) + '" data-subcategory="' + escapeHtml(subId) + '" data-uid="' + escapeHtml(uid) + '">编辑</button>';
-            html += '<button type="button" class="btn btn-sm btn-outline-secondary workspace-action" data-action="add-variant" data-category="' + escapeHtml(catId) + '" data-subcategory="' + escapeHtml(subId) + '" data-uid="' + escapeHtml(uid) + '">添加变体</button>';
-            html += '<button type="button" class="btn btn-sm btn-outline-danger workspace-action" data-action="delete-formula" data-category="' + escapeHtml(catId) + '" data-subcategory="' + escapeHtml(subId) + '" data-uid="' + escapeHtml(uid) + '">删除</button>';
-            html += '<button type="button" class="btn btn-sm ' + (formula.learned ? 'btn-success' : 'btn-outline-success') + ' workspace-action workspace-learn-btn" data-action="toggle-learned" data-category="' + escapeHtml(catId) + '" data-subcategory="' + escapeHtml(subId) + '" data-uid="' + escapeHtml(uid) + '">' + (formula.learned ? '已学' : '未学') + '</button>';
-            html += '</div>';
+            html += '<div class="action-buttons">';
+            html += '<button type="button" class="add-variant-btn workspace-action" title="添加一行变体" aria-label="添加一行变体" data-action="add-variant" data-category="' + escapeHtml(catId) + '" data-subcategory="' + escapeHtml(subId) + '" data-uid="' + escapeHtml(uid) + '">＋</button>';
+            html += '<div class="action-buttons-row">';
+            html += '<button type="button" class="btn btn-outline-secondary btn-sm workspace-action" data-action="edit-formula" data-category="' + escapeHtml(catId) + '" data-subcategory="' + escapeHtml(subId) + '" data-uid="' + escapeHtml(uid) + '">编辑</button>';
+            html += '<button type="button" class="btn btn-outline-danger btn-sm workspace-action" data-action="delete-formula" data-category="' + escapeHtml(catId) + '" data-subcategory="' + escapeHtml(subId) + '" data-uid="' + escapeHtml(uid) + '">删除</button>';
+            html += '</div></div>';
+            html += '<button type="button" class="learn-btn workspace-action' + (formula.learned ? ' learned' : '') + '" data-action="toggle-learned" data-category="' + escapeHtml(catId) + '" data-subcategory="' + escapeHtml(subId) + '" data-uid="' + escapeHtml(uid) + '" title="' + (formula.learned ? '取消已学' : '标记已学') + '" aria-label="' + (formula.learned ? '取消已学' : '标记已学') + '"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg></button>';
         }
         html += '</div></div>';
         return html;

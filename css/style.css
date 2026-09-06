@@ -722,9 +722,20 @@ html[data-theme="dark"] .form-check-label {
 .workspace-message { min-height: 1.4em; margin-top: 12px; color: #198754; }
 .workspace-message.is-error { color: #dc3545; }
 .workspace-mode-hint { margin: -24px auto 26px; text-align: center; color: var(--text-muted); }
-.workspace-card-actions { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); }
-.workspace-learn-btn { margin-left: auto; }
-.workspace-drag-handle { position: absolute; right: 14px; top: 10px; z-index: 1; color: var(--text-muted); cursor: grab; user-select: none; font-size: 1.25rem; line-height: 1; }
+.formula-card.learning-enabled { padding-bottom: 52px; }
+.formula-card.learned { outline: 3px solid #198754; outline-offset: -3px; background-color: #f0fdf4; }
+.drag-handle { cursor: move; color: #adb5bd; font-size: 1.5rem; line-height: 1; user-select: none; position: absolute; top: 10px; right: 10px; z-index: 10; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 4px; }
+.drag-handle:hover { color: #495057; background: rgba(0, 0, 0, .05); }
+.formula-id { margin-bottom: 3px; }
+.formula-note-display { margin-top: 0; }
+.action-buttons { margin-top: 6px; padding-right: 44px; display: flex; flex-direction: column; align-items: flex-start; gap: 16px; flex: 1; }
+.add-variant-btn { border: 1px dashed #86b7fe; background: transparent; color: #0d6efd; border-radius: 4px; padding: 4px 12px; font-size: 1rem; line-height: 1; cursor: pointer; margin-right: 10px; transition: background .15s; }
+.add-variant-btn:hover, .add-variant-btn:focus-visible { background: #eaf3ff; }
+.action-buttons-row { display: flex; align-items: center; margin-top: auto; gap: 8px; }
+.action-buttons-row .btn { font-size: 1rem; padding: 8px 16px; border-radius: 5px; }
+.learn-btn { position: absolute; bottom: 10px; right: 10px; z-index: 5; width: 30px; height: 30px; padding: 0; border-radius: 50%; border: 1.5px solid #adb5bd; background: #fff; color: #adb5bd; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all .15s ease; }
+.learn-btn:hover { border-color: #198754; color: #198754; background: #f0fdf4; }
+.learn-btn.learned { background: #198754; border-color: #198754; color: #fff; }
 .workspace-dragging { opacity: .5; }
 .workspace-drag-over { outline: 2px dashed #0d6efd; outline-offset: 3px; }
 .workspace-empty { padding: 14px; text-align: center; color: var(--text-muted); border: 1px dashed var(--border); border-radius: 7px; }
@@ -744,6 +755,10 @@ html[data-theme="dark"] .workspace-list-item:hover,
 html[data-theme="dark"] .workspace-list-item.active { background: var(--line-hover); }
 html[data-theme="dark"] .workspace-note-header,
 html[data-theme="dark"] .workspace-textarea { background: var(--surface-muted); color: var(--text); border-color: var(--border); }
+html[data-theme="dark"] .formula-card.learned { background: #173b27; }
+html[data-theme="dark"] .learn-btn { background: var(--surface-muted); }
+html[data-theme="dark"] .learn-btn.learned { background: #198754; }
+html[data-theme="dark"] .drag-handle { color: #9ca6b0; }
 
 @media (max-width: 600px) {
     .workspace-nav-btn { padding: 4px 7px; font-size: .76rem; }
