@@ -277,10 +277,22 @@
         sortableInstances.forEach(function (instance) { instance.destroy(); });
         sortableInstances = [];
         if (!sortingScrollBound) {
-            document.addEventListener('mousemove', function (e) { if (isDraggingFormula) dragMouseY = e.clientY; });
+            function trackDragPointer(e) {
+                if (!isDraggingFormula) return;
+                if (e.clientY <= 4) dragMouseY = -10;
+                else if (e.clientY >= window.innerHeight - 4) dragMouseY = window.innerHeight + 10;
+                else dragMouseY = e.clientY;
+            }
+            document.addEventListener('mousemove', trackDragPointer);
+            document.addEventListener('pointermove', trackDragPointer);
             document.addEventListener('mouseleave', function (e) {
                 if (!isDraggingFormula) return;
                 dragMouseY = e.clientY <= 0 ? -10 : (e.clientY >= window.innerHeight ? window.innerHeight + 10 : e.clientY);
+            });
+            window.addEventListener('mouseout', function (e) {
+                if (!isDraggingFormula || e.relatedTarget) return;
+                if (e.clientY <= 0) dragMouseY = -10;
+                else if (e.clientY >= window.innerHeight) dragMouseY = window.innerHeight + 10;
             });
             sortingScrollBound = true;
         }
