@@ -472,7 +472,7 @@
             return '<button type="button" class="workspace-list-item' + ((activeWorkspace && activeWorkspace.id === item.id) || (!activeWorkspace && selectedId === item.id) ? ' active' : '') + '" data-workspace-id="' + escapeHtml(item.id) + '"><span>' + escapeHtml(item.name) + '</span><small>' + escapeHtml(new Date(item.updatedAt).toLocaleString()) + '</small></button>';
         }).join('') : '<div class="workspace-empty">还没有本地工作区</div>';
         var exportButton = document.getElementById('workspace-export');
-        if (exportButton) exportButton.disabled = !(activeWorkspace || publicCopy);
+        if (exportButton) exportButton.disabled = false;
         ['workspace-rename', 'workspace-delete'].forEach(function (id) { var button = document.getElementById(id); if (button) button.disabled = !activeWorkspace; });
         var publicStatus = document.getElementById('workspace-public-status');
         if (publicStatus) publicStatus.textContent = publicCopy ? '已编辑，修改只保存在本浏览器' : '未编辑：当前使用最新大神版公式库';
@@ -700,7 +700,14 @@
         try {
             if (id === 'workspace-new') return createWorkspace();
             if (id === 'workspace-import') return document.getElementById('workspace-file').click();
-            if (id === 'workspace-export' && (activeWorkspace || publicCopy)) return WS.exportFile(activeWorkspace || publicCopy);
+            if (id === 'workspace-export') {
+                var target = activeWorkspace || publicCopy;
+                if (!target) target = { name: '大神版', categories: (window.ZBLL_DATA && window.ZBLL_DATA.categories) || [] };
+                setWorkspaceMessage('正在导出，请稍候…');
+                await WS.exportFile(target);
+                setWorkspaceMessage('已开始下载 ' + (target.name || 'zbll-workspace').replace(/[\\/:*?"<>|]/g, '_') + '.zbll');
+                return;
+            }
             if (id === 'workspace-public-reset' && publicCopy) {
                 if (!window.confirm('删除本地编辑并恢复默认大神版公式库？')) return;
                 await WS.resetPublicCopy(); publicCopy = null;
