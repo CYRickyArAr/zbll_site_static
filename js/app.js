@@ -291,6 +291,7 @@
                 handle: '.drag-handle',
                 forceFallback: true,
                 fallbackOnBody: true,
+                fallbackTolerance: 0,
                 scroll: false,
                 invertSwap: false,
                 swapThreshold: 0.65,
