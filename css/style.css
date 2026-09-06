@@ -807,13 +807,38 @@ html[data-theme="dark"] .form-check-label {
     border-radius: 6px;
     background: rgba(255, 255, 255, 0.1);
     color: #fff;
+    box-sizing: border-box !important;
     padding: 5px 10px;
     font-size: .86rem;
+    width: 5.4em;
+    min-width: 5.4em;
+    max-width: 5.4em;
+    flex: 0 0 5.4em !important;
+    overflow: hidden;
     white-space: nowrap;
     cursor: pointer;
 }
 .workspace-nav-btn:hover,
 .workspace-nav-btn:focus-visible { background: rgba(255, 255, 255, .25); color: #fff; }
+.workspace-nav-label {
+    display: block;
+    width: max-content;
+    min-width: 100%;
+    max-width: none;
+    overflow: hidden;
+    text-overflow: clip;
+    vertical-align: bottom;
+    white-space: nowrap;
+    will-change: transform;
+}
+.workspace-nav-btn.is-overflow:hover .workspace-nav-label,
+.workspace-nav-btn.is-overflow:focus-visible .workspace-nav-label {
+    animation: workspaceNavMarquee 4s linear infinite alternate;
+}
+@keyframes workspaceNavMarquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(var(--workspace-scroll-distance, 0px)); }
+}
 .workspace-overlay {
     position: fixed;
     inset: 0;
@@ -1075,9 +1100,11 @@ html[data-theme="dark"] .sortable-ghost { background: #303840; border-color: #4e
         flex-basis: 26px;
     }
     .workspace-nav-btn {
-        max-width: 5.5em;
+        width: 5.4em;
+        min-width: 5.4em;
+        max-width: 5.4em;
+        flex: 0 0 5.4em !important;
         overflow: hidden;
-        text-overflow: ellipsis;
         padding: 4px 5px;
         font-size: .68rem;
     }
@@ -1101,7 +1128,10 @@ html[data-theme="dark"] .sortable-ghost { background: #303840; border-color: #4e
         padding-right: 1px;
     }
     .workspace-nav-btn {
-        max-width: 3.2em;
+        width: 5.4em;
+        min-width: 5.4em;
+        max-width: 5.4em;
+        flex: 0 0 5.4em !important;
         font-size: .58rem;
     }
 }

@@ -44,12 +44,28 @@
         var publicBtn = document.getElementById('nav-public-mode');
         var workspaceBtn = document.getElementById('nav-workspace-mode');
         var publicLabel = publicCopy ? '大神版（已编辑）' : '大神版';
-        if (nav) nav.textContent = activeWorkspace ? '工作区：' + activeWorkspace.name : publicLabel;
+        if (nav) {
+            var navText = activeWorkspace ? activeWorkspace.name : publicLabel;
+            var label = nav.querySelector('.workspace-nav-label');
+            if (!label) {
+                nav.textContent = '';
+                label = document.createElement('span');
+                label.className = 'workspace-nav-label';
+                nav.appendChild(label);
+            }
+            label.textContent = navText;
+            nav.title = activeWorkspace ? activeWorkspace.name : publicLabel;
+            requestAnimationFrame(function () {
+                var overflow = Math.max(0, label.scrollWidth - nav.clientWidth + 2);
+                nav.classList.toggle('is-overflow', overflow > 1);
+                label.style.setProperty('--workspace-scroll-distance', overflow > 1 ? '-' + overflow + 'px' : '0px');
+            });
+        }
         if (publicBtn) publicBtn.classList.toggle('active', !activeWorkspace);
         if (workspaceBtn) {
             workspaceBtn.classList.toggle('active', !!activeWorkspace);
             workspaceBtn.textContent = '自定义';
-            workspaceBtn.title = activeWorkspace ? activeWorkspace.name : '切换到选定的本地工作区';
+            workspaceBtn.title = activeWorkspace ? activeWorkspace.name : publicLabel;
         }
     }
     async function ensureEditableData() {
