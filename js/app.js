@@ -217,9 +217,11 @@
             var navOpen = document.getElementById('workspace-open');
             var publicBtn = document.getElementById('nav-public-mode');
             var workspaceBtn = document.getElementById('nav-workspace-mode');
+            var anchor = firstVisibleAnchor();
             var snapshot = {
                 hash: location.hash || '#/',
                 scrollY: window.pageYOffset || window.scrollY || 0,
+                anchor: anchor,
                 appHtml: appEl.innerHTML,
                 nav: {
                     publicActive: publicBtn ? publicBtn.classList.contains('active') : true,
@@ -789,7 +791,7 @@
     function router() {
         var hash = location.hash || '#/', match = hash.match(/^#\/category\/([A-Za-z]+)$/), nextView = match ? 'cat:' + match[1] : 'home';
         if (currentView) saveScroll(); if (match) renderCategory(match[1]); else renderHome(); currentView = nextView;
-        requestAnimationFrame(function () { restoreScroll(nextView); });
+        restoreScroll(nextView);
         updateWorkspaceNav();
     }
     function initWorkspace() {

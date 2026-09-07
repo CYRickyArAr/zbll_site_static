@@ -54,6 +54,12 @@ body:not(.zbll-ready):not(.zbll-has-snapshot) .main-content {
     visibility: hidden;
 }
 
+html[data-render-snapshot="pending"] .navbar-center,
+html[data-render-snapshot="pending"] .navbar-right,
+html[data-render-snapshot="pending"] .main-content {
+    visibility: hidden;
+}
+
 /* ===== 顶部导航栏 ===== */
 .navbar {
     background-color: #1a1a2e;
