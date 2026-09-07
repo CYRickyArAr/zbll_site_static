@@ -945,14 +945,26 @@
         return WS.ready.then(async function () { var id = WS.activeId(); activeWorkspace = id ? await WS.get(id) : null; if (activeWorkspace) publicCopy = null; else { if (id) await WS.activate(null); var publicCopies = await WS.listPublicCopies(DATA); var publicMode = selectedPublicId(publicCopies); publicCopy = publicMode === 'default' ? null : await WS.getPublicCopy(DATA, publicMode); } router(); }).catch(function (error) { console.warn(error); router(); }).finally(function () { document.body.classList.add('zbll-ready'); document.body.classList.remove('zbll-has-snapshot'); });
     }
 
+    var defaultDragPromptAt = 0;
+    function promptDefaultPublicDrag() {
+        var now = Date.now();
+        if (now - defaultDragPromptAt < 400) return;
+        defaultDragPromptAt = now;
+        openWorkspaceManager().then(function () {
+            setWorkspaceMessage('默认大神版不能直接排序，请先在左侧选择或新建一个大神版公式库。', true);
+        });
+    }
+    document.addEventListener('pointerdown', function (e) {
+        if (e.button !== 0 || !e.target.closest('.drag-handle') || activeWorkspace || publicCopy) return;
+        e.preventDefault();
+        promptDefaultPublicDrag();
+    }, true);
     document.addEventListener('click', function (e) {
         var header = e.target.closest('.sticky-header');
         if (header && header.dataset.subcat) { toggleSubcategory(header.dataset.subcat); return; }
         if (e.target.closest('#toggle-all-subcategories')) { toggleAllSubcategories(); return; }
         if (e.target.closest('.drag-handle') && !activeWorkspace && !publicCopy) {
-            openWorkspaceManager().then(function () {
-                setWorkspaceMessage('默认大神版不能直接排序，请先在左侧选择或新建一个大神版公式库。', true);
-            });
+            promptDefaultPublicDrag();
             return;
         }
         var filterButton = e.target.closest('.zbll-filter-btn');
