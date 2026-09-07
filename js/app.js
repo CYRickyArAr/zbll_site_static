@@ -712,7 +712,7 @@
                 return;
             }
             if (id === 'workspace-public-reset' && publicCopy) {
-                if (!window.confirm('删除本地编辑并恢复默认大神版公式库？')) return;
+                if (!window.confirm('删除本地编辑并重置大神版公式库？')) return;
                 await WS.resetPublicCopy(); publicCopy = null;
                 if (!activeWorkspace) router();
                 await refreshWorkspaceList();
