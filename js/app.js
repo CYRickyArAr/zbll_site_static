@@ -342,7 +342,6 @@
                 sub.formulas.forEach(function (formula, index) { html += renderFormulaCard(cat.id, sub.id, formula, index); });
                 html += '</div>';
             } else html += '<div class="empty-state"><p class="mb-0">该子分类下暂无公式</p></div>';
-            if (canEditFormulaContent() && getZbllFilter() === 'all') html += '<button type="button" class="workspace-add" data-action="add-formula" data-category="' + escapeHtml(cat.id) + '" data-subcategory="' + escapeHtml(sub.id) + '">＋</button>';
             html += '</div></div>';
         });
         html += '</div>';
@@ -707,7 +706,8 @@
     function openFormulaEditor(catId, subId, formula) {
         var cat = findCategory(catId), sub = cat && cat.subcategories.filter(function (s) { return s.id === subId; })[0];
         if (!sub) return;
-        var isNew = !formula;
+        if (!formula) return;
+        var isNew = false;
         document.getElementById('editor-subcategory').value = subId;
         document.getElementById('editor-uid').value = formula ? formula.uid : '';
         document.getElementById('editor-formula').value = formula ? (formula.lines || []).map(lineText).join('\n') : '';
@@ -718,7 +718,6 @@
         document.getElementById('editor-overlay').dataset.category = catId;
         document.getElementById('editor-overlay').dataset.isNew = isNew ? '1' : '0';
         document.getElementById('editor-title').textContent = isNew ? '添加公式' : '编辑公式';
-        document.getElementById('editor-delete').hidden = isNew;
         showOverlay('editor-overlay', true); document.getElementById('editor-formula').focus();
     }
     function readFileData(file) {
@@ -737,7 +736,7 @@
         var image = clearButton && clearButton.dataset.cleared === 'true' ? '' : (formula ? formula.image : '');
         if (editorSelectedImage) image = editorSelectedImage;
         else if (input.files && input.files[0]) image = await readFileData(input.files[0]);
-        if (!formula) { formula = { uid: 'f-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2), id: 'new-' + Date.now(), image: image || '', notes: notes, lines: [], learned: false }; sub.formulas.push(formula); }
+        if (!formula) return;
         formula.lines = parseFormulaLines(document.getElementById('editor-formula').value); formula.notes = notes; formula.image = image || ''; formula.learned = !!formula.learned;
         await persistCurrentData(); showOverlay('editor-overlay', false); renderCategory(catId);
     }
@@ -827,24 +826,18 @@
         });
     }
     async function deleteFromEditor() {
-        var editable = await ensureEditableData();
-        if (!editable) return;
-        var overlay = document.getElementById('editor-overlay'), ref = findFormula(overlay.dataset.category, document.getElementById('editor-subcategory').value, document.getElementById('editor-uid').value);
-        if (!ref || !window.confirm('确定删除这条公式卡吗？')) return;
-        ref.subcat.formulas.splice(ref.index, 1);
-        await persistCurrentData(); showOverlay('editor-overlay', false); renderCategory(overlay.dataset.category);
+        return;
     }
     async function handleWorkspaceAction(button) {
         var action = button.dataset.action, catId = button.dataset.category, subId = button.dataset.subcategory, uid = button.dataset.uid;
+        if (action === 'add-formula' || action === 'delete-formula') return;
         if (!isWorkspace() && (action === 'add-formula' || action === 'add-variant' || action === 'edit-formula' || action === 'delete-formula')) return;
         var editable = await ensureEditableData();
         if (!editable) return;
-        if (action === 'add-formula') return openFormulaEditor(catId, subId, null);
         var ref = uid ? findFormula(catId, subId, uid) : null;
         if (action === 'edit-formula' && ref) return openFormulaEditor(catId, subId, ref.formula);
         if (action === 'add-variant') return addVariant(catId, subId, uid, button.closest('.formula-card'));
         if (!ref) return;
-        if (action === 'delete-formula') { if (!window.confirm('确定删除这条公式卡吗？')) return; ref.subcat.formulas.splice(ref.index, 1); }
         if (action === 'toggle-learned') ref.formula.learned = !ref.formula.learned;
         await persistCurrentData(); renderCategory(catId);
     }
@@ -987,7 +980,6 @@
     document.getElementById('workspace-overlay').addEventListener('click', function (e) { if (e.target === this) showOverlay('workspace-overlay', false); });
     document.getElementById('editor-overlay').addEventListener('click', function (e) { if (e.target === this) showOverlay('editor-overlay', false); });
     document.getElementById('formula-editor-form').addEventListener('submit', saveFormulaEditor);
-    document.getElementById('editor-delete').addEventListener('click', deleteFromEditor);
     document.getElementById('editor-clear-image').addEventListener('click', clearEditorImage);
     document.getElementById('workspace-file').addEventListener('change', importWorkspaceFile);
     document.getElementById('workspace-overlay').addEventListener('click', handleWorkspaceManagerClick);
