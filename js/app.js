@@ -533,6 +533,7 @@
         var list = (await WS.list()).filter(function (item) { return item.id !== '__public_copy__'; });
         var selectedId = '', selectedPublicMode = 'default';
         try { selectedId = localStorage.getItem(selectedWorkspaceKey) || ''; } catch (e) {}
+        if (!selectedId && activeWorkspace) selectedId = activeWorkspace.id;
         try { selectedPublicMode = localStorage.getItem(publicModeKey) || (publicCopy ? 'edited' : 'default'); } catch (e) {}
         if (selectedPublicMode === 'edited' && !storedPublicCopy) selectedPublicMode = 'default';
         var selected = list.find(function (item) { return item.id === selectedId; });
@@ -546,12 +547,30 @@
         listEl.innerHTML = list.length ? list.map(function (item) {
             return '<button type="button" class="workspace-list-item' + (selectedId === item.id ? ' active' : '') + '" data-workspace-id="' + escapeHtml(item.id) + '"><span>' + escapeHtml(item.name) + '</span><small>' + escapeHtml(new Date(item.updatedAt).toLocaleString()) + '</small></button>';
         }).join('') : '<div class="workspace-empty">还没有本地工作区</div>';
-        var exportButton = document.getElementById('workspace-export');
-        if (exportButton) exportButton.disabled = false;
-        ['workspace-rename', 'workspace-delete'].forEach(function (id) { var button = document.getElementById(id); if (button) button.disabled = !activeWorkspace; });
+        var selectedExists = !!selected;
+        var publicExportButton = document.getElementById('workspace-public-export');
+        if (publicExportButton) publicExportButton.disabled = false;
+        var customExportButton = document.getElementById('workspace-custom-export');
+        if (customExportButton) customExportButton.disabled = !selectedExists;
+        ['workspace-rename', 'workspace-delete'].forEach(function (id) { var button = document.getElementById(id); if (button) button.disabled = !selectedExists; });
         updateWorkspaceNav();
     }
     async function openWorkspaceManager() { setWorkspaceMessage(''); setWorkspaceProgress(null); showOverlay('workspace-overlay', true); await refreshWorkspaceList(); }
+    async function getSelectedWorkspace() {
+        var id = '';
+        try { id = localStorage.getItem(selectedWorkspaceKey) || ''; } catch (e) {}
+        return id ? await WS.get(id) : null;
+    }
+    async function exportWorkspace(target, button) {
+        if (!target) { setWorkspaceMessage('请先选择要导出的公式库。', true); return; }
+        if (button) button.disabled = true;
+        setWorkspaceMessage('正在导出，请稍候…');
+        setWorkspaceProgress(0, '开始导出');
+        await WS.exportFile(target, setWorkspaceProgress);
+        setWorkspaceMessage('已开始下载 ' + (target.name || 'zbll-workspace').replace(/[\\/:*?"<>|]/g, '_') + '.zbll');
+        setTimeout(function () { setWorkspaceProgress(null); }, 1200);
+        await refreshWorkspaceList();
+    }
     async function activatePublicLibrary(mode) {
         try { localStorage.setItem(publicModeKey, mode === 'edited' ? 'edited' : 'default'); } catch (e) {}
         activeWorkspace = await WS.activate(null);
@@ -802,28 +821,38 @@
         try {
             if (id === 'workspace-new') return createWorkspace();
             if (id === 'workspace-import') return document.getElementById('workspace-file').click();
-            if (id === 'workspace-export') {
-                var target = activeWorkspace || publicCopy;
-                if (!target) target = { name: '大神版', categories: (window.ZBLL_DATA && window.ZBLL_DATA.categories) || [] };
-                var exportButton = document.getElementById('workspace-export');
-                if (exportButton) exportButton.disabled = true;
-                setWorkspaceMessage('正在导出，请稍候…');
-                setWorkspaceProgress(0, '开始导出');
-                await WS.exportFile(target, setWorkspaceProgress);
-                setWorkspaceMessage('已开始下载 ' + (target.name || 'zbll-workspace').replace(/[\\/:*?"<>|]/g, '_') + '.zbll');
-                setTimeout(function () { setWorkspaceProgress(null); }, 1200);
+            if (id === 'workspace-public-export') {
+                var selectedPublicMode = 'default';
+                try { selectedPublicMode = localStorage.getItem(publicModeKey) || (publicCopy ? 'edited' : 'default'); } catch (e) {}
+                var storedPublicCopy = await WS.getPublicCopy(DATA);
+                return exportWorkspace(WS.exportPublic(DATA, selectedPublicMode === 'edited' ? storedPublicCopy : null), e.target);
+            }
+            if (id === 'workspace-custom-export') {
+                return exportWorkspace(await getSelectedWorkspace(), e.target);
+            }
+            if (id === 'workspace-rename') {
+                var selectedWorkspace = await getSelectedWorkspace();
+                if (!selectedWorkspace) { setWorkspaceMessage('请先选择要重命名的自定义公式库。', true); await refreshWorkspaceList(); return; }
+                var name = window.prompt('新的工作区名称', selectedWorkspace.name);
+                if (name && name.trim()) {
+                    selectedWorkspace.name = name.trim();
+                    await WS.put(selectedWorkspace);
+                    if (activeWorkspace && activeWorkspace.id === selectedWorkspace.id) activeWorkspace = selectedWorkspace;
+                    await refreshWorkspaceList();
+                }
+                return;
+            }
+            if (id === 'workspace-delete') {
+                var selectedToDelete = await getSelectedWorkspace();
+                if (!selectedToDelete) { setWorkspaceMessage('请先选择要删除的自定义公式库。', true); await refreshWorkspaceList(); return; }
+                if (!window.confirm('删除选中的自定义公式库？导出的 .zbll 文件不受影响。')) return;
+                var removedId = selectedToDelete.id;
+                await WS.remove(removedId);
+                try { if (localStorage.getItem(selectedWorkspaceKey) === removedId) localStorage.removeItem(selectedWorkspaceKey); } catch (e) {}
+                if (activeWorkspace && activeWorkspace.id === removedId) { activeWorkspace = null; publicCopy = await WS.getPublicCopy(DATA); await WS.activate(null); router(); }
                 await refreshWorkspaceList();
                 return;
             }
-            if (id === 'workspace-rename' && activeWorkspace) { var name = window.prompt('新的工作区名称', activeWorkspace.name); if (name && name.trim()) { activeWorkspace.name = name.trim(); await WS.put(activeWorkspace); await refreshWorkspaceList(); } return; }
-            if (id === 'workspace-delete' && activeWorkspace) {
-                if (!window.confirm('删除当前工作区？导出的 .zbll 文件不受影响。')) return;
-                var removedId = activeWorkspace.id;
-                await WS.remove(removedId);
-                try { if (localStorage.getItem(selectedWorkspaceKey) === removedId) localStorage.removeItem(selectedWorkspaceKey); } catch (e) {}
-                activeWorkspace = null; publicCopy = await WS.getPublicCopy(DATA); await WS.activate(null); showOverlay('workspace-overlay', false); router(); return;
-            }
-            if (id === 'workspace-exit') { await activateWorkspace(null); showOverlay('workspace-overlay', false); return; }
             if (id === 'workspace-close') return showOverlay('workspace-overlay', false);
         } catch (error) { setWorkspaceMessage(error.message || '工作区操作失败', true); setWorkspaceProgress(null); await refreshWorkspaceList(); }
     }

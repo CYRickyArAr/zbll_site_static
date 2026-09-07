@@ -171,6 +171,15 @@
         return merged;
     }
 
+    function exportPublicWorkspace(data, copy) {
+        var workspace = copy ? clone(copy) : publicCopy(data);
+        workspace.id = makeId();
+        workspace.kind = 'workspace';
+        workspace.name = copy ? '大神版（已编辑）' : '大神版';
+        workspace.sourceFingerprint = data.meta && data.meta.fingerprint || workspace.sourceFingerprint || '';
+        return workspace;
+    }
+
     function validLine(line) {
         return line && typeof line === 'object' && typeof line.alg === 'string' &&
             Array.isArray(line.marks) && line.marks.every(function (mark) { return typeof mark === 'string'; });
@@ -249,6 +258,9 @@
             copy.name = '大神版（已编辑）';
             await this.put(copy);
             return copy;
+        },
+        exportPublic(data, copy) {
+            return exportPublicWorkspace(data, copy);
         },
         async resetPublicCopy() {
             var db = await dbPromise;
