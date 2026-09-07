@@ -411,7 +411,7 @@
         }
         if (editing) {
             html += '<div class="action-buttons inline-editor-actions"><div class="action-buttons-row">';
-            html += '<button type="button" class="btn btn-secondary btn-sm workspace-action" data-action="cancel-inline-edit">取消</button>';
+            html += '<button type="button" class="btn btn-outline-secondary btn-sm workspace-action" data-action="cancel-inline-edit">取消</button>';
             html += '<button type="button" class="btn btn-primary btn-sm workspace-action" data-action="save-inline-edit">保存</button>';
             html += '</div></div>';
         } else if (canShowFormulaEditor()) {
