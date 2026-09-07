@@ -354,8 +354,10 @@
     function renderFormulaCard(catId, subId, formula, index) {
         var cat = findCategory(catId), sub = cat.subcategories.filter(function (s) { return s.id === subId; })[0];
         var id = displayFormulaId(sub, formula, index), uid = formula.uid || formula.id || (subId + '-' + index);
+        // 跨大神版/自定义定位按当前显示位置（如 T3-8），而非各公式库各自的内部 uid。
+        var positionAnchor = sub.id + '-' + (index + 1);
         // SortableJS 使用 forceFallback 模式接管拖动；不要再设置原生 draggable，避免出现双重拖影。
-        var html = '<div class="sortable-item" data-uid="' + escapeHtml(uid) + '" id="formula-' + escapeHtml(uid) + '">';
+        var html = '<div class="sortable-item" data-uid="' + escapeHtml(uid) + '" id="formula-position-' + escapeHtml(positionAnchor) + '">';
         var canEditContent = canEditFormulaContent();
         html += '<div class="formula-card' + (formula.learned ? ' learned' : '') + ' learning-enabled' + (canEditContent ? ' content-editable' : '') + '">';
         if (isEditableView()) html += '<div class="drag-handle" title="拖动排序" aria-label="拖动排序">⋮⋮</div>';
