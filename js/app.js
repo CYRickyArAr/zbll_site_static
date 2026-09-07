@@ -645,7 +645,7 @@
             return;
         }
         await openWorkspaceManager();
-        setWorkspaceMessage('请先在右上角选择或新建一个自定义工作区。', true);
+        setWorkspaceMessage('请先在右侧选择或新建一个自定义公式库。', true);
     }
     async function createWorkspace() {
         var name = window.prompt('请输入工作区名称', '我的zbll公式库');
