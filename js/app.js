@@ -581,7 +581,7 @@
         if (label) label.textContent = (text || '处理中') + ' · ' + value + '%';
     }
     async function refreshWorkspaceList() {
-        var listEl = document.getElementById('workspace-list'), publicListEl = document.getElementById('workspace-public-list'), currentEl = document.getElementById('workspace-current');
+        var listEl = document.getElementById('workspace-list'), publicListEl = document.getElementById('workspace-public-list');
         if (!listEl) return;
         var publicCopies = await WS.listPublicCopies(DATA);
         var list = (await WS.list()).filter(function (item) { return !isPublicLibraryItem(item); });
@@ -590,8 +590,6 @@
         if (!selectedId && activeWorkspace) selectedId = activeWorkspace.id;
         selectedPublic = selectedPublicId(publicCopies);
         var selected = list.find(function (item) { return item.id === selectedId; });
-        currentEl.textContent = activeWorkspace ? '当前：' + activeWorkspace.name :
-            (publicCopy ? '当前：' + (publicCopy.name || '大神版（已编辑）') : '当前：大神版') + (selected ? '；自定义：' + selected.name : '');
         if (publicListEl) {
             publicListEl.innerHTML =
                 '<button type="button" class="workspace-list-item' + (selectedPublic === 'default' ? ' active' : '') + '" data-public-library="default"><span>大神版</span><small>默认</small></button>' +
