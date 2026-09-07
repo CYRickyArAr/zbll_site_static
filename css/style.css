@@ -1055,9 +1055,23 @@ html[data-theme="dark"] .form-check-label {
     border-color: #6ea8fe;
 }
 .formula-card.notes-only-editing .inline-note-body {
-    min-height: 78px;
-    height: 78px;
+    min-height: 0;
+    height: auto;
+    flex: 1 1 auto;
     overflow-y: auto;
+}
+.formula-card.notes-only-editing > .row,
+.formula-card.notes-only-editing > .row > .col-8 {
+    height: 140px;
+}
+.formula-card.notes-only-editing > .row > .col-8,
+.formula-card.notes-only-editing .inline-note-editor {
+    display: flex;
+    min-height: 0;
+    flex-direction: column;
+}
+.formula-card.notes-only-editing .inline-note-editor {
+    flex: 1 1 auto;
 }
 .inline-formula-label { margin-top: 12px; }
 .formula-card.inline-editing .inline-formula-input {
