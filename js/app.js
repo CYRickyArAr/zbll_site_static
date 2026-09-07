@@ -29,6 +29,7 @@
     var selectedWorkspaceKey = 'zbll_selected_workspace';
     var publicModeKey = 'zbll_public_mode';
     var renderSnapshotKey = 'zbll_render_snapshot_v1';
+    var workspaceProgressState = null;
     var editorSelectedImage = null;
 
     function escapeHtml(value) {
@@ -534,6 +535,7 @@
         el.textContent = text || ''; el.classList.toggle('is-error', !!error);
     }
     function setWorkspaceProgress(value, text) {
+        workspaceProgressState = value === null || value === undefined ? null : { value: value, text: text || '' };
         var wrap = document.getElementById('workspace-progress'); if (!wrap) return;
         var bar = wrap.querySelector('.workspace-progress-bar');
         var label = wrap.querySelector('.workspace-progress-text');
@@ -578,7 +580,13 @@
         ['workspace-rename', 'workspace-delete'].forEach(function (id) { var button = document.getElementById(id); if (button) button.disabled = !selectedExists; });
         updateWorkspaceNav();
     }
-    async function openWorkspaceManager() { setWorkspaceMessage(''); setWorkspaceProgress(null); showOverlay('workspace-overlay', true); await refreshWorkspaceList(); }
+    async function openWorkspaceManager() {
+        setWorkspaceMessage('');
+        if (workspaceProgressState) setWorkspaceProgress(workspaceProgressState.value, workspaceProgressState.text);
+        else setWorkspaceProgress(null);
+        showOverlay('workspace-overlay', true);
+        await refreshWorkspaceList();
+    }
     async function getSelectedWorkspace() {
         var id = '';
         try { id = localStorage.getItem(selectedWorkspaceKey) || ''; } catch (e) {}
