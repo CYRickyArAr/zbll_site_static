@@ -102,7 +102,7 @@
             version: 1,
             id: PUBLIC_ID,
             kind: 'public-copy',
-            name: '公开数据副本',
+            name: '大神版（已编辑）',
             sourceFingerprint: data.meta && data.meta.fingerprint || '',
             createdAt: now,
             updatedAt: now,
@@ -128,6 +128,47 @@
                 };
             })
         };
+    }
+
+    function formulaKey(formula) {
+        return String(formula && (formula.uid || formula.id || ''));
+    }
+
+    function mergePublicCopy(data, existing) {
+        if (!existing) return null;
+        var merged = publicCopy(data);
+        merged.createdAt = existing.createdAt || merged.createdAt;
+        merged.updatedAt = existing.updatedAt || merged.updatedAt;
+        var oldBySub = {};
+        (existing.categories || []).forEach(function (category) {
+            (category.subcategories || []).forEach(function (subcat) {
+                oldBySub[category.id + '::' + subcat.id] = subcat.formulas || [];
+            });
+        });
+        merged.categories.forEach(function (category) {
+            category.subcategories.forEach(function (subcat) {
+                var oldFormulas = oldBySub[category.id + '::' + subcat.id] || [];
+                var oldByKey = {};
+                oldFormulas.forEach(function (formula) { oldByKey[formulaKey(formula)] = formula; });
+                subcat.formulas.forEach(function (formula) {
+                    var old = oldByKey[formulaKey(formula)];
+                    if (old) formula.learned = old.learned === true;
+                });
+                var currentByKey = {};
+                subcat.formulas.forEach(function (formula) { currentByKey[formulaKey(formula)] = formula; });
+                var used = {};
+                var reordered = oldFormulas.map(function (oldFormula) {
+                    var key = formulaKey(oldFormula), formula = currentByKey[key];
+                    if (formula) used[key] = true;
+                    return formula || null;
+                }).filter(Boolean);
+                subcat.formulas.forEach(function (formula) {
+                    if (!used[formulaKey(formula)]) reordered.push(formula);
+                });
+                subcat.formulas = reordered;
+            });
+        });
+        return merged;
     }
 
     function validLine(line) {
@@ -187,10 +228,16 @@
             var db = await dbPromise;
             return requestResult(db.transaction(STORE_NAME, 'readonly').objectStore(STORE_NAME).get(id));
         },
-        async getPublicCopy() { return this.get(PUBLIC_ID); },
+        async getPublicCopy(data) {
+            var existing = await this.get(PUBLIC_ID);
+            if (!existing || !data) return existing;
+            var merged = mergePublicCopy(data, existing);
+            if (merged && merged.sourceFingerprint !== existing.sourceFingerprint) await this.putPublicCopy(merged);
+            return merged;
+        },
         async hasPublicCopy() { return !!(await this.getPublicCopy()); },
         async ensurePublicCopy(data) {
-            var existing = await this.getPublicCopy();
+            var existing = await this.getPublicCopy(data);
             if (existing) return existing;
             var copy = publicCopy(data);
             await this.put(copy);
@@ -199,7 +246,7 @@
         async putPublicCopy(copy) {
             copy.id = PUBLIC_ID;
             copy.kind = 'public-copy';
-            copy.name = '公开数据副本';
+            copy.name = '大神版（已编辑）';
             await this.put(copy);
             return copy;
         },

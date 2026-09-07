@@ -27,6 +27,7 @@
     var themeKey = 'zbll_theme';
     var filterKey = 'zbll_filter';
     var selectedWorkspaceKey = 'zbll_selected_workspace';
+    var publicModeKey = 'zbll_public_mode';
     var renderSnapshotKey = 'zbll_render_snapshot_v1';
     var editorSelectedImage = null;
 
@@ -82,7 +83,11 @@
     }
     async function ensureEditableData() {
         if (activeWorkspace) return activeWorkspace;
-        if (!publicCopy) { publicCopy = await WS.ensurePublicCopy(DATA); updateWorkspaceNav(); }
+        if (!publicCopy) {
+            publicCopy = await WS.ensurePublicCopy(DATA);
+            try { localStorage.setItem(publicModeKey, 'edited'); } catch (e) {}
+            updateWorkspaceNav();
+        }
         return publicCopy;
     }
     async function persistCurrentData() {
@@ -522,34 +527,53 @@
         if (label) label.textContent = (text || '处理中') + ' · ' + value + '%';
     }
     async function refreshWorkspaceList() {
-        var listEl = document.getElementById('workspace-list'), currentEl = document.getElementById('workspace-current');
+        var listEl = document.getElementById('workspace-list'), publicListEl = document.getElementById('workspace-public-list'), currentEl = document.getElementById('workspace-current');
         if (!listEl) return;
+        var storedPublicCopy = await WS.getPublicCopy(DATA);
         var list = (await WS.list()).filter(function (item) { return item.id !== '__public_copy__'; });
         var selectedId = '';
         try { selectedId = localStorage.getItem(selectedWorkspaceKey) || ''; } catch (e) {}
         var selected = list.find(function (item) { return item.id === selectedId; });
         currentEl.textContent = activeWorkspace ? '当前：' + activeWorkspace.name :
             (publicCopy ? '当前：大神版（已编辑）' : '当前：大神版') + (selected ? '；自定义：' + selected.name : '');
+        if (publicListEl) {
+            publicListEl.innerHTML =
+                '<button type="button" class="workspace-list-item' + (!activeWorkspace && !publicCopy ? ' active' : '') + '" data-public-library="default"><span>大神版</span><small>默认</small></button>' +
+                (storedPublicCopy ? '<button type="button" class="workspace-list-item' + (!activeWorkspace && publicCopy ? ' active' : '') + '" data-public-library="edited"><span>大神版（已编辑）</span><small>' + escapeHtml(new Date(storedPublicCopy.updatedAt).toLocaleString()) + '</small></button>' : '');
+        }
         listEl.innerHTML = list.length ? list.map(function (item) {
             return '<button type="button" class="workspace-list-item' + ((activeWorkspace && activeWorkspace.id === item.id) || (!activeWorkspace && selectedId === item.id) ? ' active' : '') + '" data-workspace-id="' + escapeHtml(item.id) + '"><span>' + escapeHtml(item.name) + '</span><small>' + escapeHtml(new Date(item.updatedAt).toLocaleString()) + '</small></button>';
         }).join('') : '<div class="workspace-empty">还没有本地工作区</div>';
         var exportButton = document.getElementById('workspace-export');
         if (exportButton) exportButton.disabled = false;
         ['workspace-rename', 'workspace-delete'].forEach(function (id) { var button = document.getElementById(id); if (button) button.disabled = !activeWorkspace; });
-        var publicStatus = document.getElementById('workspace-public-status');
-        if (publicStatus) publicStatus.textContent = publicCopy ? '已编辑，修改只保存在本浏览器' : '未编辑：当前使用最新大神版公式库';
-        var resetButton = document.getElementById('workspace-public-reset');
-        if (resetButton) resetButton.disabled = !publicCopy;
         updateWorkspaceNav();
     }
     async function openWorkspaceManager() { setWorkspaceMessage(''); setWorkspaceProgress(null); showOverlay('workspace-overlay', true); await refreshWorkspaceList(); }
+    async function activatePublicLibrary(mode) {
+        try { localStorage.setItem(publicModeKey, mode === 'edited' ? 'edited' : 'default'); } catch (e) {}
+        activeWorkspace = await WS.activate(null);
+        var storedPublicCopy = await WS.getPublicCopy(DATA);
+        if (mode === 'edited' && storedPublicCopy) {
+            publicCopy = storedPublicCopy;
+        } else {
+            publicCopy = null;
+        }
+        router();
+        await refreshWorkspaceList();
+    }
     async function activateWorkspace(id) {
         if (id) {
             publicCopy = null;
             activeWorkspace = await WS.activate(id);
             try { if (activeWorkspace) localStorage.setItem(selectedWorkspaceKey, id); } catch (e) {}
         }
-        else { activeWorkspace = await WS.activate(null); publicCopy = await WS.getPublicCopy(); }
+        else {
+            var publicMode = 'edited';
+            try { publicMode = localStorage.getItem(publicModeKey) || 'edited'; } catch (e) {}
+            activeWorkspace = await WS.activate(null);
+            publicCopy = publicMode === 'default' ? null : await WS.getPublicCopy(DATA);
+        }
         router(); await refreshWorkspaceList();
     }
     async function activateSelectedWorkspace() {
@@ -757,6 +781,8 @@
     }
 
     async function handleWorkspaceManagerClick(e) {
+        var publicItem = e.target.closest('[data-public-library]');
+        if (publicItem) { await activatePublicLibrary(publicItem.dataset.publicLibrary); return; }
         var item = e.target.closest('[data-workspace-id]');
         if (item) { await activateWorkspace(item.dataset.workspaceId); return; }
         var id = e.target.id;
@@ -776,21 +802,13 @@
                 await refreshWorkspaceList();
                 return;
             }
-            if (id === 'workspace-public-reset' && publicCopy) {
-                if (!window.confirm('删除本地编辑并重置大神版公式库？')) return;
-                await WS.resetPublicCopy(); publicCopy = null;
-                if (!activeWorkspace) router();
-                await refreshWorkspaceList();
-                showOverlay('workspace-overlay', false);
-                return;
-            }
             if (id === 'workspace-rename' && activeWorkspace) { var name = window.prompt('新的工作区名称', activeWorkspace.name); if (name && name.trim()) { activeWorkspace.name = name.trim(); await WS.put(activeWorkspace); await refreshWorkspaceList(); } return; }
             if (id === 'workspace-delete' && activeWorkspace) {
                 if (!window.confirm('删除当前工作区？导出的 .zbll 文件不受影响。')) return;
                 var removedId = activeWorkspace.id;
                 await WS.remove(removedId);
                 try { if (localStorage.getItem(selectedWorkspaceKey) === removedId) localStorage.removeItem(selectedWorkspaceKey); } catch (e) {}
-                activeWorkspace = null; publicCopy = await WS.getPublicCopy(); await WS.activate(null); showOverlay('workspace-overlay', false); router(); return;
+                activeWorkspace = null; publicCopy = await WS.getPublicCopy(DATA); await WS.activate(null); showOverlay('workspace-overlay', false); router(); return;
             }
             if (id === 'workspace-exit') { await activateWorkspace(null); showOverlay('workspace-overlay', false); return; }
             if (id === 'workspace-close') return showOverlay('workspace-overlay', false);
@@ -813,7 +831,7 @@
         updateWorkspaceNav();
     }
     function initWorkspace() {
-        return WS.ready.then(async function () { var id = WS.activeId(); activeWorkspace = id ? await WS.get(id) : null; if (activeWorkspace) publicCopy = null; else { if (id) await WS.activate(null); publicCopy = await WS.getPublicCopy(); } router(); }).catch(function (error) { console.warn(error); router(); }).finally(function () { document.body.classList.add('zbll-ready'); document.body.classList.remove('zbll-has-snapshot'); });
+        return WS.ready.then(async function () { var id = WS.activeId(); activeWorkspace = id ? await WS.get(id) : null; if (activeWorkspace) publicCopy = null; else { if (id) await WS.activate(null); var publicMode = 'edited'; try { publicMode = localStorage.getItem(publicModeKey) || 'edited'; } catch (e) {} publicCopy = publicMode === 'default' ? null : await WS.getPublicCopy(DATA); } router(); }).catch(function (error) { console.warn(error); router(); }).finally(function () { document.body.classList.add('zbll-ready'); document.body.classList.remove('zbll-has-snapshot'); });
     }
 
     document.addEventListener('click', function (e) {
@@ -841,7 +859,16 @@
     var scrollTimer = null;
     window.addEventListener('scroll', function () { if (scrollTimer) clearTimeout(scrollTimer); scrollTimer = setTimeout(saveScroll, 150); });
     window.addEventListener('pagehide', function () { saveScroll(); saveRenderSnapshot(); });
-    window.addEventListener('zbll-workspace-changed', function (e) { activeWorkspace = e.detail || null; if (activeWorkspace) publicCopy = null; else WS.getPublicCopy().then(function (copy) { publicCopy = copy; router(); }); router(); });
+    window.addEventListener('zbll-workspace-changed', function (e) {
+        activeWorkspace = e.detail || null;
+        if (activeWorkspace) { publicCopy = null; router(); return; }
+        var publicMode = 'edited';
+        try { publicMode = localStorage.getItem(publicModeKey) || 'edited'; } catch (ignore) {}
+        WS.getPublicCopy(DATA).then(function (copy) {
+            publicCopy = publicMode === 'default' ? null : copy;
+            router();
+        });
+    });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { showOverlay('workspace-overlay', false); showOverlay('editor-overlay', false); } });
     initWorkspace();
 })();
