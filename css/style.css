@@ -1041,6 +1041,11 @@ html[data-theme="dark"] .form-check-label {
     padding: 7px 9px;
     line-height: 1.35;
 }
+.formula-card.inline-editing .inline-note-body {
+    font-size: 1.1rem;
+    border-width: 2px;
+    border-color: #6ea8fe;
+}
 .inline-formula-label { margin-top: 12px; }
 .inline-formula-input { margin-bottom: 8px; }
 .inline-image-editor { width: 140px; }
