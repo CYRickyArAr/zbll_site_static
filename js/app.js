@@ -745,7 +745,7 @@
         updateWorkspaceNav();
     }
     function initWorkspace() {
-        return WS.ready.then(async function () { var id = WS.activeId(); activeWorkspace = id ? await WS.get(id) : null; if (activeWorkspace) publicCopy = null; else { if (id) await WS.activate(null); publicCopy = await WS.getPublicCopy(); } router(); }).catch(function (error) { console.warn(error); router(); });
+        return WS.ready.then(async function () { var id = WS.activeId(); activeWorkspace = id ? await WS.get(id) : null; if (activeWorkspace) publicCopy = null; else { if (id) await WS.activate(null); publicCopy = await WS.getPublicCopy(); } router(); }).catch(function (error) { console.warn(error); router(); }).finally(function () { document.body.classList.add('zbll-ready'); });
     }
 
     document.addEventListener('click', function (e) {
