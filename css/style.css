@@ -889,7 +889,7 @@ html[data-theme="dark"] .form-check-label {
 .workspace-public-section, .workspace-custom-section { min-width: 0; padding: 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-muted); }
 .workspace-public-title, .workspace-list-title { margin: 0 0 8px; font-size: 1rem; }
 .workspace-list-title { margin-top: 0; }
-.workspace-list { --workspace-list-row-height: 46px; display: grid; align-content: start; grid-auto-rows: var(--workspace-list-row-height); gap: 8px; height: calc(var(--workspace-list-row-height) * 5 + 32px); min-height: calc(var(--workspace-list-row-height) * 5 + 32px); max-height: calc(var(--workspace-list-row-height) * 5 + 32px); overflow-x: hidden; overflow-y: auto; }
+.workspace-list { --workspace-list-row-height: 46px; display: grid; align-content: start; grid-auto-rows: var(--workspace-list-row-height); gap: 8px; height: calc(var(--workspace-list-row-height) * 4 + 24px); min-height: calc(var(--workspace-list-row-height) * 4 + 24px); max-height: calc(var(--workspace-list-row-height) * 4 + 24px); overflow-x: hidden; overflow-y: auto; }
 .workspace-list-item { height: var(--workspace-list-row-height); display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 12px; text-align: left; border: 1px solid var(--border); border-radius: 7px; background: var(--surface); color: var(--text); cursor: pointer; }
 .workspace-list-item:hover, .workspace-list-item.active { border-color: #0d6efd; background: var(--line-hover); }
 .workspace-list-item small { color: var(--text-muted); white-space: nowrap; }
