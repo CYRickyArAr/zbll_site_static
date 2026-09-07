@@ -897,7 +897,7 @@ html[data-theme="dark"] .form-check-label {
 .workspace-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .workspace-section-actions { display: flex; flex-wrap: nowrap; align-content: flex-start; gap: 8px; min-height: 42px; }
 .workspace-section-actions .btn { flex: 1 1 0; min-width: 0; overflow: hidden; white-space: nowrap; padding: .5em .25em; font-size: clamp(.55rem, 1vw, .85rem); line-height: 1.35; text-align: center; }
-.workspace-common-actions { padding-top: 2px; }
+.workspace-common-actions { justify-content: center; padding-top: 2px; }
 .workspace-message { min-height: 1.4em; margin-top: 12px; color: #198754; }
 .workspace-message.is-error { color: #dc3545; }
 .workspace-progress { margin-top: 10px; }
