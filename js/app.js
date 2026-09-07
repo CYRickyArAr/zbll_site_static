@@ -684,6 +684,7 @@
         if (!name || !name.trim()) return;
         name = name.trim();
         var workspace = await WS.create(DATA, name);
+        setWorkspaceMessage('');
         try { localStorage.setItem(selectedWorkspaceKey, workspace.id); } catch (e) {}
         if (activeWorkspace) { publicCopy = null; activeWorkspace = await WS.activate(workspace.id); router(); }
         await refreshWorkspaceList();
@@ -692,6 +693,7 @@
         var name = window.prompt('请输入大神版公式库名称', '');
         if (!name || !name.trim()) return;
         var copy = await WS.createPublicCopy(DATA, name.trim());
+        setWorkspaceMessage('');
         try { localStorage.setItem(publicModeKey, copy.id); } catch (e) {}
         if (!activeWorkspace) { publicCopy = copy; router(); }
         await refreshWorkspaceList();
@@ -852,6 +854,7 @@
         var publicItem = e.target.closest('[data-public-library]');
         if (publicItem) {
             var publicMode = publicItem.dataset.publicLibrary || 'default';
+            setWorkspaceMessage('');
             try { localStorage.setItem(publicModeKey, publicMode); } catch (ignore) {}
             if (!activeWorkspace) await activatePublicLibrary(publicMode);
             else await refreshWorkspaceList();
@@ -859,6 +862,7 @@
         }
         var item = e.target.closest('[data-workspace-id]');
         if (item) {
+            setWorkspaceMessage('');
             try { localStorage.setItem(selectedWorkspaceKey, item.dataset.workspaceId); } catch (ignore) {}
             if (activeWorkspace) await activateWorkspace(item.dataset.workspaceId);
             else await refreshWorkspaceList();
