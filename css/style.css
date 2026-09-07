@@ -1041,7 +1041,7 @@ html[data-theme="dark"] .form-check-label {
     width: 100%;
 }
 .formula-card.inline-editing { cursor: default; }
-.formula-card.inline-editing .workspace-note-header { margin-bottom: 6px; padding: 6px 9px; }
+.formula-card.inline-editing .inline-note-header { margin-bottom: 4px; }
 .formula-card.inline-editing .workspace-textarea {
     min-height: 96px;
     height: 96px;

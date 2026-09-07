@@ -385,7 +385,7 @@
         else html += '<div class="formula-image d-flex align-items-center justify-content-center bg-light"><span class="text-muted">无图</span></div>';
         html += '</div><div class="col-8"><div class="formula-id">' + escapeHtml(id) + '</div>';
         if (editing) {
-            html += '<div class="inline-note-editor"><div class="workspace-note-header inline-note-header">' + escapeHtml(note.header) + '</div>';
+            html += '<div class="inline-note-editor"><div class="formula-notes formula-note-fixed inline-note-header">' + escapeHtml(note.header) + '</div>';
             html += '<textarea class="workspace-textarea form-control note-body inline-note-body" rows="4" placeholder="可以在这里写备注">' + escapeHtml(note.body) + '</textarea></div>';
         } else if (formula.notes) {
             html += '<div class="formula-note-display formula-notes"><div class="formula-note-fixed">' + escapeHtml(note.header) + '</div>';
