@@ -387,7 +387,11 @@
         if (editing) {
             html += '<div class="inline-note-editor"><div class="workspace-note-header inline-note-header">' + escapeHtml(note.header) + '</div>';
             html += '<textarea class="workspace-textarea form-control note-body inline-note-body" rows="4" placeholder="可以在这里写备注">' + escapeHtml(note.body) + '</textarea></div>';
-        } else if (formula.notes) html += '<div class="formula-note-display"><pre class="formula-notes">' + escapeHtml(formula.notes) + '</pre></div>';
+        } else if (formula.notes) {
+            html += '<div class="formula-note-display formula-notes"><div class="formula-note-fixed">' + escapeHtml(note.header) + '</div>';
+            if (note.body) html += '<div class="formula-note-body-display">' + escapeHtml(note.body) + '</div>';
+            html += '</div>';
+        }
         html += '</div></div>';
         if (editing && !notesOnly) {
             html += '<label class="workspace-label inline-formula-label">公式</label>';
@@ -776,6 +780,7 @@
         var body = bodyInput ? bodyInput.value.replace(/^\s+|\s+$/g, '') : '';
         if (body) notes += '\n' + body;
         ref.formula.notes = notes;
+        if (state.notesOnly) ref.formula.localNoteEdited = true;
         if (!state.notesOnly) {
             var formulaInput = card.querySelector('.inline-formula-input');
             ref.formula.lines = parseFormulaLines(formulaInput ? formulaInput.value : '');

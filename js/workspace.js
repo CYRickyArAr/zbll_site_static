@@ -136,6 +136,7 @@
 
     function mergePublicCopy(data, existing) {
         if (!existing) return null;
+        var sameSource = (existing.sourceFingerprint || '') === ((data.meta && data.meta.fingerprint) || '');
         var merged = publicCopy(data);
         merged.id = existing.id || merged.id;
         merged.kind = 'public-copy';
@@ -155,7 +156,15 @@
                 oldFormulas.forEach(function (formula) { oldByKey[formulaKey(formula)] = formula; });
                 subcat.formulas.forEach(function (formula) {
                     var old = oldByKey[formulaKey(formula)];
-                    if (old) formula.learned = old.learned === true;
+                    if (old) {
+                        formula.learned = old.learned === true;
+                        var preserveLocalNote = old.localNoteEdited === true ||
+                            (sameSource && typeof old.notes === 'string' && old.notes !== formula.notes);
+                        if (preserveLocalNote) {
+                            formula.notes = old.notes;
+                            formula.localNoteEdited = true;
+                        }
+                    }
                 });
                 var currentByKey = {};
                 subcat.formulas.forEach(function (formula) { currentByKey[formulaKey(formula)] = formula; });

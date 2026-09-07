@@ -642,6 +642,14 @@ html[data-zbll-filter="unlearned"] .sortable-item:has(.formula-card.learned) {
     padding: 0;
     color: #495057;
 }
+.formula-note-body-display {
+    margin-top: 4px;
+    font-size: 1.15rem;
+    font-weight: 600;
+    line-height: 1.45;
+    color: var(--text);
+    white-space: pre-wrap;
+}
 
 /* ===== 深色模式 ===== */
 html[data-theme="dark"] .breadcrumb,
