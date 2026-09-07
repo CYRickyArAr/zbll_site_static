@@ -30,6 +30,7 @@
     var publicModeKey = 'zbll_public_mode';
     var renderSnapshotKey = 'zbll_render_snapshot_v1';
     var workspaceProgressState = null;
+    var workspaceExportController = null;
     var inlineEditor = null;
 
     function escapeHtml(value) {
@@ -579,6 +580,8 @@
         var track = wrap.querySelector('.workspace-progress-track');
         if (track) track.setAttribute('aria-valuenow', String(value));
         if (label) label.textContent = (text || '处理中') + ' · ' + value + '%';
+        var cancel = document.getElementById('workspace-export-cancel');
+        if (cancel) { cancel.hidden = !workspaceExportController; cancel.disabled = false; }
     }
     async function refreshWorkspaceList() {
         var listEl = document.getElementById('workspace-list'), publicListEl = document.getElementById('workspace-public-list');
@@ -629,13 +632,27 @@
     }
     async function exportWorkspace(target, button) {
         if (!target) { setWorkspaceMessage('请先选择要导出的公式库。', true); return; }
+        if (workspaceExportController) { setWorkspaceMessage('已有导出正在进行，请先等待或取消。', true); return; }
         if (button) button.disabled = true;
+        workspaceExportController = new AbortController();
         setWorkspaceMessage('正在导出，请稍候…');
         setWorkspaceProgress(0, '开始导出');
-        await WS.exportFile(target, setWorkspaceProgress);
-        setWorkspaceMessage('已开始下载 ' + (target.name || 'zbll-workspace').replace(/[\\/:*?"<>|]/g, '_') + '.zbll');
-        setTimeout(function () { setWorkspaceProgress(null); }, 1200);
-        await refreshWorkspaceList();
+        try {
+            await WS.exportFile(target, setWorkspaceProgress, workspaceExportController.signal);
+            setWorkspaceMessage('已开始下载 ' + (target.name || 'zbll-workspace').replace(/[\\/:*?"<>|]/g, '_') + '.zbll');
+            setTimeout(function () { if (!workspaceExportController) setWorkspaceProgress(null); }, 1200);
+        } catch (error) {
+            if (workspaceExportController.signal.aborted || (error && error.name === 'AbortError')) {
+                setWorkspaceMessage('已取消导出。');
+                setWorkspaceProgress(null);
+            } else {
+                setWorkspaceMessage(error && error.message ? error.message : '导出失败，请重试。', true);
+                setWorkspaceProgress(null);
+            }
+        } finally {
+            workspaceExportController = null;
+            await refreshWorkspaceList();
+        }
     }
     async function activatePublicLibrary(mode) {
         var publicCopies = await WS.listPublicCopies(DATA);
@@ -871,6 +888,14 @@
             if (id === 'workspace-public-new') return createPublicLibrary();
             if (id === 'workspace-new') return createWorkspace();
             if (id === 'workspace-import') return document.getElementById('workspace-file').click();
+            if (id === 'workspace-export-cancel') {
+                if (workspaceExportController) {
+                    workspaceExportController.abort();
+                    e.target.disabled = true;
+                    setWorkspaceMessage('正在取消导出…');
+                }
+                return;
+            }
             if (id === 'workspace-public-export') {
                 return exportWorkspace(WS.exportPublic(DATA, await getSelectedPublicCopy()), e.target);
             }

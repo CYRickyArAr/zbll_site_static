@@ -320,10 +320,14 @@
             await this.put(workspace);
             return workspace;
         },
-        async exportFile(workspace, onProgress) {
+        async exportFile(workspace, onProgress, signal) {
             function progress(value, text) {
                 if (typeof onProgress === 'function') onProgress(value, text);
             }
+            function checkCancelled() {
+                if (signal && signal.aborted) throw new DOMException('导出已取消', 'AbortError');
+            }
+            checkCancelled();
             progress(5, '准备工作区数据');
             var output = clone(workspace);
             var formulasTotal = 0, formulasDone = 0;
@@ -338,12 +342,14 @@
                 for (var si = 0; si < category.subcategories.length; si++) {
                     var formulas = category.subcategories[si].formulas;
                     for (var fi = 0; fi < formulas.length; fi++) {
+                        checkCancelled();
                         var image = formulas[fi].image;
                         if (image && !/^data:/i.test(image)) {
                             try {
-                                var response = await fetch(new URL(image, document.baseURI).href);
+                                var response = await fetch(new URL(image, document.baseURI).href, signal ? { signal: signal } : undefined);
                                 if (response.ok) {
                                     var blob = await response.blob();
+                                    checkCancelled();
                                     formulas[fi].image = await new Promise(function (resolve, reject) {
                                         var reader = new FileReader();
                                         reader.onload = function () { resolve(reader.result); };
@@ -351,7 +357,10 @@
                                         reader.readAsDataURL(blob);
                                     });
                                 }
-                            } catch (e) { /* 路径图片无法读取时保留原路径 */ }
+                            } catch (e) {
+                                if ((signal && signal.aborted) || (e && e.name === 'AbortError')) throw e;
+                                /* 路径图片无法读取时保留原路径 */
+                            }
                         }
                         formulasDone++;
                         if (formulasDone === 1 || formulasDone === formulasTotal || formulasDone % 24 === 0) {
@@ -361,13 +370,16 @@
                     }
                 }
             }
+            checkCancelled();
             progress(82, '生成 .zbll 文件');
             var blob = new Blob([JSON.stringify(output, null, 2)], { type: 'application/json;charset=utf-8' });
+            checkCancelled();
             progress(92, '准备下载');
             var url = URL.createObjectURL(blob);
             var link = document.createElement('a');
             link.href = url;
             link.download = (workspace.name || 'zbll-workspace').replace(/[\\/:*?"<>|]/g, '_') + '.zbll';
+            checkCancelled();
             link.click();
             progress(100, '已开始下载');
             setTimeout(function () { URL.revokeObjectURL(url); }, 1000);

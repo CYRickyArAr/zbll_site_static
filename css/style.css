@@ -889,8 +889,8 @@ html[data-theme="dark"] .form-check-label {
 .workspace-public-section, .workspace-custom-section { min-width: 0; padding: 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-muted); }
 .workspace-public-title, .workspace-list-title { margin: 0 0 8px; font-size: 1rem; }
 .workspace-list-title { margin-top: 0; }
-.workspace-list { display: grid; align-content: start; gap: 8px; min-height: 112px; max-height: 260px; overflow: auto; }
-.workspace-list-item { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 12px; text-align: left; border: 1px solid var(--border); border-radius: 7px; background: var(--surface); color: var(--text); cursor: pointer; }
+.workspace-list { --workspace-list-row-height: 46px; display: grid; align-content: start; grid-auto-rows: var(--workspace-list-row-height); gap: 8px; height: calc(var(--workspace-list-row-height) * 5 + 32px); min-height: calc(var(--workspace-list-row-height) * 5 + 32px); max-height: calc(var(--workspace-list-row-height) * 5 + 32px); overflow-x: hidden; overflow-y: auto; }
+.workspace-list-item { height: var(--workspace-list-row-height); display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 12px; text-align: left; border: 1px solid var(--border); border-radius: 7px; background: var(--surface); color: var(--text); cursor: pointer; }
 .workspace-list-item:hover, .workspace-list-item.active { border-color: #0d6efd; background: var(--line-hover); }
 .workspace-list-item small { color: var(--text-muted); white-space: nowrap; }
 .workspace-actions { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -902,7 +902,8 @@ html[data-theme="dark"] .form-check-label {
 .workspace-progress { margin-top: 10px; }
 .workspace-progress-track { height: 8px; border-radius: 999px; overflow: hidden; background: var(--surface-muted); border: 1px solid var(--border); }
 .workspace-progress-bar { width: 0; height: 100%; border-radius: inherit; background: #0d6efd; transition: width .18s ease; }
-.workspace-progress-text { margin-top: 6px; font-size: .9rem; color: var(--text-muted); }
+.workspace-progress-meta { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 6px; }
+.workspace-progress-text { font-size: .9rem; color: var(--text-muted); }
 .workspace-mode-slot { position: relative; }
 .workspace-mode-placeholder { visibility: hidden; pointer-events: none; }
 .workspace-mode-hint { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; margin: 0; text-align: center; color: var(--text-muted); }
@@ -1086,6 +1087,7 @@ html[data-theme="dark"] .variant-add-form {
     .workspace-nav-btn { padding: 4px 0.5em; font-size: .76rem; }
     .workspace-dialog { padding: 16px; }
     .workspace-panels { grid-template-columns: 1fr; }
+    .workspace-list { --workspace-list-row-height: 62px; }
     .workspace-list-item { align-items: flex-start; flex-direction: column; gap: 3px; }
     .workspace-learn-btn { margin-left: 0; }
 }
