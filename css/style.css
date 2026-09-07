@@ -1072,12 +1072,15 @@ html[data-theme="dark"] .variant-add-form {
 .formula-card > .row > .col-8 { width: auto; flex: 1 1 auto; min-width: 0; padding: 0; }
 .formula-id { margin-bottom: 3px; }
 .formula-note-display { margin-top: 0; }
-/* 只有纯只读卡片才需给右下角勾预留空白；static 的大神版也有底部“编辑”，须与自定义共用同一操作区。 */
+/* 只有纯只读卡片才需给右下角勾预留空白。带编辑入口的卡片统一给左右底部按钮预留同一操作区。 */
 .formula-card.learning-enabled:not(.content-editable):not(.has-card-editor) { padding-bottom: 52px; }
+.formula-card.has-card-editor { padding-bottom: 62px; }
 .drag-handle { cursor: move; color: #adb5bd; font-size: 1.5rem; line-height: 1; user-select: none; position: absolute; top: 10px; right: 10px; z-index: 10; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 4px; }
 .drag-handle:hover { color: #495057; background: rgba(0,0,0,.05); }
 .action-buttons { margin-top: 6px; padding-right: 44px; display: flex; flex-direction: column; align-items: flex-start; gap: 16px; flex: 1; }
 .action-buttons-row { display: flex; align-items: center; margin-top: auto; }
+.formula-card.has-card-editor .action-buttons { flex: 0 0 auto; }
+.formula-card.has-card-editor .action-buttons-row { position: absolute; left: 20px; bottom: 10px; margin-top: 0; }
 .add-variant-btn { border: 1px dashed #86b7fe; background: transparent; color: #0d6efd; border-radius: 4px; padding: 4px 12px; font-size: 1rem; line-height: 1; cursor: pointer; margin-right: 10px; transition: background .15s; }
 .add-variant-placeholder { visibility: hidden; pointer-events: none; }
 .add-variant-btn:hover, .add-variant-btn:focus-visible { background: #eaf3ff; }
@@ -1215,6 +1218,7 @@ html[data-theme="dark"] .sortable-ghost { background: #303840; border-color: #4e
 
 @media (max-width: 768px) {
     .formula-card > .row { gap: 12px; }
+    .formula-card.has-card-editor .action-buttons-row { left: 12px; }
     .category-title-row { align-items: flex-start; flex-direction: column; }
     .collapse-all-btn { top: 110px; right: 12px; }
     .formula-image { height: 140px; }
