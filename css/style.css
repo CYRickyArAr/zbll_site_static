@@ -904,7 +904,9 @@ html[data-theme="dark"] .form-check-label {
 .workspace-progress-track { height: 8px; border-radius: 999px; overflow: hidden; background: var(--surface-muted); border: 1px solid var(--border); }
 .workspace-progress-bar { width: 0; height: 100%; border-radius: inherit; background: #0d6efd; transition: width .18s ease; }
 .workspace-progress-text { margin-top: 6px; font-size: .9rem; color: var(--text-muted); }
-.workspace-mode-hint { margin: -24px auto 26px; text-align: center; color: var(--text-muted); }
+.workspace-mode-slot { position: relative; }
+.workspace-mode-placeholder { visibility: hidden; pointer-events: none; }
+.workspace-mode-hint { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; margin: 0; text-align: center; color: var(--text-muted); }
 .workspace-card-actions { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); }
 .workspace-learn-btn { margin-left: auto; }
 .workspace-empty { padding: 14px; text-align: center; color: var(--text-muted); border: 1px dashed var(--border); border-radius: 7px; }

@@ -310,7 +310,14 @@
                 } else html += '<span class="player-stat-box">' + escapeHtml(p.label) + ' <b>' + p.count + '</b></span>';
             });
             html += '</div>';
-        } else html += '<div class="workspace-mode-hint">当前工作区：' + escapeHtml(activeWorkspace.name) + '</div>';
+        } else {
+            // 用与大神版统计框相同的隐形占位保留首页分类卡位置，切换时不发生上下跳动。
+            html += '<div class="player-stats workspace-mode-slot">';
+            getPlayerStats(DATA).forEach(function (p) {
+                html += '<span class="player-stat-box workspace-mode-placeholder" aria-hidden="true">' + escapeHtml(p.label) + ' <b>' + p.count + '</b></span>';
+            });
+            html += '<div class="workspace-mode-hint">当前自定义公式库：' + escapeHtml(activeWorkspace.name) + '</div></div>';
+        }
         html += '<div class="row row-cols-1 row-cols-md-3 g-4">';
         (data.categories || []).forEach(function (cat) {
             var total = 0;
