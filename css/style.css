@@ -1037,7 +1037,7 @@ html:not([data-theme="dark"]) .workspace-nav-btn:focus-visible {
 #workspace-import:focus {
     border-color: transparent;
     background:
-        linear-gradient(90deg, rgba(53, 120, 246, .10) 0%, rgba(166, 47, 210, .10) 100%) padding-box,
+        linear-gradient(90deg, #edf3ff 0%, #f7edfb 100%) padding-box,
         linear-gradient(90deg, #1f6ff2 0%, #a62fd2 100%) border-box;
 }
 #workspace-import:hover > span,
@@ -1047,7 +1047,7 @@ html:not([data-theme="dark"]) .workspace-nav-btn:focus-visible {
 #workspace-import.active {
     border-color: transparent;
     background:
-        linear-gradient(90deg, rgba(20, 95, 216, .16) 0%, rgba(141, 37, 185, .16) 100%) padding-box,
+        linear-gradient(90deg, #e4edff 0%, #f2e4f8 100%) padding-box,
         linear-gradient(90deg, #145fd8 0%, #8d25b9 100%) border-box;
 }
 .workspace-list-item > span { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -1270,6 +1270,18 @@ html[data-theme="dark"] #workspace-import > span { background-image: linear-grad
 html[data-theme="dark"] #workspace-import:hover > span,
 html[data-theme="dark"] #workspace-import:focus > span,
 html[data-theme="dark"] #workspace-import:active > span { background-image: linear-gradient(90deg, #8bb2ff 0%, #dc96fa 100%); }
+html[data-theme="dark"] #workspace-import:hover,
+html[data-theme="dark"] #workspace-import:focus {
+    background:
+        linear-gradient(90deg, #242b39 0%, #302638 100%) padding-box,
+        linear-gradient(90deg, #5790ff 0%, #b35bdf 100%) border-box;
+}
+html[data-theme="dark"] #workspace-import:active,
+html[data-theme="dark"] #workspace-import.active {
+    background:
+        linear-gradient(90deg, #293247 0%, #392943 100%) padding-box,
+        linear-gradient(90deg, #4b84f0 0%, #a44dce 100%) border-box;
+}
 html[data-theme="dark"] .workspace-note-header,
 html[data-theme="dark"] .workspace-textarea { background: var(--surface-muted); color: var(--text); border-color: var(--border); }
 html[data-theme="dark"] .drag-area {
