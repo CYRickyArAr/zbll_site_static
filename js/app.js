@@ -784,9 +784,20 @@
 
     async function handleWorkspaceManagerClick(e) {
         var publicItem = e.target.closest('[data-public-library]');
-        if (publicItem) { try { localStorage.setItem(publicModeKey, publicItem.dataset.publicLibrary === 'edited' ? 'edited' : 'default'); } catch (ignore) {} await refreshWorkspaceList(); return; }
+        if (publicItem) {
+            var publicMode = publicItem.dataset.publicLibrary === 'edited' ? 'edited' : 'default';
+            try { localStorage.setItem(publicModeKey, publicMode); } catch (ignore) {}
+            if (!activeWorkspace) await activatePublicLibrary(publicMode);
+            else await refreshWorkspaceList();
+            return;
+        }
         var item = e.target.closest('[data-workspace-id]');
-        if (item) { try { localStorage.setItem(selectedWorkspaceKey, item.dataset.workspaceId); } catch (ignore) {} await refreshWorkspaceList(); return; }
+        if (item) {
+            try { localStorage.setItem(selectedWorkspaceKey, item.dataset.workspaceId); } catch (ignore) {}
+            if (activeWorkspace) await activateWorkspace(item.dataset.workspaceId);
+            else await refreshWorkspaceList();
+            return;
+        }
         var id = e.target.id;
         try {
             if (id === 'workspace-new') return createWorkspace();
