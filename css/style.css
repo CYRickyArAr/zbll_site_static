@@ -916,6 +916,53 @@ html[data-theme="dark"] .form-check-label {
     overflow: auto;
     max-height: calc(100vh - 130px);
 }
+.workspace-editor {
+    max-height: calc(100vh - 24px);
+}
+.workspace-editor .workspace-dialog-header {
+    padding: 10px 16px;
+}
+.workspace-editor .workspace-dialog-header h2 {
+    font-size: 1.15rem;
+}
+.workspace-editor form {
+    padding: 10px 16px 12px;
+    overflow: visible;
+    max-height: none;
+}
+.workspace-editor .workspace-label {
+    margin: 5px 0 3px;
+}
+.workspace-editor .workspace-textarea {
+    margin-bottom: 8px;
+    padding: 6px 9px;
+    line-height: 1.35;
+}
+.workspace-editor .workspace-textarea#editor-formula {
+    min-height: 62px;
+}
+.workspace-editor .workspace-textarea.note-body {
+    min-height: 42px;
+}
+.workspace-editor .workspace-note-header {
+    padding: 6px 9px;
+    margin-bottom: 5px;
+}
+.workspace-editor .drag-area {
+    padding: 10px;
+}
+.workspace-editor .drag-area-icon {
+    font-size: 28px;
+}
+.workspace-editor .editor-preview-image {
+    max-height: 78px;
+}
+.workspace-editor .editor-image-container {
+    margin-bottom: 5px;
+}
+.workspace-editor .workspace-editor-actions {
+    margin-top: 10px;
+}
 .modal-like-dialog .workspace-label {
     margin: 0 0 8px;
 }
