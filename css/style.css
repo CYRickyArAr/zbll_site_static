@@ -1060,7 +1060,11 @@ html[data-theme="dark"] .form-check-label {
     overflow-y: auto;
 }
 .inline-formula-label { margin-top: 12px; }
-.inline-formula-input { margin-bottom: 8px; }
+.inline-formula-input {
+    margin-bottom: 8px;
+    border-width: 2px;
+    border-color: #6ea8fe;
+}
 .inline-image-editor { width: 140px; }
 .inline-image-drop {
     width: 140px;
