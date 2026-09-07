@@ -998,7 +998,8 @@ html:not([data-theme="dark"]) .workspace-nav-btn:focus-visible {
 .workspace-list { --workspace-list-row-height: 46px; display: grid; align-content: start; grid-auto-rows: var(--workspace-list-row-height); gap: 8px; height: calc(var(--workspace-list-row-height) * 4 + 24px); min-height: calc(var(--workspace-list-row-height) * 4 + 24px); max-height: calc(var(--workspace-list-row-height) * 4 + 24px); overflow-x: hidden; overflow-y: auto; }
 .workspace-list-item { height: var(--workspace-list-row-height); display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 12px; text-align: left; border: 1px solid var(--border); border-radius: 7px; background: var(--surface); color: var(--text); cursor: pointer; }
 .workspace-list-item:hover, .workspace-list-item.active { border-color: #0d6efd; background: var(--line-hover); }
-.workspace-list-item small { color: var(--text-muted); white-space: nowrap; }
+.workspace-list-item > span { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.workspace-list-item small { flex: 0 0 auto; color: var(--text-muted); white-space: nowrap; }
 .workspace-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .workspace-section-actions { display: flex; flex-wrap: nowrap; align-content: flex-start; gap: 8px; min-height: 42px; }
 .workspace-section-actions .btn { flex: 1 1 0; min-width: 0; overflow: hidden; white-space: nowrap; padding: .5em .25em; font-size: clamp(.55rem, 1vw, .85rem); line-height: 1.35; text-align: center; }
