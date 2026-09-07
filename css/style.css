@@ -48,9 +48,9 @@ body {
 }
 
 /* 等待 IndexedDB 恢复上次工作区后再显示首帧，避免刷新时先闪过大神版。 */
-body:not(.zbll-ready) .navbar-center,
-body:not(.zbll-ready) .navbar-right,
-body:not(.zbll-ready) .main-content {
+body:not(.zbll-ready):not(.zbll-has-snapshot) .navbar-center,
+body:not(.zbll-ready):not(.zbll-has-snapshot) .navbar-right,
+body:not(.zbll-ready):not(.zbll-has-snapshot) .main-content {
     visibility: hidden;
 }
 

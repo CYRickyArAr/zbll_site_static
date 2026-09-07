@@ -21,12 +21,13 @@
         '懿': 'Yi Shen (沈懿)', 'Matty': 'Matty Hiroto Inaba', 'Luke': 'Luke Garrett',
         '昆': 'Zhaokun Li (李昭昆)', '连': 'Yunzhi Lian (连允之)'
     };
-    var currentView = 'home';
+    var currentView = '';
     var activeWorkspace = null;
     var publicCopy = null;
     var themeKey = 'zbll_theme';
     var filterKey = 'zbll_filter';
     var selectedWorkspaceKey = 'zbll_selected_workspace';
+    var renderSnapshotKey = 'zbll_render_snapshot_v1';
     var editorSelectedImage = null;
 
     function escapeHtml(value) {
@@ -181,6 +182,7 @@
         return findVisible('.sortable-item[id]') || findVisible('.sticky-header[id]');
     }
     function saveScroll() {
+        if (!currentView) return;
         try {
             var key = getScrollKey(currentView);
             localStorage.setItem(key, String(window.pageYOffset || window.scrollY || 0));
@@ -208,6 +210,37 @@
         if (anchorEl) window.scrollTo(0, Math.max(0, window.pageYOffset + anchorEl.getBoundingClientRect().top - navOffset() - anchorOffset));
         else window.scrollTo(0, y);
         document.documentElement.removeAttribute('data-scroll-restore');
+    }
+    function saveRenderSnapshot() {
+        if (!appEl || !appEl.innerHTML) return;
+        try {
+            var navOpen = document.getElementById('workspace-open');
+            var publicBtn = document.getElementById('nav-public-mode');
+            var workspaceBtn = document.getElementById('nav-workspace-mode');
+            var snapshot = {
+                hash: location.hash || '#/',
+                scrollY: window.pageYOffset || window.scrollY || 0,
+                appHtml: appEl.innerHTML,
+                nav: {
+                    publicActive: publicBtn ? publicBtn.classList.contains('active') : true,
+                    workspaceActive: workspaceBtn ? workspaceBtn.classList.contains('active') : false,
+                    workspaceTitle: workspaceBtn ? workspaceBtn.title : '',
+                    workspaceOpenHtml: navOpen ? navOpen.innerHTML : '',
+                    workspaceOpenTitle: navOpen ? navOpen.title : '',
+                    workspaceOpenClass: navOpen ? navOpen.className : ''
+                }
+            };
+            try {
+                sessionStorage.setItem(renderSnapshotKey, JSON.stringify(snapshot));
+            } catch (quotaError) {
+                var clone = appEl.cloneNode(true);
+                clone.querySelectorAll('img[src^="data:"]').forEach(function (img) { img.removeAttribute('src'); });
+                snapshot.appHtml = clone.innerHTML;
+                sessionStorage.setItem(renderSnapshotKey, JSON.stringify(snapshot));
+            }
+        } catch (e) {
+            try { sessionStorage.removeItem(renderSnapshotKey); } catch (ignore) {}
+        }
     }
     function findCategory(catId) {
         var cats = viewData().categories || [];
@@ -755,12 +788,12 @@
 
     function router() {
         var hash = location.hash || '#/', match = hash.match(/^#\/category\/([A-Za-z]+)$/), nextView = match ? 'cat:' + match[1] : 'home';
-        saveScroll(); if (match) renderCategory(match[1]); else renderHome(); currentView = nextView;
+        if (currentView) saveScroll(); if (match) renderCategory(match[1]); else renderHome(); currentView = nextView;
         requestAnimationFrame(function () { restoreScroll(nextView); });
         updateWorkspaceNav();
     }
     function initWorkspace() {
-        return WS.ready.then(async function () { var id = WS.activeId(); activeWorkspace = id ? await WS.get(id) : null; if (activeWorkspace) publicCopy = null; else { if (id) await WS.activate(null); publicCopy = await WS.getPublicCopy(); } router(); }).catch(function (error) { console.warn(error); router(); }).finally(function () { document.body.classList.add('zbll-ready'); });
+        return WS.ready.then(async function () { var id = WS.activeId(); activeWorkspace = id ? await WS.get(id) : null; if (activeWorkspace) publicCopy = null; else { if (id) await WS.activate(null); publicCopy = await WS.getPublicCopy(); } router(); }).catch(function (error) { console.warn(error); router(); }).finally(function () { document.body.classList.add('zbll-ready'); document.body.classList.remove('zbll-has-snapshot'); });
     }
 
     document.addEventListener('click', function (e) {
@@ -787,7 +820,7 @@
     window.addEventListener('hashchange', router);
     var scrollTimer = null;
     window.addEventListener('scroll', function () { if (scrollTimer) clearTimeout(scrollTimer); scrollTimer = setTimeout(saveScroll, 150); });
-    window.addEventListener('pagehide', saveScroll);
+    window.addEventListener('pagehide', function () { saveScroll(); saveRenderSnapshot(); });
     window.addEventListener('zbll-workspace-changed', function (e) { activeWorkspace = e.detail || null; if (activeWorkspace) publicCopy = null; else WS.getPublicCopy().then(function (copy) { publicCopy = copy; router(); }); router(); });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { showOverlay('workspace-overlay', false); showOverlay('editor-overlay', false); } });
     initWorkspace();
