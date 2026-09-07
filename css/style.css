@@ -1083,7 +1083,7 @@ html[data-theme="dark"] .form-check-label {
 .inline-image-drop {
     width: 140px;
     height: 140px;
-    padding: 6px;
+    padding: 7px;
     display: flex;
     align-items: center;
     justify-content: center;
