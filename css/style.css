@@ -896,6 +896,10 @@ html[data-theme="dark"] .form-check-label {
 .workspace-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .workspace-message { min-height: 1.4em; margin-top: 12px; color: #198754; }
 .workspace-message.is-error { color: #dc3545; }
+.workspace-progress { margin-top: 10px; }
+.workspace-progress-track { height: 8px; border-radius: 999px; overflow: hidden; background: var(--surface-muted); border: 1px solid var(--border); }
+.workspace-progress-bar { width: 0; height: 100%; border-radius: inherit; background: #0d6efd; transition: width .18s ease; }
+.workspace-progress-text { margin-top: 6px; font-size: .9rem; color: var(--text-muted); }
 .workspace-mode-hint { margin: -24px auto 26px; text-align: center; color: var(--text-muted); }
 .workspace-card-actions { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); }
 .workspace-learn-btn { margin-left: auto; }

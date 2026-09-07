@@ -508,6 +508,19 @@
         var el = document.getElementById('workspace-message'); if (!el) return;
         el.textContent = text || ''; el.classList.toggle('is-error', !!error);
     }
+    function setWorkspaceProgress(value, text) {
+        var wrap = document.getElementById('workspace-progress'); if (!wrap) return;
+        var bar = wrap.querySelector('.workspace-progress-bar');
+        var label = wrap.querySelector('.workspace-progress-text');
+        var visible = value !== null && value !== undefined;
+        wrap.hidden = !visible;
+        if (!visible) return;
+        value = Math.max(0, Math.min(100, Number(value) || 0));
+        if (bar) bar.style.width = value + '%';
+        var track = wrap.querySelector('.workspace-progress-track');
+        if (track) track.setAttribute('aria-valuenow', String(value));
+        if (label) label.textContent = (text || '处理中') + ' · ' + value + '%';
+    }
     async function refreshWorkspaceList() {
         var listEl = document.getElementById('workspace-list'), currentEl = document.getElementById('workspace-current');
         if (!listEl) return;
@@ -529,7 +542,7 @@
         if (resetButton) resetButton.disabled = !publicCopy;
         updateWorkspaceNav();
     }
-    async function openWorkspaceManager() { setWorkspaceMessage(''); showOverlay('workspace-overlay', true); await refreshWorkspaceList(); }
+    async function openWorkspaceManager() { setWorkspaceMessage(''); setWorkspaceProgress(null); showOverlay('workspace-overlay', true); await refreshWorkspaceList(); }
     async function activateWorkspace(id) {
         if (id) {
             publicCopy = null;
@@ -753,9 +766,14 @@
             if (id === 'workspace-export') {
                 var target = activeWorkspace || publicCopy;
                 if (!target) target = { name: '大神版', categories: (window.ZBLL_DATA && window.ZBLL_DATA.categories) || [] };
+                var exportButton = document.getElementById('workspace-export');
+                if (exportButton) exportButton.disabled = true;
                 setWorkspaceMessage('正在导出，请稍候…');
-                await WS.exportFile(target);
+                setWorkspaceProgress(0, '开始导出');
+                await WS.exportFile(target, setWorkspaceProgress);
                 setWorkspaceMessage('已开始下载 ' + (target.name || 'zbll-workspace').replace(/[\\/:*?"<>|]/g, '_') + '.zbll');
+                setTimeout(function () { setWorkspaceProgress(null); }, 1200);
+                await refreshWorkspaceList();
                 return;
             }
             if (id === 'workspace-public-reset' && publicCopy) {
@@ -776,7 +794,7 @@
             }
             if (id === 'workspace-exit') { await activateWorkspace(null); showOverlay('workspace-overlay', false); return; }
             if (id === 'workspace-close') return showOverlay('workspace-overlay', false);
-        } catch (error) { setWorkspaceMessage(error.message || '工作区操作失败', true); }
+        } catch (error) { setWorkspaceMessage(error.message || '工作区操作失败', true); setWorkspaceProgress(null); await refreshWorkspaceList(); }
     }
     async function importWorkspaceFile(e) {
         var file = e.target.files && e.target.files[0]; e.target.value = ''; if (!file) return;

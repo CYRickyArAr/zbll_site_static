@@ -242,8 +242,19 @@
             await this.activate(workspace.id);
             return workspace;
         },
-        async exportFile(workspace) {
+        async exportFile(workspace, onProgress) {
+            function progress(value, text) {
+                if (typeof onProgress === 'function') onProgress(value, text);
+            }
+            progress(5, '准备工作区数据');
             var output = clone(workspace);
+            var formulasTotal = 0, formulasDone = 0;
+            for (var countCi = 0; countCi < output.categories.length; countCi++) {
+                var countCategory = output.categories[countCi];
+                for (var countSi = 0; countSi < countCategory.subcategories.length; countSi++) {
+                    formulasTotal += countCategory.subcategories[countSi].formulas.length;
+                }
+            }
             for (var ci = 0; ci < output.categories.length; ci++) {
                 var category = output.categories[ci];
                 for (var si = 0; si < category.subcategories.length; si++) {
@@ -264,15 +275,23 @@
                                 }
                             } catch (e) { /* 路径图片无法读取时保留原路径 */ }
                         }
+                        formulasDone++;
+                        if (formulasDone === 1 || formulasDone === formulasTotal || formulasDone % 24 === 0) {
+                            progress(10 + Math.round((formulasDone / Math.max(1, formulasTotal)) * 65), '整理图片和公式 ' + formulasDone + '/' + formulasTotal);
+                            await new Promise(function (resolve) { setTimeout(resolve, 0); });
+                        }
                     }
                 }
             }
+            progress(82, '生成 .zbll 文件');
             var blob = new Blob([JSON.stringify(output, null, 2)], { type: 'application/json;charset=utf-8' });
+            progress(92, '准备下载');
             var url = URL.createObjectURL(blob);
             var link = document.createElement('a');
             link.href = url;
             link.download = (workspace.name || 'zbll-workspace').replace(/[\\/:*?"<>|]/g, '_') + '.zbll';
             link.click();
+            progress(100, '已开始下载');
             setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
         }
     };
