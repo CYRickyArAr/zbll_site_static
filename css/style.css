@@ -885,6 +885,7 @@ html[data-theme="dark"] .form-check-label {
 .workspace-help { color: var(--text-muted); margin-bottom: 14px; }
 .workspace-current { padding: 10px 12px; border-radius: 7px; background: var(--surface-muted); border: 1px solid var(--border); margin-bottom: 10px; font-weight: 700; }
 .workspace-panels { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; margin-bottom: 16px; align-items: stretch; }
+.workspace-panel-column { min-width: 0; display: flex; flex-direction: column; gap: 10px; }
 .workspace-public-section, .workspace-custom-section { min-width: 0; padding: 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-muted); }
 .workspace-public-title, .workspace-list-title { margin: 0 0 8px; font-size: 1rem; }
 .workspace-list-title { margin-top: 0; }
@@ -893,7 +894,7 @@ html[data-theme="dark"] .form-check-label {
 .workspace-list-item:hover, .workspace-list-item.active { border-color: #0d6efd; background: var(--line-hover); }
 .workspace-list-item small { color: var(--text-muted); white-space: nowrap; }
 .workspace-actions { display: flex; flex-wrap: wrap; gap: 8px; }
-.workspace-section-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.workspace-section-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .workspace-common-actions { padding-top: 2px; }
 .workspace-message { min-height: 1.4em; margin-top: 12px; color: #198754; }
 .workspace-message.is-error { color: #dc3545; }
