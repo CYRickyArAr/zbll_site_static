@@ -884,12 +884,13 @@ html[data-theme="dark"] .form-check-label {
 .workspace-close { border: 0; background: transparent; color: var(--text-muted); font-size: 1.8rem; line-height: 1; cursor: pointer; }
 .workspace-help { color: var(--text-muted); margin-bottom: 14px; }
 .workspace-current { padding: 10px 12px; border-radius: 7px; background: var(--surface-muted); border: 1px solid var(--border); margin-bottom: 10px; font-weight: 700; }
-.workspace-public-section { padding: 12px; margin-bottom: 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-muted); }
+.workspace-panels { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; margin-bottom: 16px; align-items: stretch; }
+.workspace-public-section, .workspace-custom-section { min-width: 0; padding: 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-muted); }
 .workspace-public-title, .workspace-list-title { margin: 0 0 8px; font-size: 1rem; }
 .workspace-public-status { color: var(--text-muted); margin-bottom: 10px; }
 .workspace-public-actions { display: flex; flex-wrap: wrap; gap: 8px; }
-.workspace-list-title { margin-top: 4px; }
-.workspace-list { display: grid; gap: 8px; max-height: 260px; overflow: auto; margin-bottom: 16px; }
+.workspace-list-title { margin-top: 0; }
+.workspace-list { display: grid; gap: 8px; max-height: 260px; overflow: auto; }
 .workspace-list-item { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 12px; text-align: left; border: 1px solid var(--border); border-radius: 7px; background: var(--surface); color: var(--text); cursor: pointer; }
 .workspace-list-item:hover, .workspace-list-item.active { border-color: #0d6efd; background: var(--line-hover); }
 .workspace-list-item small { color: var(--text-muted); white-space: nowrap; }
@@ -1051,6 +1052,7 @@ html[data-theme="dark"] .variant-add-form {
 @media (max-width: 600px) {
     .workspace-nav-btn { padding: 4px 0.5em; font-size: .76rem; }
     .workspace-dialog { padding: 16px; }
+    .workspace-panels { grid-template-columns: 1fr; }
     .workspace-list-item { align-items: flex-start; flex-direction: column; gap: 3px; }
     .workspace-learn-btn { margin-left: 0; }
 }
