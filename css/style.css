@@ -1020,6 +1020,24 @@ html:not([data-theme="dark"]) .workspace-nav-btn:focus-visible {
 #workspace-new.active { color: #fff; background-color: #573d89; border-color: #573d89; }
 #workspace-new:disabled,
 #workspace-new.disabled { color: #fff; background-color: #7255ad; border-color: #7255ad; }
+#workspace-import {
+    color: #fff;
+    border-color: transparent;
+    background: linear-gradient(90deg, #4777ed 0%, #7255ad 100%);
+}
+#workspace-import:hover,
+#workspace-import:focus {
+    color: #fff;
+    border-color: transparent;
+    background: linear-gradient(90deg, #3869dc 0%, #624797 100%);
+}
+#workspace-import:focus { box-shadow: 0 0 0 .2rem rgba(101, 82, 174, .24); }
+#workspace-import:active,
+#workspace-import.active {
+    color: #fff;
+    border-color: transparent;
+    background: linear-gradient(90deg, #2f5fc9 0%, #573d89 100%);
+}
 .workspace-list-item > span { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .workspace-list-item small { flex: 0 0 auto; color: var(--text-muted); white-space: nowrap; }
 .workspace-actions { display: flex; flex-wrap: wrap; gap: 8px; }
