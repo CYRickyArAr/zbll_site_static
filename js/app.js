@@ -569,7 +569,7 @@
         }
         listEl.innerHTML = list.length ? list.map(function (item) {
             return '<button type="button" class="workspace-list-item' + (selectedId === item.id ? ' active' : '') + '" data-workspace-id="' + escapeHtml(item.id) + '"><span>' + escapeHtml(item.name) + '</span><small>' + escapeHtml(new Date(item.updatedAt).toLocaleString()) + '</small></button>';
-        }).join('') : '<div class="workspace-empty">还没有本地工作区</div>';
+        }).join('') : '<div class="workspace-empty">暂无自定义公式库</div>';
         var selectedExists = !!selected;
         var publicExportButton = document.getElementById('workspace-public-export');
         if (publicExportButton) publicExportButton.disabled = false;
