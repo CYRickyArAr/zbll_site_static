@@ -18,7 +18,8 @@ Algorithms and competitor annotations are sourced from [reco.nz](https://reco.nz
 
 ## Usage
 
-Open the site to browse all categories. Click a category to view its algorithms; click a sub-category title to collapse / expand.
+Open the site to browse all categories. Click a category to view its algorithms; click a sub-category title to collapse / expand. Use the top navigation to switch between the Expert Library and Custom mode.
 
-> Online: [https://cyrickyarar.github.io/zbll_site_static/](https://cyrickyarar.github.io/zbll_site_static/)<br>
-> Editable version: [https://cyricky.pythonanywhere.com/](https://cyricky.pythonanywhere.com/) (signed-in users can manage their own algorithms, images, and notes; public data is maintained by the administrator.)
+Open Local Libraries from the upper-right corner to create or choose multiple libraries. Custom libraries support editing algorithms, images, and notes; Expert Libraries store your personal learned status and ordering. Everything stays in the current browser only. Export a `.zbll` file, then import it on another device to continue editing.
+
+> Online: [https://cyrickyarar.github.io/zbll_site_static/](https://cyrickyarar.github.io/zbll_site_static/)
