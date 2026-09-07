@@ -764,7 +764,11 @@
             if (inlineEditor !== state) return;
             var card = findInlineCard(state.uid);
             var field = card && card.querySelector(state.notesOnly ? '.inline-note-body' : '.inline-formula-input');
-            if (field) field.focus();
+            if (field) {
+                field.focus();
+                var end = field.value.length;
+                field.setSelectionRange(end, end);
+            }
         });
     }
     function cancelInlineEditor(button) {
