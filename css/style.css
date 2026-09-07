@@ -1013,12 +1013,12 @@ html:not([data-theme="dark"]) .workspace-nav-btn:focus-visible {
 #workspace-public-new,
 #workspace-new,
 #workspace-import { background: transparent; box-shadow: none; }
-#workspace-public-new { color: #0a58ca; border-color: #7cb3ff; }
+#workspace-public-new { color: #0a58ca; border-color: #7cb3ff; background: #eaf3ff; }
 #workspace-public-new:hover,
-#workspace-public-new:active { color: #0a58ca; border-color: #4e9cff; background: #eaf3ff; }
-#workspace-new { color: #513783; border-color: #8f72c3; }
+#workspace-public-new:active { color: #fff; border-color: #0d6efd; background: #0d6efd; }
+#workspace-new { color: #513783; border-color: #8f72c3; background: #ebe5f6; }
 #workspace-new:hover,
-#workspace-new:active { color: #513783; border-color: #8f72c3; background: #ebe5f6; }
+#workspace-new:active { color: #fff; border-color: #7255ad; background: #7255ad; }
 #workspace-public-new:focus-visible,
 #workspace-new:focus-visible,
 #workspace-import:focus-visible { box-shadow: none; outline: 2px solid currentColor; outline-offset: 2px; }
@@ -1248,12 +1248,12 @@ html[data-theme="dark"] .workspace-custom-section .workspace-list-item.active {
 }
 html[data-theme="dark"] .workspace-public-list .workspace-list-item.active small { color: #b9d7ff; }
 html[data-theme="dark"] .workspace-custom-section .workspace-list-item.active small { color: #d1c3ef; }
-html[data-theme="dark"] #workspace-public-new { color: #dbeafe; border-color: #4e9cff; }
+html[data-theme="dark"] #workspace-public-new { color: #dbeafe; border-color: #4e9cff; background: #173b67; }
 html[data-theme="dark"] #workspace-public-new:hover,
-html[data-theme="dark"] #workspace-public-new:active { color: #dbeafe; border-color: #4e9cff; background: #173b67; }
-html[data-theme="dark"] #workspace-new { color: #ede9fe; border-color: #9b7cff; }
+html[data-theme="dark"] #workspace-public-new:active { color: #fff; border-color: #0d6efd; background: #0d6efd; }
+html[data-theme="dark"] #workspace-new { color: #ede9fe; border-color: #9b7cff; background: #382d5c; }
 html[data-theme="dark"] #workspace-new:hover,
-html[data-theme="dark"] #workspace-new:active { color: #ede9fe; border-color: #9b7cff; background: #382d5c; }
+html[data-theme="dark"] #workspace-new:active { color: #fff; border-color: #7255ad; background: #7255ad; }
 html[data-theme="dark"] #workspace-import { color: var(--text-muted); border-color: #68737e; }
 html[data-theme="dark"] #workspace-import:hover,
 html[data-theme="dark"] #workspace-import:active { color: var(--text); border-color: #84909c; background: var(--surface-muted); }
