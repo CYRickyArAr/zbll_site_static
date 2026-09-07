@@ -1070,7 +1070,7 @@ html[data-theme="dark"] .variant-add-form {
 .add-variant-btn:hover, .add-variant-btn:focus-visible { background: #eaf3ff; }
 .action-buttons .btn { margin-right: 10px; font-size: 1rem; padding: 8px 16px; border-radius: 5px; }
 .formula-card.learned { outline: 3px solid #198754; outline-offset: -3px; background-color: #f0fdf4; }
-.learn-btn { position: absolute; bottom: 10px; right: 10px; z-index: 5; width: 30px; height: 30px; padding: 0; border-radius: 50%; border: 1.5px solid #adb5bd; background: #fff; color: #adb5bd; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all .15s ease; }
+.learn-btn { position: absolute; bottom: 10px; right: 10px; z-index: 5; width: 30px; height: 30px; padding: 0; border-radius: 50%; border: 1.5px solid #adb5bd; background: #fff; color: #adb5bd; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: none; }
 .learn-btn:hover { border-color: #198754; color: #198754; background: #f0fdf4; }
 .learn-btn.learned { background: #198754; border-color: #198754; color: #fff; }
 
