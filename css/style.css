@@ -1078,6 +1078,7 @@ html[data-theme="dark"] .variant-add-form {
 .action-buttons { margin-top: 6px; padding-right: 44px; display: flex; flex-direction: column; align-items: flex-start; gap: 16px; flex: 1; }
 .action-buttons-row { display: flex; align-items: center; margin-top: auto; }
 .add-variant-btn { border: 1px dashed #86b7fe; background: transparent; color: #0d6efd; border-radius: 4px; padding: 4px 12px; font-size: 1rem; line-height: 1; cursor: pointer; margin-right: 10px; transition: background .15s; }
+.add-variant-placeholder { visibility: hidden; pointer-events: none; }
 .add-variant-btn:hover, .add-variant-btn:focus-visible { background: #eaf3ff; }
 .action-buttons .btn { margin-right: 10px; font-size: 1rem; padding: 8px 16px; border-radius: 5px; }
 .formula-card.learned { outline: 3px solid #198754; outline-offset: -3px; background-color: #f0fdf4; }
