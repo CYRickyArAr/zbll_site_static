@@ -648,18 +648,18 @@
         setWorkspaceMessage('请先在右侧选择或新建一个自定义公式库。', true);
     }
     async function createWorkspace() {
-        var name = window.prompt('请输入工作区名称', '我的zbll公式库');
-        if (name === null) return;
-        name = name.trim() || '我的zbll公式库';
+        var name = window.prompt('请输入自定义公式库名称', '');
+        if (!name || !name.trim()) return;
+        name = name.trim();
         var workspace = await WS.create(DATA, name);
         try { localStorage.setItem(selectedWorkspaceKey, workspace.id); } catch (e) {}
         if (activeWorkspace) { publicCopy = null; activeWorkspace = await WS.activate(workspace.id); router(); }
         await refreshWorkspaceList();
     }
     async function createPublicLibrary() {
-        var name = window.prompt('请输入大神版名称', '大神版（已编辑）');
-        if (name === null) return;
-        var copy = await WS.createPublicCopy(DATA, name.trim() || '大神版（已编辑）');
+        var name = window.prompt('请输入大神版公式库名称', '');
+        if (!name || !name.trim()) return;
+        var copy = await WS.createPublicCopy(DATA, name.trim());
         try { localStorage.setItem(publicModeKey, copy.id); } catch (e) {}
         if (!activeWorkspace) { publicCopy = copy; router(); }
         await refreshWorkspaceList();
