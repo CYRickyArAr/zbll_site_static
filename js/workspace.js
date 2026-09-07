@@ -330,46 +330,51 @@
             checkCancelled();
             progress(5, '准备工作区数据');
             var output = clone(workspace);
-            var formulasTotal = 0, formulasDone = 0;
+            var formulaQueue = [], formulasDone = 0;
             for (var countCi = 0; countCi < output.categories.length; countCi++) {
                 var countCategory = output.categories[countCi];
                 for (var countSi = 0; countSi < countCategory.subcategories.length; countSi++) {
-                    formulasTotal += countCategory.subcategories[countSi].formulas.length;
+                    formulaQueue = formulaQueue.concat(countCategory.subcategories[countSi].formulas);
                 }
             }
-            for (var ci = 0; ci < output.categories.length; ci++) {
-                var category = output.categories[ci];
-                for (var si = 0; si < category.subcategories.length; si++) {
-                    var formulas = category.subcategories[si].formulas;
-                    for (var fi = 0; fi < formulas.length; fi++) {
-                        checkCancelled();
-                        var image = formulas[fi].image;
-                        if (image && !/^data:/i.test(image)) {
-                            try {
-                                var response = await fetch(new URL(image, document.baseURI).href, signal ? { signal: signal } : undefined);
-                                if (response.ok) {
-                                    var blob = await response.blob();
-                                    checkCancelled();
-                                    formulas[fi].image = await new Promise(function (resolve, reject) {
-                                        var reader = new FileReader();
-                                        reader.onload = function () { resolve(reader.result); };
-                                        reader.onerror = reject;
-                                        reader.readAsDataURL(blob);
-                                    });
-                                }
-                            } catch (e) {
-                                if ((signal && signal.aborted) || (e && e.name === 'AbortError')) throw e;
-                                /* 路径图片无法读取时保留原路径 */
+            var formulasTotal = formulaQueue.length;
+            var nextFormula = 0;
+            async function processImages() {
+                while (true) {
+                    checkCancelled();
+                    var formulaIndex = nextFormula++;
+                    if (formulaIndex >= formulasTotal) return;
+                    var formula = formulaQueue[formulaIndex];
+                    var image = formula.image;
+                    if (image && !/^data:/i.test(image)) {
+                        try {
+                            var response = await fetch(new URL(image, document.baseURI).href, signal ? { signal: signal } : undefined);
+                            if (response.ok) {
+                                var blob = await response.blob();
+                                checkCancelled();
+                                formula.image = await new Promise(function (resolve, reject) {
+                                    var reader = new FileReader();
+                                    reader.onload = function () { resolve(reader.result); };
+                                    reader.onerror = reject;
+                                    reader.readAsDataURL(blob);
+                                });
                             }
+                        } catch (e) {
+                            if ((signal && signal.aborted) || (e && e.name === 'AbortError')) throw e;
+                            /* 路径图片无法读取时保留原路径 */
                         }
-                        formulasDone++;
-                        if (formulasDone === 1 || formulasDone === formulasTotal || formulasDone % 24 === 0) {
-                            progress(10 + Math.round((formulasDone / Math.max(1, formulasTotal)) * 65), '整理图片和公式 ' + formulasDone + '/' + formulasTotal);
-                            await new Promise(function (resolve) { setTimeout(resolve, 0); });
-                        }
+                    }
+                    formulasDone++;
+                    if (formulasDone === 1 || formulasDone === formulasTotal || formulasDone % 12 === 0) {
+                        progress(10 + Math.round((formulasDone / Math.max(1, formulasTotal)) * 65), '整理图片和公式 ' + formulasDone + '/' + formulasTotal);
+                        await new Promise(function (resolve) { setTimeout(resolve, 0); });
                     }
                 }
             }
+            var workerCount = Math.min(16, Math.max(1, formulasTotal));
+            var workers = [];
+            for (var wi = 0; wi < workerCount; wi++) workers.push(processImages());
+            await Promise.all(workers);
             checkCancelled();
             progress(82, '生成 .zbll 文件');
             var blob = new Blob([JSON.stringify(output, null, 2)], { type: 'application/json;charset=utf-8' });
