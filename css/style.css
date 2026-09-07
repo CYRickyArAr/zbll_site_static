@@ -1055,8 +1055,8 @@ html[data-theme="dark"] .form-check-label {
     border-color: #6ea8fe;
 }
 .formula-card.notes-only-editing .inline-note-body {
-    min-height: 56px;
-    height: 56px;
+    min-height: 78px;
+    height: 78px;
     overflow-y: auto;
 }
 .inline-formula-label { margin-top: 12px; }
