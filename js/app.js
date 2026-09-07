@@ -30,7 +30,7 @@
     var publicModeKey = 'zbll_public_mode';
     var renderSnapshotKey = 'zbll_render_snapshot_v1';
     var workspaceProgressState = null;
-    var editorSelectedImage = null;
+    var inlineEditor = null;
 
     function escapeHtml(value) {
         if (value === null || value === undefined) return '';
@@ -367,15 +367,31 @@
         // SortableJS 使用 forceFallback 模式接管拖动；不要再设置原生 draggable，避免出现双重拖影。
         var html = '<div class="sortable-item" data-uid="' + escapeHtml(uid) + '" id="formula-position-' + escapeHtml(positionAnchor) + '">';
         var canEditContent = canEditFormulaContent();
-        html += '<div class="formula-card' + (formula.learned ? ' learned' : '') + ' learning-enabled has-card-editor' + (canEditContent ? ' content-editable' : '') + '">';
-        if (isEditableView()) html += '<div class="drag-handle" title="拖动排序" aria-label="拖动排序">⋮⋮</div>';
+        var editing = !!inlineEditor && inlineEditor.catId === catId && inlineEditor.subId === subId && inlineEditor.uid === uid;
+        var notesOnly = editing && inlineEditor.notesOnly;
+        var note = splitNotes(formula.notes, formula, subId);
+        html += '<div class="formula-card' + (formula.learned ? ' learned' : '') + ' learning-enabled has-card-editor' + (canEditContent ? ' content-editable' : '') + (editing ? ' inline-editing' : '') + '">';
+        if (isEditableView() && !editing) html += '<div class="drag-handle" title="拖动排序" aria-label="拖动排序">⋮⋮</div>';
         html += '<div class="row"><div class="col-4">';
-        if (formula.image) html += '<img src="' + escapeHtml(formula.image) + '" class="formula-image" alt="' + escapeHtml(id) + '" loading="lazy">';
+        if (editing && !notesOnly) {
+            var editImage = inlineEditor.imageCleared ? '' : (inlineEditor.selectedImage || formula.image || '');
+            html += '<div class="inline-image-editor"><label class="drag-area inline-image-drop" title="点击选择图片">';
+            html += '<img class="inline-image-preview" alt="图片预览"' + (editImage ? ' src="' + escapeHtml(editImage) + '"' : ' hidden') + '>';
+            html += '<span class="inline-image-prompt"' + (editImage ? ' hidden' : '') + '>📷<small>选择图片</small></span>';
+            html += '<input type="file" class="inline-image-input d-none" accept="image/png,image/jpeg,image/gif,image/svg+xml"></label>';
+            html += '<button type="button" class="btn btn-sm btn-outline-secondary workspace-action inline-image-clear" data-action="clear-inline-image">清除图片</button></div>';
+        } else if (formula.image) html += '<img src="' + escapeHtml(formula.image) + '" class="formula-image" alt="' + escapeHtml(id) + '" loading="lazy">';
         else html += '<div class="formula-image d-flex align-items-center justify-content-center bg-light"><span class="text-muted">无图</span></div>';
         html += '</div><div class="col-8"><div class="formula-id">' + escapeHtml(id) + '</div>';
-        if (formula.notes) html += '<div class="formula-note-display"><pre class="formula-notes">' + escapeHtml(formula.notes) + '</pre></div>';
+        if (editing) {
+            html += '<div class="inline-note-editor"><div class="workspace-note-header inline-note-header">' + escapeHtml(note.header) + '</div>';
+            html += '<textarea class="workspace-textarea form-control note-body inline-note-body" rows="4" placeholder="可以在这里写备注">' + escapeHtml(note.body) + '</textarea></div>';
+        } else if (formula.notes) html += '<div class="formula-note-display"><pre class="formula-notes">' + escapeHtml(formula.notes) + '</pre></div>';
         html += '</div></div>';
-        if (formula.lines && formula.lines.length) {
+        if (editing && !notesOnly) {
+            html += '<label class="workspace-label inline-formula-label">公式</label>';
+            html += '<textarea class="workspace-textarea form-control inline-formula-input" rows="4" placeholder="输入公式">' + escapeHtml((formula.lines || []).map(lineText).join('\n')) + '</textarea>';
+        } else if (formula.lines && formula.lines.length) {
             html += '<div class="formula-lines">';
             formula.lines.forEach(function (line) {
                 html += '<div class="formula-line"><span class="formula-line-alg">' + escapeHtml(line.alg) + '</span>';
@@ -388,14 +404,19 @@
             });
             html += '</div>';
         }
-        if (canShowFormulaEditor()) {
+        if (editing) {
+            html += '<div class="action-buttons inline-editor-actions"><div class="action-buttons-row">';
+            html += '<button type="button" class="btn btn-secondary btn-sm workspace-action" data-action="cancel-inline-edit">取消</button>';
+            html += '<button type="button" class="btn btn-primary btn-sm workspace-action" data-action="save-inline-edit">保存</button>';
+            html += '</div></div>';
+        } else if (canShowFormulaEditor()) {
             html += '<div class="action-buttons">';
             if (canEditContent) html += '<button type="button" class="add-variant-btn workspace-action" title="添加一行变体" aria-label="添加一行变体" data-action="add-variant" data-category="' + escapeHtml(catId) + '" data-subcategory="' + escapeHtml(subId) + '" data-uid="' + escapeHtml(uid) + '">＋</button>';
             // 大神版不允许添加变体，但保留同尺寸的占位，确保“编辑”与自定义公式库始终落在同一左下角位置。
             else html += '<span class="add-variant-btn add-variant-placeholder" aria-hidden="true">＋</span>';
             html += '<div class="action-buttons-row"><button type="button" class="btn btn-outline-secondary btn-sm workspace-action" data-action="edit-formula" data-category="' + escapeHtml(catId) + '" data-subcategory="' + escapeHtml(subId) + '" data-uid="' + escapeHtml(uid) + '">编辑</button></div></div>';
         }
-        html += '<button type="button" class="learn-btn workspace-action' + (formula.learned ? ' learned' : '') + '" data-action="toggle-learned" data-category="' + escapeHtml(catId) + '" data-subcategory="' + escapeHtml(subId) + '" data-uid="' + escapeHtml(uid) + '" title="' + (formula.learned ? '取消已学' : '标记已学') + '" aria-label="' + (formula.learned ? '取消已学' : '标记已学') + '"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg></button>';
+        html += '<button type="button" class="learn-btn workspace-action' + (formula.learned ? ' learned' : '') + '" data-action="toggle-learned" data-category="' + escapeHtml(catId) + '" data-subcategory="' + escapeHtml(subId) + '" data-uid="' + escapeHtml(uid) + '" title="' + (formula.learned ? '取消已学' : '标记已学') + '" aria-label="' + (formula.learned ? '取消已学' : '标记已学') + '"' + (editing ? ' disabled' : '') + '><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg></button>';
         html += '</div></div>';
         return html;
     }
@@ -688,142 +709,92 @@
             return line ? { alg: line, marks: marks } : null;
         }).filter(Boolean);
     }
-    function resetEditorImageUI(currentImage) {
-        editorSelectedImage = null;
-        var input = document.getElementById('editor-image');
-        var currentContainer = document.getElementById('editor-current-image-container');
-        var current = document.getElementById('editor-current-image');
-        var previewContainer = document.getElementById('editor-preview-container');
-        var preview = document.getElementById('editor-preview');
-        var fileInfo = document.getElementById('editor-file-info');
-        var prompt = document.getElementById('editor-upload-prompt');
-        var clearButton = document.getElementById('editor-clear-image');
-        if (input) input.value = '';
-        if (preview) preview.removeAttribute('src');
-        if (fileInfo) fileInfo.textContent = '';
-        if (previewContainer) previewContainer.hidden = true;
-        if (currentImage) {
-            current.src = currentImage;
-            currentContainer.hidden = false;
-            if (prompt) prompt.style.display = 'none';
-            if (clearButton) clearButton.textContent = '清除图片';
-        } else {
-            if (current) current.removeAttribute('src');
-            if (currentContainer) currentContainer.hidden = true;
-            if (prompt) prompt.style.display = 'block';
-            if (clearButton) clearButton.textContent = '清除图片';
-        }
-        if (clearButton) clearButton.dataset.cleared = 'false';
-    }
-    function openFormulaEditor(catId, subId, formula) {
-        var cat = findCategory(catId), sub = cat && cat.subcategories.filter(function (s) { return s.id === subId; })[0];
-        if (!sub) return;
-        if (!formula) return;
-        var isNew = false;
-        var notesOnly = isPublicCopy();
-        document.getElementById('editor-subcategory').value = subId;
-        document.getElementById('editor-uid').value = formula ? formula.uid : '';
-        document.getElementById('editor-formula').value = formula ? (formula.lines || []).map(lineText).join('\n') : '';
-        var note = splitNotes(formula && formula.notes, formula, subId);
-        document.getElementById('editor-note-header').textContent = note.header;
-        document.getElementById('editor-note-body').value = note.body;
-        resetEditorImageUI(formula && formula.image ? formula.image : '');
-        var formulaLabel = document.querySelector('label[for="editor-formula"]');
-        var formulaInput = document.getElementById('editor-formula');
-        var imageLabel = document.querySelector('label[for="editor-image"]');
-        var imageArea = document.getElementById('editor-drag-area');
-        var imageControls = document.getElementById('editor-clear-image').parentElement;
-        [formulaLabel, formulaInput, imageLabel, imageArea, imageControls].forEach(function (element) {
-            if (element) element.hidden = notesOnly;
-        });
-        formulaInput.disabled = notesOnly;
-        document.getElementById('editor-overlay').dataset.category = catId;
-        document.getElementById('editor-overlay').dataset.isNew = isNew ? '1' : '0';
-        document.getElementById('editor-title').textContent = notesOnly ? '编辑备注' : (isNew ? '添加公式' : '编辑公式');
-        showOverlay('editor-overlay', true); (notesOnly ? document.getElementById('editor-note-body') : formulaInput).focus();
-    }
     function readFileData(file) {
         return new Promise(function (resolve, reject) { if (!file) return resolve(null); var reader = new FileReader(); reader.onload = function () { resolve(reader.result); }; reader.onerror = reject; reader.readAsDataURL(file); });
     }
-    async function saveFormulaEditor(e) {
-        e.preventDefault();
-        var editable = await ensureEditableData();
-        if (!editable) return;
-        var overlay = document.getElementById('editor-overlay'), catId = overlay.dataset.category, subId = document.getElementById('editor-subcategory').value, uid = document.getElementById('editor-uid').value;
-        var cat = findCategory(catId), sub = cat && cat.subcategories.filter(function (s) { return s.id === subId; })[0]; if (!sub) return;
-        var formula = uid ? sub.formulas.find(function (f) { return f.uid === uid; }) : null;
-        var notes = document.getElementById('editor-note-header').textContent, body = document.getElementById('editor-note-body').value.replace(/^\s+|\s+$/g, '');
-        if (body) notes += '\n' + body;
-        if (!formula) return;
-        if (isPublicCopy()) {
-            formula.notes = notes;
-        } else {
-            var input = document.getElementById('editor-image'), clearButton = document.getElementById('editor-clear-image');
-            var image = clearButton && clearButton.dataset.cleared === 'true' ? '' : formula.image;
-            if (editorSelectedImage) image = editorSelectedImage;
-            else if (input.files && input.files[0]) image = await readFileData(input.files[0]);
-            formula.lines = parseFormulaLines(document.getElementById('editor-formula').value);
-            formula.notes = notes;
-            formula.image = image || '';
-        }
-        formula.learned = !!formula.learned;
-        await persistCurrentData(); showOverlay('editor-overlay', false); renderCategory(catId);
+    function findInlineCard(uid) {
+        return document.querySelector('.sortable-item[data-uid="' + CSS.escape(uid) + '"] .formula-card');
     }
-    function updateEditorImagePreview(file) {
-        if (!file) return;
+    function rerenderAtSameCard(catId, uid, previousTop) {
+        renderCategory(catId);
+        requestAnimationFrame(function () {
+            var card = findInlineCard(uid);
+            if (card && typeof previousTop === 'number') window.scrollBy(0, card.getBoundingClientRect().top - previousTop);
+        });
+    }
+    function openFormulaEditor(catId, subId, formula) {
+        if (!formula) return;
+        var state = inlineEditor = {
+            catId: catId,
+            subId: subId,
+            uid: formula.uid || formula.id,
+            notesOnly: isPublicCopy(),
+            selectedImage: null,
+            imageCleared: false
+        };
+        renderCategory(catId);
+        requestAnimationFrame(function () {
+            if (inlineEditor !== state) return;
+            var card = findInlineCard(state.uid);
+            var field = card && card.querySelector(state.notesOnly ? '.inline-note-body' : '.inline-formula-input');
+            if (field) field.focus();
+        });
+    }
+    function cancelInlineEditor(button) {
+        if (!inlineEditor) return;
+        var state = inlineEditor, card = button && button.closest('.formula-card');
+        var top = card ? card.getBoundingClientRect().top : null;
+        inlineEditor = null;
+        rerenderAtSameCard(state.catId, state.uid, top);
+    }
+    async function saveInlineEditor(button) {
+        if (!inlineEditor) return;
+        var state = inlineEditor, card = button && button.closest('.formula-card');
+        if (!card) return;
+        var ref = findFormula(state.catId, state.subId, state.uid);
+        if (!ref) return;
+        var header = card.querySelector('.inline-note-header');
+        var bodyInput = card.querySelector('.inline-note-body');
+        var notes = header ? header.textContent : '';
+        var body = bodyInput ? bodyInput.value.replace(/^\s+|\s+$/g, '') : '';
+        if (body) notes += '\n' + body;
+        ref.formula.notes = notes;
+        if (!state.notesOnly) {
+            var formulaInput = card.querySelector('.inline-formula-input');
+            ref.formula.lines = parseFormulaLines(formulaInput ? formulaInput.value : '');
+            if (state.imageCleared) ref.formula.image = '';
+            else if (state.selectedImage) ref.formula.image = state.selectedImage;
+        }
+        ref.formula.learned = !!ref.formula.learned;
+        var top = card.getBoundingClientRect().top;
+        await persistCurrentData();
+        inlineEditor = null;
+        rerenderAtSameCard(state.catId, state.uid, top);
+    }
+    function updateInlineImage(file, area) {
+        if (!file || !inlineEditor || inlineEditor.notesOnly) return;
+        var state = inlineEditor;
         readFileData(file).then(function (dataUrl) {
-            editorSelectedImage = dataUrl;
-            var currentContainer = document.getElementById('editor-current-image-container');
-            var previewContainer = document.getElementById('editor-preview-container');
-            var preview = document.getElementById('editor-preview');
-            var fileInfo = document.getElementById('editor-file-info');
-            var prompt = document.getElementById('editor-upload-prompt');
-            var clearButton = document.getElementById('editor-clear-image');
-            if (preview) preview.src = dataUrl;
-            if (fileInfo) fileInfo.textContent = file.name + ' · ' + Math.ceil(file.size / 1024) + ' KB';
-            if (previewContainer) previewContainer.hidden = false;
-            if (currentContainer) currentContainer.hidden = true;
-            if (prompt) prompt.style.display = 'none';
-            if (clearButton) clearButton.dataset.cleared = 'false';
+            if (inlineEditor !== state) return;
+            state.selectedImage = dataUrl;
+            state.imageCleared = false;
+            var image = area && area.querySelector('.inline-image-preview');
+            var prompt = area && area.querySelector('.inline-image-prompt');
+            if (image) { image.src = dataUrl; image.hidden = false; }
+            if (prompt) prompt.hidden = true;
         }).catch(function () { window.alert('图片读取失败'); });
     }
-    function clearEditorImage() {
-        editorSelectedImage = null;
-        var input = document.getElementById('editor-image');
-        var currentContainer = document.getElementById('editor-current-image-container');
-        var previewContainer = document.getElementById('editor-preview-container');
-        var prompt = document.getElementById('editor-upload-prompt');
-        var clearButton = document.getElementById('editor-clear-image');
+    function clearInlineImage(button) {
+        if (!inlineEditor || inlineEditor.notesOnly) return;
+        inlineEditor.selectedImage = null;
+        inlineEditor.imageCleared = true;
+        var editor = button.closest('.inline-image-editor');
+        var image = editor && editor.querySelector('.inline-image-preview');
+        var prompt = editor && editor.querySelector('.inline-image-prompt');
+        var input = editor && editor.querySelector('.inline-image-input');
         if (input) input.value = '';
-        if (currentContainer) currentContainer.hidden = true;
-        if (previewContainer) previewContainer.hidden = true;
-        if (prompt) prompt.style.display = 'block';
-        if (clearButton) clearButton.dataset.cleared = 'true';
-    }
-    function bindEditorImageDrop() {
-        var dragArea = document.getElementById('editor-drag-area');
-        var input = document.getElementById('editor-image');
-        if (!dragArea || !input) return;
-        dragArea.addEventListener('click', function () { input.click(); });
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(function (name) {
-            dragArea.addEventListener(name, function (e) {
-                e.preventDefault();
-                e.stopPropagation();
-            });
-        });
-        ['dragenter', 'dragover'].forEach(function (name) {
-            dragArea.addEventListener(name, function () { dragArea.classList.add('highlight'); });
-        });
-        ['dragleave', 'drop'].forEach(function (name) {
-            dragArea.addEventListener(name, function () { dragArea.classList.remove('highlight'); });
-        });
-        dragArea.addEventListener('drop', function (e) {
-            var files = e.dataTransfer && e.dataTransfer.files;
-            if (files && files[0]) updateEditorImagePreview(files[0]);
-        });
-        input.addEventListener('change', function () {
-            if (input.files && input.files[0]) updateEditorImagePreview(input.files[0]);
-        });
+        if (image) { image.removeAttribute('src'); image.hidden = true; }
+        if (prompt) prompt.hidden = false;
     }
     async function addVariant(catId, subId, uid, card) {
         var editable = await ensureEditableData();
@@ -854,18 +825,24 @@
             renderCategory(catId);
         });
     }
-    async function deleteFromEditor() {
-        return;
-    }
     async function handleWorkspaceAction(button) {
         var action = button.dataset.action, catId = button.dataset.category, subId = button.dataset.subcategory, uid = button.dataset.uid;
+        if (action === 'cancel-inline-edit') { cancelInlineEditor(button); return; }
+        if (action === 'save-inline-edit') { await saveInlineEditor(button); return; }
+        if (action === 'clear-inline-image') { clearInlineImage(button); return; }
         if (action === 'add-formula' || action === 'delete-formula') return;
         if (!isWorkspace() && action === 'add-variant') return;
         var editable = await ensureEditableData();
         if (!editable) return;
+        var cancelledInlineEditor = false;
+        if (inlineEditor && action !== 'edit-formula') {
+            inlineEditor = null;
+            cancelledInlineEditor = true;
+            renderCategory(catId);
+        }
         var ref = uid ? findFormula(catId, subId, uid) : null;
         if (action === 'edit-formula' && ref) return openFormulaEditor(catId, subId, ref.formula);
-        if (action === 'add-variant') return addVariant(catId, subId, uid, button.closest('.formula-card'));
+        if (action === 'add-variant') return addVariant(catId, subId, uid, cancelledInlineEditor ? null : button.closest('.formula-card'));
         if (!ref) return;
         if (action === 'toggle-learned') ref.formula.learned = !ref.formula.learned;
         await persistCurrentData(); renderCategory(catId);
@@ -967,6 +944,7 @@
 
     function router() {
         var hash = location.hash || '#/', match = hash.match(/^#\/category\/([A-Za-z]+)$/), nextView = match ? 'cat:' + match[1] : 'home';
+        inlineEditor = null;
         if (currentView) saveScroll(); if (match) renderCategory(match[1]); else renderHome(); currentView = nextView;
         restoreScroll(nextView);
         updateWorkspaceNav();
@@ -1004,15 +982,32 @@
         var action = e.target.closest('.workspace-action'); if (action) { handleWorkspaceAction(action); return; }
         var add = e.target.closest('.workspace-add'); if (add) { handleWorkspaceAction(add); return; }
         if (e.target.closest('#workspace-open')) { openWorkspaceManager(); return; }
-        if (e.target.id === 'editor-close' || e.target.id === 'editor-cancel') showOverlay('editor-overlay', false);
     });
     document.getElementById('workspace-overlay').addEventListener('click', function (e) { if (e.target === this) showOverlay('workspace-overlay', false); });
-    document.getElementById('editor-overlay').addEventListener('click', function (e) { if (e.target === this) showOverlay('editor-overlay', false); });
-    document.getElementById('formula-editor-form').addEventListener('submit', saveFormulaEditor);
-    document.getElementById('editor-clear-image').addEventListener('click', clearEditorImage);
     document.getElementById('workspace-file').addEventListener('change', importWorkspaceFile);
     document.getElementById('workspace-overlay').addEventListener('click', handleWorkspaceManagerClick);
-    bindEditorImageDrop();
+    document.addEventListener('change', function (e) {
+        if (!e.target.classList.contains('inline-image-input') || !e.target.files || !e.target.files[0]) return;
+        updateInlineImage(e.target.files[0], e.target.closest('.inline-image-drop'));
+    });
+    document.addEventListener('dragover', function (e) {
+        var area = e.target.closest('.inline-image-drop');
+        if (!area) return;
+        e.preventDefault();
+        area.classList.add('highlight');
+    });
+    document.addEventListener('dragleave', function (e) {
+        var area = e.target.closest('.inline-image-drop');
+        if (area) area.classList.remove('highlight');
+    });
+    document.addEventListener('drop', function (e) {
+        var area = e.target.closest('.inline-image-drop');
+        if (!area) return;
+        e.preventDefault();
+        area.classList.remove('highlight');
+        var files = e.dataTransfer && e.dataTransfer.files;
+        if (files && files[0]) updateInlineImage(files[0], area);
+    });
     window.addEventListener('hashchange', router);
     var scrollTimer = null;
     window.addEventListener('scroll', function () { if (scrollTimer) clearTimeout(scrollTimer); scrollTimer = setTimeout(saveScroll, 150); });
@@ -1028,6 +1023,10 @@
             router();
         });
     });
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { showOverlay('workspace-overlay', false); showOverlay('editor-overlay', false); } });
+    document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Escape') return;
+        if (inlineEditor) { cancelInlineEditor(findInlineCard(inlineEditor.uid)); return; }
+        showOverlay('workspace-overlay', false);
+    });
     initWorkspace();
 })();
