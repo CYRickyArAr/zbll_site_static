@@ -42,6 +42,7 @@
     function isPublicCopy() { return !activeWorkspace && !!publicCopy; }
     function isEditableView() { return true; }
     function canEditFormulaContent() { return isWorkspace(); }
+    function canShowFormulaEditor() { return isWorkspace() || !activeWorkspace; }
     function usesLearnedStats() { return true; }
     function isPublicLibraryItem(item) {
         return !!item && (item.id === '__public_copy__' || item.kind === 'public-copy' || item.kind === 'public-library');
@@ -387,9 +388,9 @@
             });
             html += '</div>';
         }
-        if (canEditContent) {
+        if (canShowFormulaEditor()) {
             html += '<div class="action-buttons">';
-            html += '<button type="button" class="add-variant-btn workspace-action" title="添加一行变体" aria-label="添加一行变体" data-action="add-variant" data-category="' + escapeHtml(catId) + '" data-subcategory="' + escapeHtml(subId) + '" data-uid="' + escapeHtml(uid) + '">＋</button>';
+            if (canEditContent) html += '<button type="button" class="add-variant-btn workspace-action" title="添加一行变体" aria-label="添加一行变体" data-action="add-variant" data-category="' + escapeHtml(catId) + '" data-subcategory="' + escapeHtml(subId) + '" data-uid="' + escapeHtml(uid) + '">＋</button>';
             html += '<div class="action-buttons-row"><button type="button" class="btn btn-outline-secondary btn-sm workspace-action" data-action="edit-formula" data-category="' + escapeHtml(catId) + '" data-subcategory="' + escapeHtml(subId) + '" data-uid="' + escapeHtml(uid) + '">编辑</button></div></div>';
         }
         html += '<button type="button" class="learn-btn workspace-action' + (formula.learned ? ' learned' : '') + '" data-action="toggle-learned" data-category="' + escapeHtml(catId) + '" data-subcategory="' + escapeHtml(subId) + '" data-uid="' + escapeHtml(uid) + '" title="' + (formula.learned ? '取消已学' : '标记已学') + '" aria-label="' + (formula.learned ? '取消已学' : '标记已学') + '"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg></button>';
@@ -717,6 +718,7 @@
         if (!sub) return;
         if (!formula) return;
         var isNew = false;
+        var notesOnly = isPublicCopy();
         document.getElementById('editor-subcategory').value = subId;
         document.getElementById('editor-uid').value = formula ? formula.uid : '';
         document.getElementById('editor-formula').value = formula ? (formula.lines || []).map(lineText).join('\n') : '';
@@ -724,10 +726,19 @@
         document.getElementById('editor-note-header').textContent = note.header;
         document.getElementById('editor-note-body').value = note.body;
         resetEditorImageUI(formula && formula.image ? formula.image : '');
+        var formulaLabel = document.querySelector('label[for="editor-formula"]');
+        var formulaInput = document.getElementById('editor-formula');
+        var imageLabel = document.querySelector('label[for="editor-image"]');
+        var imageArea = document.getElementById('editor-drag-area');
+        var imageControls = document.getElementById('editor-clear-image').parentElement;
+        [formulaLabel, formulaInput, imageLabel, imageArea, imageControls].forEach(function (element) {
+            if (element) element.hidden = notesOnly;
+        });
+        formulaInput.disabled = notesOnly;
         document.getElementById('editor-overlay').dataset.category = catId;
         document.getElementById('editor-overlay').dataset.isNew = isNew ? '1' : '0';
-        document.getElementById('editor-title').textContent = isNew ? '添加公式' : '编辑公式';
-        showOverlay('editor-overlay', true); document.getElementById('editor-formula').focus();
+        document.getElementById('editor-title').textContent = notesOnly ? '编辑备注' : (isNew ? '添加公式' : '编辑公式');
+        showOverlay('editor-overlay', true); (notesOnly ? document.getElementById('editor-note-body') : formulaInput).focus();
     }
     function readFileData(file) {
         return new Promise(function (resolve, reject) { if (!file) return resolve(null); var reader = new FileReader(); reader.onload = function () { resolve(reader.result); }; reader.onerror = reject; reader.readAsDataURL(file); });
@@ -741,12 +752,19 @@
         var formula = uid ? sub.formulas.find(function (f) { return f.uid === uid; }) : null;
         var notes = document.getElementById('editor-note-header').textContent, body = document.getElementById('editor-note-body').value.replace(/^\s+|\s+$/g, '');
         if (body) notes += '\n' + body;
-        var input = document.getElementById('editor-image'), clearButton = document.getElementById('editor-clear-image');
-        var image = clearButton && clearButton.dataset.cleared === 'true' ? '' : (formula ? formula.image : '');
-        if (editorSelectedImage) image = editorSelectedImage;
-        else if (input.files && input.files[0]) image = await readFileData(input.files[0]);
         if (!formula) return;
-        formula.lines = parseFormulaLines(document.getElementById('editor-formula').value); formula.notes = notes; formula.image = image || ''; formula.learned = !!formula.learned;
+        if (isPublicCopy()) {
+            formula.notes = notes;
+        } else {
+            var input = document.getElementById('editor-image'), clearButton = document.getElementById('editor-clear-image');
+            var image = clearButton && clearButton.dataset.cleared === 'true' ? '' : formula.image;
+            if (editorSelectedImage) image = editorSelectedImage;
+            else if (input.files && input.files[0]) image = await readFileData(input.files[0]);
+            formula.lines = parseFormulaLines(document.getElementById('editor-formula').value);
+            formula.notes = notes;
+            formula.image = image || '';
+        }
+        formula.learned = !!formula.learned;
         await persistCurrentData(); showOverlay('editor-overlay', false); renderCategory(catId);
     }
     function updateEditorImagePreview(file) {
@@ -840,7 +858,7 @@
     async function handleWorkspaceAction(button) {
         var action = button.dataset.action, catId = button.dataset.category, subId = button.dataset.subcategory, uid = button.dataset.uid;
         if (action === 'add-formula' || action === 'delete-formula') return;
-        if (!isWorkspace() && (action === 'add-formula' || action === 'add-variant' || action === 'edit-formula' || action === 'delete-formula')) return;
+        if (!isWorkspace() && action === 'add-variant') return;
         var editable = await ensureEditableData();
         if (!editable) return;
         var ref = uid ? findFormula(catId, subId, uid) : null;
