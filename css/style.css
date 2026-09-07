@@ -1037,7 +1037,7 @@ html:not([data-theme="dark"]) .workspace-nav-btn:focus-visible {
 #workspace-import:focus {
     border-color: transparent;
     background:
-        linear-gradient(var(--line-hover), var(--line-hover)) padding-box,
+        linear-gradient(90deg, rgba(53, 120, 246, .10) 0%, rgba(166, 47, 210, .10) 100%) padding-box,
         linear-gradient(90deg, #1f6ff2 0%, #a62fd2 100%) border-box;
 }
 #workspace-import:hover > span,
@@ -1047,7 +1047,7 @@ html:not([data-theme="dark"]) .workspace-nav-btn:focus-visible {
 #workspace-import.active {
     border-color: transparent;
     background:
-        linear-gradient(var(--line-hover), var(--line-hover)) padding-box,
+        linear-gradient(90deg, rgba(20, 95, 216, .16) 0%, rgba(141, 37, 185, .16) 100%) padding-box,
         linear-gradient(90deg, #145fd8 0%, #8d25b9 100%) border-box;
 }
 .workspace-list-item > span { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
