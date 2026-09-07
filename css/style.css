@@ -1021,28 +1021,34 @@ html:not([data-theme="dark"]) .workspace-nav-btn:focus-visible {
 #workspace-new:disabled,
 #workspace-new.disabled { color: #fff; background-color: #7255ad; border-color: #7255ad; }
 #workspace-import {
-    color: #625db9;
     border: 1px solid transparent;
     background:
         linear-gradient(var(--surface), var(--surface)) padding-box,
-        linear-gradient(90deg, #4777ed 0%, #8f72c3 100%) border-box;
+        linear-gradient(90deg, #3578f6 0%, #9b3fce 100%) border-box;
+}
+#workspace-import > span {
+    color: #625db9;
+    background: linear-gradient(90deg, #3578f6 0%, #9b3fce 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 #workspace-import:hover,
 #workspace-import:focus {
-    color: #51479d;
     border-color: transparent;
     background:
         linear-gradient(var(--line-hover), var(--line-hover)) padding-box,
-        linear-gradient(90deg, #3869dc 0%, #7c5daf 100%) border-box;
+        linear-gradient(90deg, #1f6ff2 0%, #a62fd2 100%) border-box;
 }
+#workspace-import:hover > span,
+#workspace-import:focus > span { background-image: linear-gradient(90deg, #1f6ff2 0%, #a62fd2 100%); }
 #workspace-import:focus { box-shadow: 0 0 0 .2rem rgba(101, 82, 174, .24); }
 #workspace-import:active,
 #workspace-import.active {
-    color: #463985;
     border-color: transparent;
     background:
         linear-gradient(var(--line-hover), var(--line-hover)) padding-box,
-        linear-gradient(90deg, #2f5fc9 0%, #68489a 100%) border-box;
+        linear-gradient(90deg, #145fd8 0%, #8d25b9 100%) border-box;
 }
 .workspace-list-item > span { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .workspace-list-item small { flex: 0 0 auto; color: var(--text-muted); white-space: nowrap; }
@@ -1260,10 +1266,10 @@ html[data-theme="dark"] .workspace-custom-section .workspace-list-item.active {
     color: #ede9fe;
 }
 html[data-theme="dark"] .workspace-custom-section .workspace-list-item.active small { color: #d1c3ef; }
-html[data-theme="dark"] #workspace-import { color: #aaa3f4; }
-html[data-theme="dark"] #workspace-import:hover,
-html[data-theme="dark"] #workspace-import:focus,
-html[data-theme="dark"] #workspace-import:active { color: #c2bcff; }
+html[data-theme="dark"] #workspace-import > span { background-image: linear-gradient(90deg, #72a2ff 0%, #c986ee 100%); }
+html[data-theme="dark"] #workspace-import:hover > span,
+html[data-theme="dark"] #workspace-import:focus > span,
+html[data-theme="dark"] #workspace-import:active > span { background-image: linear-gradient(90deg, #8bb2ff 0%, #dc96fa 100%); }
 html[data-theme="dark"] .workspace-note-header,
 html[data-theme="dark"] .workspace-textarea { background: var(--surface-muted); color: var(--text); border-color: var(--border); }
 html[data-theme="dark"] .drag-area {
