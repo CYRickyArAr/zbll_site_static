@@ -662,12 +662,12 @@ html[data-zbll-filter="unlearned"] .sortable-item:has(.formula-card.learned) {
     display: inline-block;
     max-width: 100%;
     padding: 4px 9px;
-    background: #f3b2d5;
+    background: #e8ebef;
     border-radius: 3px;
     font-size: 1.15rem;
     font-weight: 500;
     line-height: 1.45;
-    color: #48162f;
+    color: #4b5563;
     white-space: pre-wrap;
 }
 
@@ -761,8 +761,8 @@ html[data-theme="dark"] .formula-notes {
     color: var(--note-text);
 }
 html[data-theme="dark"] .formula-note-body-display {
-    background: #572641;
-    color: #ffdced;
+    background: #3b424a;
+    color: #eef1f4;
 }
 
 html[data-theme="dark"] .empty-state {
