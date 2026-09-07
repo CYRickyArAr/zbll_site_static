@@ -1022,20 +1022,23 @@ html:not([data-theme="dark"]) .workspace-nav-btn:focus-visible {
 #workspace-public-new:focus-visible,
 #workspace-new:focus-visible,
 #workspace-import:focus-visible { box-shadow: none; outline: 2px solid currentColor; outline-offset: 2px; }
-#workspace-import { color: #5f6870; border-color: #929aa2; }
+#workspace-import { color: #495057; border-color: #adb5bd; background: #f3f4f6; }
 #workspace-import:hover,
-#workspace-import:active { color: #343a40; border-color: #7f8891; background: #f1f3f5; }
+#workspace-import:active { color: #fff; border-color: #6c757d; background: #6c757d; }
 .workspace-list-item > span { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .workspace-list-item small { flex: 0 0 auto; color: var(--text-muted); white-space: nowrap; }
 .workspace-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .workspace-section-actions { display: flex; flex-wrap: nowrap; align-content: flex-start; gap: 8px; min-height: 42px; }
 .workspace-section-actions .btn { flex: 1 1 0; min-width: 0; overflow: hidden; white-space: nowrap; padding: .5em .25em; font-size: clamp(.55rem, 1vw, .85rem); line-height: 1.35; text-align: center; }
-.workspace-section-actions .btn-outline-secondary { color: #626b73; border-color: #9aa2a9; background: transparent; }
-.workspace-section-actions .btn-outline-secondary:hover,
-.workspace-section-actions .btn-outline-secondary:active { color: #343a40; border-color: #7f8891; background: #f1f3f5; }
-.workspace-section-actions .btn-outline-danger { color: #b14f57; border-color: #c96b72; background: transparent; }
-.workspace-section-actions .btn-outline-danger:hover,
-.workspace-section-actions .btn-outline-danger:active { color: #a33f48; border-color: #b85760; background: #fbf0f1; }
+.workspace-section-actions .btn,
+#workspace-import { border-radius: 8px; }
+.workspace-section-actions .btn:focus-visible { box-shadow: none; outline: 2px solid currentColor; outline-offset: 2px; }
+.workspace-section-actions .btn-outline-secondary { color: #495057; border-color: #adb5bd; background: #f3f4f6; }
+.workspace-section-actions .btn-outline-secondary:not(:disabled):hover,
+.workspace-section-actions .btn-outline-secondary:not(:disabled):active { color: #fff; border-color: #6c757d; background: #6c757d; }
+.workspace-section-actions .btn-outline-danger { color: #b02a37; border-color: #e08b93; background: #fbeaec; }
+.workspace-section-actions .btn-outline-danger:not(:disabled):hover,
+.workspace-section-actions .btn-outline-danger:not(:disabled):active { color: #fff; border-color: #dc3545; background: #dc3545; }
 .workspace-common-actions { justify-content: center; padding-top: 2px; }
 .workspace-message { min-height: 1.4em; margin-top: 12px; color: #198754; }
 .workspace-message.is-error { color: #dc3545; }
@@ -1254,15 +1257,15 @@ html[data-theme="dark"] #workspace-public-new:active { color: #fff; border-color
 html[data-theme="dark"] #workspace-new { color: #ede9fe; border-color: #9b7cff; background: #382d5c; }
 html[data-theme="dark"] #workspace-new:hover,
 html[data-theme="dark"] #workspace-new:active { color: #fff; border-color: #7255ad; background: #7255ad; }
-html[data-theme="dark"] #workspace-import { color: var(--text-muted); border-color: #68737e; }
+html[data-theme="dark"] #workspace-import { color: #d0d5db; border-color: #6c7680; background: #2b3138; }
 html[data-theme="dark"] #workspace-import:hover,
-html[data-theme="dark"] #workspace-import:active { color: var(--text); border-color: #84909c; background: var(--surface-muted); }
-html[data-theme="dark"] .workspace-section-actions .btn-outline-secondary { color: var(--text-muted); border-color: #68737e; }
-html[data-theme="dark"] .workspace-section-actions .btn-outline-secondary:hover,
-html[data-theme="dark"] .workspace-section-actions .btn-outline-secondary:active { color: var(--text); border-color: #84909c; background: var(--surface-muted); }
-html[data-theme="dark"] .workspace-section-actions .btn-outline-danger { color: #dc8b91; border-color: #9d555b; }
-html[data-theme="dark"] .workspace-section-actions .btn-outline-danger:hover,
-html[data-theme="dark"] .workspace-section-actions .btn-outline-danger:active { color: #efadb2; border-color: #b7676e; background: #36282b; }
+html[data-theme="dark"] #workspace-import:active { color: #fff; border-color: #697581; background: #59636e; }
+html[data-theme="dark"] .workspace-section-actions .btn-outline-secondary { color: #d0d5db; border-color: #6c7680; background: #2b3138; }
+html[data-theme="dark"] .workspace-section-actions .btn-outline-secondary:not(:disabled):hover,
+html[data-theme="dark"] .workspace-section-actions .btn-outline-secondary:not(:disabled):active { color: #fff; border-color: #697581; background: #59636e; }
+html[data-theme="dark"] .workspace-section-actions .btn-outline-danger { color: #f1b0b7; border-color: #a75d64; background: #39292c; }
+html[data-theme="dark"] .workspace-section-actions .btn-outline-danger:not(:disabled):hover,
+html[data-theme="dark"] .workspace-section-actions .btn-outline-danger:not(:disabled):active { color: #fff; border-color: #c65a64; background: #b64b55; }
 html[data-theme="dark"] .workspace-note-header,
 html[data-theme="dark"] .workspace-textarea { background: var(--surface-muted); color: var(--text); border-color: var(--border); }
 html[data-theme="dark"] .drag-area {
