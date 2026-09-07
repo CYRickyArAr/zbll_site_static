@@ -763,8 +763,7 @@
         requestAnimationFrame(function () {
             if (inlineEditor !== state) return;
             var card = findInlineCard(state.uid);
-            // 大神版备注框已常驻蓝色边框，无需自动聚焦产生额外光晕；自定义仍直接聚焦公式输入框。
-            var field = !state.notesOnly && card && card.querySelector('.inline-formula-input');
+            var field = card && card.querySelector(state.notesOnly ? '.inline-note-body' : '.inline-formula-input');
             if (field) field.focus();
         });
     }
