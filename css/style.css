@@ -1009,15 +1009,17 @@ html:not([data-theme="dark"]) .workspace-nav-btn:focus-visible {
 }
 .workspace-custom-section .workspace-list-item.active small { color: #705b96; }
 #workspace-new {
-    --bs-btn-bg: #7255ad;
-    --bs-btn-border-color: #7255ad;
-    --bs-btn-hover-bg: #624797;
-    --bs-btn-hover-border-color: #624797;
-    --bs-btn-active-bg: #573d89;
-    --bs-btn-active-border-color: #573d89;
-    --bs-btn-disabled-bg: #7255ad;
-    --bs-btn-disabled-border-color: #7255ad;
+    color: #fff;
+    background-color: #7255ad;
+    border-color: #7255ad;
 }
+#workspace-new:hover,
+#workspace-new:focus { color: #fff; background-color: #624797; border-color: #624797; }
+#workspace-new:focus { box-shadow: 0 0 0 .2rem rgba(114, 85, 173, .28); }
+#workspace-new:active,
+#workspace-new.active { color: #fff; background-color: #573d89; border-color: #573d89; }
+#workspace-new:disabled,
+#workspace-new.disabled { color: #fff; background-color: #7255ad; border-color: #7255ad; }
 .workspace-list-item > span { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .workspace-list-item small { flex: 0 0 auto; color: var(--text-muted); white-space: nowrap; }
 .workspace-actions { display: flex; flex-wrap: wrap; gap: 8px; }
