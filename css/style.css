@@ -663,8 +663,7 @@ html[data-zbll-filter="unlearned"] .sortable-item:has(.formula-card.learned) {
     max-width: 100%;
     padding: 4px 9px;
     background: #fff7df;
-    border-left: 3px solid #d99a2b;
-    border-radius: 0 5px 5px 0;
+    border-radius: 5px;
     font-size: 1.15rem;
     font-weight: 500;
     line-height: 1.45;
@@ -763,7 +762,6 @@ html[data-theme="dark"] .formula-notes {
 }
 html[data-theme="dark"] .formula-note-body-display {
     background: #3d3218;
-    border-left-color: #e5a83b;
     color: #ffe6a3;
 }
 
