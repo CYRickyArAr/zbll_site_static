@@ -38,6 +38,7 @@
     function isWorkspace() { return !!activeWorkspace; }
     function isPublicCopy() { return !activeWorkspace && !!publicCopy; }
     function isEditableView() { return true; }
+    function canEditFormulaContent() { return isWorkspace(); }
     function usesLearnedStats() { return isWorkspace() || isPublicCopy(); }
     function updateWorkspaceNav() {
         var nav = document.getElementById('workspace-open');
@@ -279,8 +280,8 @@
                 html += '<div class="sortable-container" data-category="' + escapeHtml(cat.id) + '" data-subcategory="' + escapeHtml(sub.id) + '">';
                 sub.formulas.forEach(function (formula, index) { html += renderFormulaCard(cat.id, sub.id, formula, index); });
                 html += '</div>';
-            } else if (!isEditableView()) html += '<div class="empty-state"><p class="mb-0">该子分类下暂无公式</p></div>';
-            if (isEditableView() && getZbllFilter() === 'all') html += '<button type="button" class="workspace-add" data-action="add-formula" data-category="' + escapeHtml(cat.id) + '" data-subcategory="' + escapeHtml(sub.id) + '">＋</button>';
+            } else html += '<div class="empty-state"><p class="mb-0">该子分类下暂无公式</p></div>';
+            if (canEditFormulaContent() && getZbllFilter() === 'all') html += '<button type="button" class="workspace-add" data-action="add-formula" data-category="' + escapeHtml(cat.id) + '" data-subcategory="' + escapeHtml(sub.id) + '">＋</button>';
             html += '</div></div>';
         });
         html += '</div>';
@@ -295,7 +296,8 @@
         var id = displayFormulaId(sub, formula, index), uid = formula.uid || formula.id || (subId + '-' + index);
         // SortableJS 使用 forceFallback 模式接管拖动；不要再设置原生 draggable，避免出现双重拖影。
         var html = '<div class="sortable-item" data-uid="' + escapeHtml(uid) + '" id="formula-' + escapeHtml(uid) + '">';
-        html += '<div class="formula-card' + (formula.learned ? ' learned' : '') + (isEditableView() ? ' content-editable learning-enabled' : '') + '">';
+        var canEditContent = canEditFormulaContent();
+        html += '<div class="formula-card' + (formula.learned ? ' learned' : '') + ' learning-enabled' + (canEditContent ? ' content-editable' : '') + '">';
         if (isEditableView()) html += '<div class="drag-handle" title="拖动排序" aria-label="拖动排序">⋮⋮</div>';
         html += '<div class="row"><div class="col-4">';
         if (formula.image) html += '<img src="' + escapeHtml(formula.image) + '" class="formula-image" alt="' + escapeHtml(id) + '" loading="lazy">';
@@ -316,12 +318,12 @@
             });
             html += '</div>';
         }
-        if (isEditableView()) {
+        if (canEditContent) {
             html += '<div class="action-buttons">';
             html += '<button type="button" class="add-variant-btn workspace-action" title="添加一行变体" aria-label="添加一行变体" data-action="add-variant" data-category="' + escapeHtml(catId) + '" data-subcategory="' + escapeHtml(subId) + '" data-uid="' + escapeHtml(uid) + '">＋</button>';
             html += '<div class="action-buttons-row"><button type="button" class="btn btn-outline-secondary btn-sm workspace-action" data-action="edit-formula" data-category="' + escapeHtml(catId) + '" data-subcategory="' + escapeHtml(subId) + '" data-uid="' + escapeHtml(uid) + '">编辑</button></div></div>';
-            html += '<button type="button" class="learn-btn workspace-action' + (formula.learned ? ' learned' : '') + '" data-action="toggle-learned" data-category="' + escapeHtml(catId) + '" data-subcategory="' + escapeHtml(subId) + '" data-uid="' + escapeHtml(uid) + '" title="' + (formula.learned ? '取消已学' : '标记已学') + '" aria-label="' + (formula.learned ? '取消已学' : '标记已学') + '"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg></button>';
         }
+        html += '<button type="button" class="learn-btn workspace-action' + (formula.learned ? ' learned' : '') + '" data-action="toggle-learned" data-category="' + escapeHtml(catId) + '" data-subcategory="' + escapeHtml(subId) + '" data-uid="' + escapeHtml(uid) + '" title="' + (formula.learned ? '取消已学' : '标记已学') + '" aria-label="' + (formula.learned ? '取消已学' : '标记已学') + '"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg></button>';
         html += '</div></div>';
         return html;
     }
@@ -682,6 +684,7 @@
     }
     async function handleWorkspaceAction(button) {
         var action = button.dataset.action, catId = button.dataset.category, subId = button.dataset.subcategory, uid = button.dataset.uid;
+        if (!isWorkspace() && (action === 'add-formula' || action === 'add-variant' || action === 'edit-formula' || action === 'delete-formula')) return;
         await ensureEditableData();
         if (action === 'add-formula') return openFormulaEditor(catId, subId, null);
         var ref = uid ? findFormula(catId, subId, uid) : null;
