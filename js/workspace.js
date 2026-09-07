@@ -95,14 +95,14 @@
         };
     }
 
-    function publicCopy(data) {
+    function publicCopy(data, name) {
         var now = new Date().toISOString();
         return {
             format: 'zbll-workspace',
             version: 1,
-            id: PUBLIC_ID,
+            id: makeId(),
             kind: 'public-copy',
-            name: '大神版（已编辑）',
+            name: name || '大神版（已编辑）',
             sourceFingerprint: data.meta && data.meta.fingerprint || '',
             createdAt: now,
             updatedAt: now,
@@ -137,6 +137,9 @@
     function mergePublicCopy(data, existing) {
         if (!existing) return null;
         var merged = publicCopy(data);
+        merged.id = existing.id || merged.id;
+        merged.kind = 'public-copy';
+        merged.name = existing.name || merged.name;
         merged.createdAt = existing.createdAt || merged.createdAt;
         merged.updatedAt = existing.updatedAt || merged.updatedAt;
         var oldBySub = {};
@@ -174,10 +177,14 @@
     function exportPublicWorkspace(data, copy) {
         var workspace = copy ? clone(copy) : publicCopy(data);
         workspace.id = makeId();
-        workspace.kind = 'workspace';
-        workspace.name = copy ? '大神版（已编辑）' : '大神版';
+        workspace.kind = 'public-copy';
+        workspace.name = copy ? (copy.name || '大神版（已编辑）') : '大神版';
         workspace.sourceFingerprint = data.meta && data.meta.fingerprint || workspace.sourceFingerprint || '';
         return workspace;
+    }
+
+    function isPublicWorkspace(workspace) {
+        return !!workspace && (workspace.id === PUBLIC_ID || workspace.kind === 'public-copy' || workspace.kind === 'public-library');
     }
 
     function validLine(line) {
@@ -206,6 +213,7 @@
         var workspace = clone(raw);
         workspace.id = makeId();
         workspace.name = String(workspace.name || '导入的 ZBLL 工作区').slice(0, 80);
+        workspace.kind = isPublicWorkspace(raw) || /^大神版/.test(String(raw.name || '')) ? 'public-copy' : 'workspace';
         workspace.createdAt = workspace.createdAt || new Date().toISOString();
         workspace.updatedAt = new Date().toISOString();
         workspace.categories.forEach(function (category) {
@@ -237,12 +245,20 @@
             var db = await dbPromise;
             return requestResult(db.transaction(STORE_NAME, 'readonly').objectStore(STORE_NAME).get(id));
         },
-        async getPublicCopy(data) {
-            var existing = await this.get(PUBLIC_ID);
+        async getPublicCopy(data, id) {
+            var existing = await this.get(id || PUBLIC_ID);
             if (!existing || !data) return existing;
             var merged = mergePublicCopy(data, existing);
             if (merged && merged.sourceFingerprint !== existing.sourceFingerprint) await this.putPublicCopy(merged);
             return merged;
+        },
+        async listPublicCopies(data) {
+            var all = await this.list();
+            var copies = all.filter(isPublicWorkspace);
+            if (!data) return copies;
+            var merged = [];
+            for (var i = 0; i < copies.length; i++) merged.push(await this.getPublicCopy(data, copies[i].id));
+            return merged.filter(Boolean).sort(function (a, b) { return String(b.updatedAt).localeCompare(String(a.updatedAt)); });
         },
         async hasPublicCopy() { return !!(await this.getPublicCopy()); },
         async ensurePublicCopy(data) {
@@ -253,10 +269,15 @@
             return copy;
         },
         async putPublicCopy(copy) {
-            copy.id = PUBLIC_ID;
+            copy.id = copy.id || makeId();
             copy.kind = 'public-copy';
-            copy.name = '大神版（已编辑）';
+            copy.name = copy.name || '大神版（已编辑）';
             await this.put(copy);
+            return copy;
+        },
+        async createPublicCopy(data, name) {
+            var copy = publicCopy(data, name || '大神版（已编辑）');
+            await this.putPublicCopy(copy);
             return copy;
         },
         exportPublic(data, copy) {
@@ -280,7 +301,6 @@
         async create(data, name) {
             var workspace = blankWorkspace(data, name);
             await this.put(workspace);
-            await this.activate(workspace.id);
             return workspace;
         },
         async activate(id) {
@@ -293,12 +313,11 @@
         async importFile(file) {
             var text = await file.text();
             var workspace = normalizeImported(JSON.parse(text));
-            var existing = (await this.list()).filter(function (item) { return item.id !== PUBLIC_ID; });
+            var existing = await this.list();
             var baseName = workspace.name;
             var suffix = 2;
             while (existing.some(function (item) { return item.name === workspace.name; })) workspace.name = baseName + ' ' + suffix++;
             await this.put(workspace);
-            await this.activate(workspace.id);
             return workspace;
         },
         async exportFile(workspace, onProgress) {
