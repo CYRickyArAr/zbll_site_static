@@ -531,18 +531,20 @@
         if (!listEl) return;
         var storedPublicCopy = await WS.getPublicCopy(DATA);
         var list = (await WS.list()).filter(function (item) { return item.id !== '__public_copy__'; });
-        var selectedId = '';
+        var selectedId = '', selectedPublicMode = 'default';
         try { selectedId = localStorage.getItem(selectedWorkspaceKey) || ''; } catch (e) {}
+        try { selectedPublicMode = localStorage.getItem(publicModeKey) || (publicCopy ? 'edited' : 'default'); } catch (e) {}
+        if (selectedPublicMode === 'edited' && !storedPublicCopy) selectedPublicMode = 'default';
         var selected = list.find(function (item) { return item.id === selectedId; });
         currentEl.textContent = activeWorkspace ? '当前：' + activeWorkspace.name :
             (publicCopy ? '当前：大神版（已编辑）' : '当前：大神版') + (selected ? '；自定义：' + selected.name : '');
         if (publicListEl) {
             publicListEl.innerHTML =
-                '<button type="button" class="workspace-list-item' + (!activeWorkspace && !publicCopy ? ' active' : '') + '" data-public-library="default"><span>大神版</span><small>默认</small></button>' +
-                (storedPublicCopy ? '<button type="button" class="workspace-list-item' + (!activeWorkspace && publicCopy ? ' active' : '') + '" data-public-library="edited"><span>大神版（已编辑）</span><small>' + escapeHtml(new Date(storedPublicCopy.updatedAt).toLocaleString()) + '</small></button>' : '');
+                '<button type="button" class="workspace-list-item' + (selectedPublicMode === 'default' ? ' active' : '') + '" data-public-library="default"><span>大神版</span><small>默认</small></button>' +
+                (storedPublicCopy ? '<button type="button" class="workspace-list-item' + (selectedPublicMode === 'edited' ? ' active' : '') + '" data-public-library="edited"><span>大神版（已编辑）</span><small>' + escapeHtml(new Date(storedPublicCopy.updatedAt).toLocaleString()) + '</small></button>' : '');
         }
         listEl.innerHTML = list.length ? list.map(function (item) {
-            return '<button type="button" class="workspace-list-item' + ((activeWorkspace && activeWorkspace.id === item.id) || (!activeWorkspace && selectedId === item.id) ? ' active' : '') + '" data-workspace-id="' + escapeHtml(item.id) + '"><span>' + escapeHtml(item.name) + '</span><small>' + escapeHtml(new Date(item.updatedAt).toLocaleString()) + '</small></button>';
+            return '<button type="button" class="workspace-list-item' + (selectedId === item.id ? ' active' : '') + '" data-workspace-id="' + escapeHtml(item.id) + '"><span>' + escapeHtml(item.name) + '</span><small>' + escapeHtml(new Date(item.updatedAt).toLocaleString()) + '</small></button>';
         }).join('') : '<div class="workspace-empty">还没有本地工作区</div>';
         var exportButton = document.getElementById('workspace-export');
         if (exportButton) exportButton.disabled = false;
@@ -577,10 +579,10 @@
         router(); await refreshWorkspaceList();
     }
     async function activateSelectedWorkspace() {
-        if (activeWorkspace) return;
         var id = '';
         try { id = localStorage.getItem(selectedWorkspaceKey) || ''; } catch (e) {}
         var workspace = id ? await WS.get(id) : null;
+        if (activeWorkspace && workspace && activeWorkspace.id === workspace.id) return;
         if (!workspace) {
             var list = (await WS.list()).filter(function (item) { return item.id !== '__public_copy__'; });
             if (list.length === 1) workspace = list[0];
@@ -782,9 +784,9 @@
 
     async function handleWorkspaceManagerClick(e) {
         var publicItem = e.target.closest('[data-public-library]');
-        if (publicItem) { await activatePublicLibrary(publicItem.dataset.publicLibrary); return; }
+        if (publicItem) { try { localStorage.setItem(publicModeKey, publicItem.dataset.publicLibrary === 'edited' ? 'edited' : 'default'); } catch (ignore) {} await refreshWorkspaceList(); return; }
         var item = e.target.closest('[data-workspace-id]');
-        if (item) { await activateWorkspace(item.dataset.workspaceId); return; }
+        if (item) { try { localStorage.setItem(selectedWorkspaceKey, item.dataset.workspaceId); } catch (ignore) {} await refreshWorkspaceList(); return; }
         var id = e.target.id;
         try {
             if (id === 'workspace-new') return createWorkspace();
