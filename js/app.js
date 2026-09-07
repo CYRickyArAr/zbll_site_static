@@ -371,7 +371,7 @@
         var editing = !!inlineEditor && inlineEditor.catId === catId && inlineEditor.subId === subId && inlineEditor.uid === uid;
         var notesOnly = editing && inlineEditor.notesOnly;
         var note = splitNotes(formula.notes, formula, subId);
-        html += '<div class="formula-card' + (formula.learned ? ' learned' : '') + ' learning-enabled has-card-editor' + (canEditContent ? ' content-editable' : '') + (editing ? ' inline-editing' : '') + '">';
+        html += '<div class="formula-card' + (formula.learned ? ' learned' : '') + ' learning-enabled has-card-editor' + (canEditContent ? ' content-editable' : '') + (editing ? ' inline-editing' : '') + (notesOnly ? ' notes-only-editing' : '') + '">';
         if (isEditableView() && !editing) html += '<div class="drag-handle" title="拖动排序" aria-label="拖动排序">⋮⋮</div>';
         html += '<div class="row"><div class="col-4">';
         if (editing && !notesOnly) {

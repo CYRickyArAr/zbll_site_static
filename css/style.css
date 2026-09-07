@@ -1054,6 +1054,11 @@ html[data-theme="dark"] .form-check-label {
     border-width: 2px;
     border-color: #6ea8fe;
 }
+.formula-card.notes-only-editing .inline-note-body {
+    min-height: 56px;
+    height: 56px;
+    overflow-y: auto;
+}
 .inline-formula-label { margin-top: 12px; }
 .inline-formula-input { margin-bottom: 8px; }
 .inline-image-editor { width: 140px; }
