@@ -39,7 +39,7 @@
     function isPublicCopy() { return !activeWorkspace && !!publicCopy; }
     function isEditableView() { return true; }
     function canEditFormulaContent() { return isWorkspace(); }
-    function usesLearnedStats() { return isWorkspace() || isPublicCopy(); }
+    function usesLearnedStats() { return true; }
     function updateWorkspaceNav() {
         var nav = document.getElementById('workspace-open');
         var publicBtn = document.getElementById('nav-public-mode');
