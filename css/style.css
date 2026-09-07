@@ -937,12 +937,11 @@ html[data-theme="dark"] .form-check-label {
     margin-bottom: 8px;
     padding: 6px 9px;
     line-height: 1.35;
-}
-.workspace-editor .workspace-textarea#editor-formula {
-    min-height: 62px;
-}
-.workspace-editor .workspace-textarea.note-body {
-    min-height: 42px;
+    height: calc(4 * 1.35em + 14px);
+    min-height: calc(4 * 1.35em + 14px);
+    max-height: calc(4 * 1.35em + 14px);
+    resize: none;
+    overflow-y: auto;
 }
 .workspace-editor .workspace-note-header {
     padding: 6px 9px;
