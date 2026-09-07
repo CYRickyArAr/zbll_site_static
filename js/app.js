@@ -844,7 +844,7 @@
     async function handleWorkspaceManagerClick(e) {
         var publicItem = e.target.closest('[data-public-library]');
         if (publicItem) {
-            var publicMode = publicItem.dataset.publicLibrary === 'edited' ? 'edited' : 'default';
+            var publicMode = publicItem.dataset.publicLibrary || 'default';
             try { localStorage.setItem(publicModeKey, publicMode); } catch (ignore) {}
             if (!activeWorkspace) await activatePublicLibrary(publicMode);
             else await refreshWorkspaceList();
