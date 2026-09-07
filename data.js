@@ -53,7 +53,7 @@ window.ZBLL_DATA = {
       },
       {
         "label": "Tymon",
-        "count": 211,
+        "count": 213,
         "wca": "2016KOLA02"
       },
       {
@@ -112,8 +112,8 @@ window.ZBLL_DATA = {
         "wca": "2025LIAN01"
       }
     ],
-    "generatedAt": "2026-09-06T15:58:29+08:00",
-    "fingerprint": "7160fc880e85854a6375311824c46ed1f89b1375771c76686072e4df199252af"
+    "generatedAt": "2026-09-07T23:02:40+08:00",
+    "fingerprint": "e70c6fad41d126b4093c2b4c0c09a261b67549c1ee2a446eae20a999628a3946"
   },
   "categories": [
     {
@@ -2512,6 +2512,7 @@ window.ZBLL_DATA = {
                   "alg": "U R' U' R U' F U' R' U R U F' R' U R",
                   "marks": [
                     "耿",
+                    "Tymon",
                     "杜",
                     "南"
                   ]
@@ -3080,6 +3081,7 @@ window.ZBLL_DATA = {
                   "alg": "U' R U R' U R U' R' U R' U' R2 U' R2 U2 R",
                   "marks": [
                     "耿",
+                    "Tymon",
                     "杜",
                     "Feliks",
                     "Park"
