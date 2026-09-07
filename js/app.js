@@ -372,7 +372,7 @@
         var notesOnly = editing && inlineEditor.notesOnly;
         var note = splitNotes(formula.notes, formula, subId);
         html += '<div class="formula-card' + (formula.learned ? ' learned' : '') + ' learning-enabled has-card-editor' + (canEditContent ? ' content-editable' : '') + (editing ? ' inline-editing' : '') + (notesOnly ? ' notes-only-editing' : '') + '">';
-        if (isEditableView() && !editing) html += '<div class="drag-handle" title="拖动排序" aria-label="拖动排序">⋮⋮</div>';
+        if (isEditableView()) html += '<div class="drag-handle" title="拖动排序" aria-label="拖动排序">⋮⋮</div>';
         html += '<div class="row"><div class="col-4">';
         if (editing && !notesOnly) {
             var editImage = inlineEditor.imageCleared ? '' : (inlineEditor.selectedImage || formula.image || '');
@@ -419,7 +419,7 @@
             if (canEditContent) html += '<button type="button" class="add-variant-btn workspace-action" title="添加一行公式" aria-label="添加一行公式" data-action="add-variant" data-category="' + escapeHtml(catId) + '" data-subcategory="' + escapeHtml(subId) + '" data-uid="' + escapeHtml(uid) + '">＋</button>';
             html += '<div class="action-buttons-row"><button type="button" class="btn btn-outline-secondary btn-sm workspace-action" data-action="edit-formula" data-category="' + escapeHtml(catId) + '" data-subcategory="' + escapeHtml(subId) + '" data-uid="' + escapeHtml(uid) + '">编辑</button></div></div>';
         }
-        html += '<button type="button" class="learn-btn workspace-action' + (formula.learned ? ' learned' : '') + '" data-action="toggle-learned" data-category="' + escapeHtml(catId) + '" data-subcategory="' + escapeHtml(subId) + '" data-uid="' + escapeHtml(uid) + '" title="' + (formula.learned ? '取消已学' : '标记已学') + '" aria-label="' + (formula.learned ? '取消已学' : '标记已学') + '"' + (editing ? ' disabled' : '') + '><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg></button>';
+        html += '<button type="button" class="learn-btn workspace-action' + (formula.learned ? ' learned' : '') + '" data-action="toggle-learned" data-category="' + escapeHtml(catId) + '" data-subcategory="' + escapeHtml(subId) + '" data-uid="' + escapeHtml(uid) + '" title="' + (formula.learned ? '取消已学' : '标记已学') + '" aria-label="' + (formula.learned ? '取消已学' : '标记已学') + '"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg></button>';
         html += '</div></div>';
         return html;
     }
@@ -556,7 +556,15 @@
                     if (reordered.length === sub.formulas.length) {
                         sub.formulas = reordered;
                         await persistCurrentData();
-                        renderCategory(evt.to.dataset.category);
+                        if (inlineEditor) {
+                            Array.prototype.forEach.call(evt.to.children, function (item, index) {
+                                var formula = sub.formulas[index];
+                                var positionAnchor = sub.id + '-' + (index + 1);
+                                item.id = 'formula-position-' + positionAnchor;
+                                var idNode = item.querySelector('.formula-id');
+                                if (idNode) idNode.textContent = displayFormulaId(sub, formula, index);
+                            });
+                        } else renderCategory(evt.to.dataset.category);
                     }
                 }
             });
@@ -855,7 +863,7 @@
         var editable = await ensureEditableData();
         if (!editable) return;
         var cancelledInlineEditor = false;
-        if (inlineEditor && action !== 'edit-formula') {
+        if (inlineEditor && action !== 'edit-formula' && action !== 'toggle-learned') {
             inlineEditor = null;
             cancelledInlineEditor = true;
             renderCategory(catId);
@@ -864,7 +872,18 @@
         if (action === 'edit-formula' && ref) return openFormulaEditor(catId, subId, ref.formula);
         if (action === 'add-variant') return addVariant(catId, subId, uid, cancelledInlineEditor ? null : button.closest('.formula-card'));
         if (!ref) return;
-        if (action === 'toggle-learned') ref.formula.learned = !ref.formula.learned;
+        if (action === 'toggle-learned') {
+            ref.formula.learned = !ref.formula.learned;
+            if (inlineEditor) {
+                await persistCurrentData();
+                var card = button.closest('.formula-card');
+                if (card) card.classList.toggle('learned', ref.formula.learned);
+                button.classList.toggle('learned', ref.formula.learned);
+                button.title = ref.formula.learned ? '取消已学' : '标记已学';
+                button.setAttribute('aria-label', button.title);
+                return;
+            }
+        }
         await persistCurrentData(); renderCategory(catId);
     }
 
