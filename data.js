@@ -53,7 +53,7 @@ window.ZBLL_DATA = {
       },
       {
         "label": "Tymon",
-        "count": 213,
+        "count": 219,
         "wca": "2016KOLA02"
       },
       {
@@ -112,8 +112,8 @@ window.ZBLL_DATA = {
         "wca": "2025LIAN01"
       }
     ],
-    "generatedAt": "2026-09-07T23:02:40+08:00",
-    "fingerprint": "e70c6fad41d126b4093c2b4c0c09a261b67549c1ee2a446eae20a999628a3946"
+    "generatedAt": "2026-09-07T23:25:55+08:00",
+    "fingerprint": "69e36f0eb63a5f499f45fadb887bca06d9234c9f1d859e43ed6d1d214a4aba06"
   },
   "categories": [
     {
@@ -1797,6 +1797,7 @@ window.ZBLL_DATA = {
                   "alg": "R' U2 R F U' R' U R U F' R' U R",
                   "marks": [
                     "耿",
+                    "Tymon",
                     "杜",
                     "南"
                   ]
@@ -2120,6 +2121,7 @@ window.ZBLL_DATA = {
                   "alg": "U' F' U' L' U2 L U' L' U' L F",
                   "marks": [
                     "耿",
+                    "Tymon",
                     "Park"
                   ]
                 },
@@ -4533,6 +4535,7 @@ window.ZBLL_DATA = {
                   "alg": "U2 R U2 R' U' R U' R' U R' U2 R U R' U R",
                   "marks": [
                     "耿",
+                    "Tymon",
                     "杜",
                     "藩",
                     "懿",
@@ -5609,6 +5612,7 @@ window.ZBLL_DATA = {
                   "alg": "R U R' U R U2 R' U' R U' L' U R' U' L",
                   "marks": [
                     "耿",
+                    "Tymon",
                     "杜",
                     "藩",
                     "董"
@@ -6839,7 +6843,8 @@ window.ZBLL_DATA = {
                 {
                   "alg": "U L' R U R' U' L U2 R U2 R'",
                   "marks": [
-                    "耿"
+                    "耿",
+                    "Tymon"
                   ]
                 }
               ]
@@ -7045,7 +7050,8 @@ window.ZBLL_DATA = {
                 {
                   "alg": "U2 R2 U R2 F' R U2 R' U' R U' R' F R2 U' R2",
                   "marks": [
-                    "耿"
+                    "耿",
+                    "Tymon"
                   ]
                 },
                 {
@@ -7851,7 +7857,8 @@ window.ZBLL_DATA = {
                 {
                   "alg": "U' S R U R' U' R' F R S' R U R' U' F'",
                   "marks": [
-                    "耿"
+                    "耿",
+                    "Tymon"
                   ]
                 },
                 {
