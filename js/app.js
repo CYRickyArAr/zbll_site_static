@@ -167,33 +167,45 @@
         return (nav ? nav.offsetHeight : 60) + 8;
     }
     function firstVisibleAnchor() {
-        var candidates = document.querySelectorAll('.sortable-item[id], .sticky-header[id]');
         var offset = navOffset();
-        for (var i = 0; i < candidates.length; i++) {
-            var rect = candidates[i].getBoundingClientRect();
-            if (rect.bottom > offset && rect.top < window.innerHeight) return candidates[i].id;
+        function findVisible(selector) {
+            var candidates = document.querySelectorAll(selector);
+            for (var i = 0; i < candidates.length; i++) {
+                var rect = candidates[i].getBoundingClientRect();
+                if (rect.bottom > offset && rect.top < window.innerHeight) {
+                    return { id: candidates[i].id, offset: rect.top - offset };
+                }
+            }
+            return null;
         }
-        return '';
+        return findVisible('.sortable-item[id]') || findVisible('.sticky-header[id]');
     }
     function saveScroll() {
         try {
             var key = getScrollKey(currentView);
             localStorage.setItem(key, String(window.pageYOffset || window.scrollY || 0));
             var anchor = firstVisibleAnchor();
-            if (anchor) localStorage.setItem(key + '_anchor', anchor);
+            if (anchor) {
+                localStorage.setItem(key + '_anchor', anchor.id);
+                localStorage.setItem(key + '_anchor_offset', String(anchor.offset));
+            } else {
+                localStorage.removeItem(key + '_anchor');
+                localStorage.removeItem(key + '_anchor_offset');
+            }
         } catch (e) {}
     }
     function restoreScroll(view) {
-        var y = 0, anchor = '';
+        var y = 0, anchor = '', anchorOffset = 0;
         try {
             var key = getScrollKey(view);
             y = parseInt(localStorage.getItem(key), 10) || 0;
             anchor = localStorage.getItem(key + '_anchor') || '';
+            anchorOffset = parseFloat(localStorage.getItem(key + '_anchor_offset')) || 0;
         } catch (e) {}
         document.documentElement.style.scrollBehavior = 'auto';
         document.body.style.scrollBehavior = 'auto';
         var anchorEl = anchor ? document.getElementById(anchor) : null;
-        if (anchorEl) window.scrollTo(0, Math.max(0, window.pageYOffset + anchorEl.getBoundingClientRect().top - navOffset()));
+        if (anchorEl) window.scrollTo(0, Math.max(0, window.pageYOffset + anchorEl.getBoundingClientRect().top - navOffset() - anchorOffset));
         else window.scrollTo(0, y);
         document.documentElement.removeAttribute('data-scroll-restore');
     }
@@ -775,6 +787,7 @@
     window.addEventListener('hashchange', router);
     var scrollTimer = null;
     window.addEventListener('scroll', function () { if (scrollTimer) clearTimeout(scrollTimer); scrollTimer = setTimeout(saveScroll, 150); });
+    window.addEventListener('pagehide', saveScroll);
     window.addEventListener('zbll-workspace-changed', function (e) { activeWorkspace = e.detail || null; if (activeWorkspace) publicCopy = null; else WS.getPublicCopy().then(function (copy) { publicCopy = copy; router(); }); router(); });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { showOverlay('workspace-overlay', false); showOverlay('editor-overlay', false); } });
     initWorkspace();
