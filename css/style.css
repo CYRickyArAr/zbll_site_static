@@ -997,7 +997,8 @@ html:not([data-theme="dark"]) .workspace-nav-btn:focus-visible {
 .workspace-list-title { margin-top: 0; }
 .workspace-list { --workspace-list-row-height: 46px; display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; grid-auto-rows: var(--workspace-list-row-height); gap: 8px; height: calc(var(--workspace-list-row-height) * 4 + 24px); min-height: calc(var(--workspace-list-row-height) * 4 + 24px); max-height: calc(var(--workspace-list-row-height) * 4 + 24px); overflow-x: hidden; overflow-y: auto; }
 .workspace-list-item { width: 100%; max-width: 100%; min-width: 0; height: var(--workspace-list-row-height); display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 12px; overflow: hidden; text-align: left; border: 1px solid var(--border); border-radius: 7px; background: var(--surface); color: var(--text); cursor: pointer; }
-.workspace-list-item:hover { border-color: #c7ccd2; background: #f3f4f6; }
+.workspace-list-item:hover { border-color: #9da7b1; background: #e5e8ec; }
+.workspace-list-item:hover small { color: #495057; }
 .workspace-public-list .workspace-list-item.active {
     border-color: #7cb3ff;
     background: #eaf3ff;
@@ -1238,7 +1239,8 @@ html:not([data-theme="dark"]) .workspace-nav-btn:focus-visible {
 
 html[data-theme="dark"] .workspace-dialog,
 html[data-theme="dark"] .workspace-list-item { background: var(--surface); color: var(--text); }
-html[data-theme="dark"] .workspace-list-item:hover { border-color: #53606c; background: #272d33; }
+html[data-theme="dark"] .workspace-list-item:hover { border-color: #687786; background: #38414a; }
+html[data-theme="dark"] .workspace-list-item:hover small { color: #d7dce2; }
 html[data-theme="dark"] .workspace-public-list .workspace-list-item.active {
     border-color: #4e9cff;
     background: #173b67;
