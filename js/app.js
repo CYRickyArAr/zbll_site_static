@@ -367,7 +367,7 @@
         // SortableJS 使用 forceFallback 模式接管拖动；不要再设置原生 draggable，避免出现双重拖影。
         var html = '<div class="sortable-item" data-uid="' + escapeHtml(uid) + '" id="formula-position-' + escapeHtml(positionAnchor) + '">';
         var canEditContent = canEditFormulaContent();
-        html += '<div class="formula-card' + (formula.learned ? ' learned' : '') + ' learning-enabled' + (canEditContent ? ' content-editable' : '') + '">';
+        html += '<div class="formula-card' + (formula.learned ? ' learned' : '') + ' learning-enabled has-card-editor' + (canEditContent ? ' content-editable' : '') + '">';
         if (isEditableView()) html += '<div class="drag-handle" title="拖动排序" aria-label="拖动排序">⋮⋮</div>';
         html += '<div class="row"><div class="col-4">';
         if (formula.image) html += '<img src="' + escapeHtml(formula.image) + '" class="formula-image" alt="' + escapeHtml(id) + '" loading="lazy">';

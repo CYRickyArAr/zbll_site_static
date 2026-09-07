@@ -1072,7 +1072,8 @@ html[data-theme="dark"] .variant-add-form {
 .formula-card > .row > .col-8 { width: auto; flex: 1 1 auto; min-width: 0; padding: 0; }
 .formula-id { margin-bottom: 3px; }
 .formula-note-display { margin-top: 0; }
-.formula-card.learning-enabled:not(.content-editable) { padding-bottom: 52px; }
+/* 只有纯只读卡片才需给右下角勾预留空白；static 的大神版也有底部“编辑”，须与自定义共用同一操作区。 */
+.formula-card.learning-enabled:not(.content-editable):not(.has-card-editor) { padding-bottom: 52px; }
 .drag-handle { cursor: move; color: #adb5bd; font-size: 1.5rem; line-height: 1; user-select: none; position: absolute; top: 10px; right: 10px; z-index: 10; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 4px; }
 .drag-handle:hover { color: #495057; background: rgba(0,0,0,.05); }
 .action-buttons { margin-top: 6px; padding-right: 44px; display: flex; flex-direction: column; align-items: flex-start; gap: 16px; flex: 1; }
