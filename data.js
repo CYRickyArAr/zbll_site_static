@@ -73,7 +73,7 @@ window.ZBLL_DATA = {
       },
       {
         "label": "藩",
-        "count": 46,
+        "count": 49,
         "wca": "2021ZHAN01"
       },
       {
@@ -112,8 +112,8 @@ window.ZBLL_DATA = {
         "wca": "2025LIAN01"
       }
     ],
-    "generatedAt": "2026-09-08T15:07:38+08:00",
-    "fingerprint": "1ed61ab8d92337aebeba631cb32c2275f1c78bb1e074193593234e963783f838"
+    "generatedAt": "2026-09-08T15:18:04+08:00",
+    "fingerprint": "5bc3c36a7c67ec194a31f18ba19327c8666dc440aef359e6040a88fd6d0b7900"
   },
   "categories": [
     {
@@ -3733,8 +3733,9 @@ window.ZBLL_DATA = {
                   "alg": "U R U R' U R U' R' U' L' U R U' R' L",
                   "marks": [
                     "耿",
-                    "南",
-                    "Tymon"
+                    "Tymon",
+                    "藩",
+                    "南"
                   ]
                 },
                 {
@@ -4248,6 +4249,7 @@ window.ZBLL_DATA = {
                   "alg": "U' M F R' F' r U R U R' U' R U R' U' R U' R'",
                   "marks": [
                     "耿",
+                    "藩",
                     "董"
                   ]
                 },
@@ -4754,6 +4756,12 @@ window.ZBLL_DATA = {
                   "alg": "R U2 R' U2 R' U' R U R U' R' U2 R' U2 R",
                   "marks": [
                     "Tymon"
+                  ]
+                },
+                {
+                  "alg": "U2 L' U R U' L U R' F' r U R' U' r' F R",
+                  "marks": [
+                    "藩"
                   ]
                 }
               ]
