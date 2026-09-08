@@ -31,6 +31,7 @@
     var renderSnapshotKey = 'zbll_render_snapshot_v1';
     var workspaceProgressState = null;
     var workspaceExportController = null;
+    var workspaceContextTarget = null;
     var inlineEditor = null;
 
     function escapeHtml(value) {
@@ -895,6 +896,7 @@
     function hideWorkspaceContextMenu() {
         var menu = document.getElementById('workspace-context-menu');
         if (menu) menu.hidden = true;
+        workspaceContextTarget = null;
     }
     async function selectWorkspaceManagerItem(kind, id) {
         setWorkspaceMessage('');
@@ -909,17 +911,26 @@
         if (activeWorkspace) await activateWorkspace(id);
         else await refreshWorkspaceList();
     }
-    async function openWorkspaceContextMenu(kind, id, clientX, clientY, focusMenu) {
-        try {
-            await selectWorkspaceManagerItem(kind, id);
-        } catch (error) {
-            setWorkspaceMessage(error && error.message ? error.message : '无法打开公式库操作菜单', true);
-            return;
-        }
+    function openWorkspaceContextMenu(kind, id, clientX, clientY, focusMenu) {
         var menu = document.getElementById('workspace-context-menu');
         if (!menu) return;
+        setWorkspaceMessage('');
+        workspaceContextTarget = { kind: kind, id: id };
         Array.prototype.forEach.call(menu.querySelectorAll('[data-context-group]'), function (group) {
             group.hidden = group.dataset.contextGroup !== kind;
+        });
+        var publicDefault = kind === 'public' && id === 'default';
+        var publicExport = document.getElementById('workspace-public-export');
+        var customExport = document.getElementById('workspace-custom-export');
+        if (publicExport) publicExport.disabled = kind !== 'public';
+        if (customExport) customExport.disabled = kind !== 'custom';
+        ['workspace-public-rename', 'workspace-public-delete'].forEach(function (buttonId) {
+            var button = document.getElementById(buttonId);
+            if (button) button.disabled = kind !== 'public' || publicDefault;
+        });
+        ['workspace-rename', 'workspace-delete'].forEach(function (buttonId) {
+            var button = document.getElementById(buttonId);
+            if (button) button.disabled = kind !== 'custom';
         });
         menu.hidden = false;
         menu.style.left = '0px';
@@ -933,6 +944,14 @@
             var first = menu.querySelector('[data-context-group]:not([hidden]) .workspace-context-action:not(:disabled)');
             if (first) first.focus();
         }
+    }
+    async function getContextPublicCopy(target) {
+        if (target && target.kind === 'public') return target.id === 'default' ? null : await WS.getPublicCopy(DATA, target.id);
+        return getSelectedPublicCopy();
+    }
+    async function getContextWorkspace(target) {
+        if (target && target.kind === 'custom') return await WS.get(target.id);
+        return getSelectedWorkspace();
     }
 
     async function handleWorkspaceManagerClick(e) {
@@ -955,7 +974,8 @@
         }
         var control = e.target.closest('[id]');
         var id = control ? control.id : '';
-        if (control && control.classList.contains('workspace-context-action')) hideWorkspaceContextMenu();
+        var contextTarget = control && control.classList.contains('workspace-context-action') ? workspaceContextTarget : null;
+        if (contextTarget) hideWorkspaceContextMenu();
         try {
             if (id === 'workspace-public-new') return createPublicLibrary();
             if (id === 'workspace-new') return createWorkspace();
@@ -969,13 +989,13 @@
                 return;
             }
             if (id === 'workspace-public-export') {
-                return exportWorkspace(WS.exportPublic(DATA, await getSelectedPublicCopy()), control);
+                return exportWorkspace(WS.exportPublic(DATA, await getContextPublicCopy(contextTarget)), control);
             }
             if (id === 'workspace-custom-export') {
-                return exportWorkspace(await getSelectedWorkspace(), control);
+                return exportWorkspace(await getContextWorkspace(contextTarget), control);
             }
             if (id === 'workspace-public-rename') {
-                var selectedPublicCopy = await getSelectedPublicCopy();
+                var selectedPublicCopy = await getContextPublicCopy(contextTarget);
                 if (!selectedPublicCopy) { setWorkspaceMessage('默认大神版不能重命名，请先选择一个大神版副本。', true); await refreshWorkspaceList(); return; }
                 var publicName = window.prompt('新的大神版名称', selectedPublicCopy.name || '大神版（已编辑）');
                 if (publicName && publicName.trim()) {
@@ -987,7 +1007,7 @@
                 return;
             }
             if (id === 'workspace-public-delete') {
-                var publicToDelete = await getSelectedPublicCopy();
+                var publicToDelete = await getContextPublicCopy(contextTarget);
                 if (!publicToDelete) { setWorkspaceMessage('默认大神版不能删除，请先选择一个大神版副本。', true); await refreshWorkspaceList(); return; }
                 if (!window.confirm('删除选中的大神版副本？导出的 .zbll 文件不受影响。')) return;
                 var removedPublicId = publicToDelete.id;
@@ -998,7 +1018,7 @@
                 return;
             }
             if (id === 'workspace-rename') {
-                var selectedWorkspace = await getSelectedWorkspace();
+                var selectedWorkspace = await getContextWorkspace(contextTarget);
                 if (!selectedWorkspace) { setWorkspaceMessage('请先选择要重命名的自定义公式库。', true); await refreshWorkspaceList(); return; }
                 var name = window.prompt('新的工作区名称', selectedWorkspace.name);
                 if (name && name.trim()) {
@@ -1010,7 +1030,7 @@
                 return;
             }
             if (id === 'workspace-delete') {
-                var selectedToDelete = await getSelectedWorkspace();
+                var selectedToDelete = await getContextWorkspace(contextTarget);
                 if (!selectedToDelete) { setWorkspaceMessage('请先选择要删除的自定义公式库。', true); await refreshWorkspaceList(); return; }
                 if (!window.confirm('删除选中的自定义公式库？导出的 .zbll 文件不受影响。')) return;
                 var removedId = selectedToDelete.id;
