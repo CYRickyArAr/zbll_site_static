@@ -1027,15 +1027,14 @@ html:not([data-theme="dark"]) .workspace-nav-btn:focus-visible {
 }
 .workspace-public-list .workspace-list-item.active small { color: #4777b9; }
 .workspace-custom-section .workspace-list-item.active small { color: #705b96; }
-#workspace-import { box-shadow: none; }
-#workspace-import:focus-visible { box-shadow: none; outline: 2px solid currentColor; outline-offset: 2px; }
-#workspace-import { color: #495057; border-color: #adb5bd; background: #f3f4f6; }
-#workspace-import:hover,
-#workspace-import:active { color: #fff; border-color: #6c757d; background: #6c757d; }
+#workspace-import { display: inline-flex; align-items: center; gap: 9px; padding: 8px 10px; border: 0; border-radius: 6px; background: transparent; color: #495057; font: inherit; line-height: 1.2; cursor: pointer; }
+#workspace-import svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.65; stroke-linecap: round; stroke-linejoin: round; }
+#workspace-import:hover { background: #e9ecef; color: #212529; }
+#workspace-import:active { background: #dee2e6; }
+#workspace-import:focus-visible { outline: 2px solid #7488a8; outline-offset: 1px; }
 .workspace-list-item > span { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .workspace-list-item small { flex: 0 0 auto; color: var(--text-muted); white-space: nowrap; }
 .workspace-actions { display: flex; flex-wrap: wrap; gap: 8px; }
-#workspace-import { border-radius: 8px; }
 .workspace-common-actions { justify-content: center; padding-top: 2px; }
 .workspace-context-menu { position: fixed; z-index: 1300; min-width: 150px; padding: 5px; border: 1px solid #c9ced4; border-radius: 8px; background: #fff; box-shadow: 0 10px 30px rgba(15, 23, 42, .18); }
 .workspace-context-menu[hidden],
@@ -1265,9 +1264,9 @@ html[data-theme="dark"] #workspace-public-new { color: #9cc4ff; }
 html[data-theme="dark"] #workspace-public-new:hover { border-color: #4e9cff; background: #173b67; }
 html[data-theme="dark"] #workspace-new { color: #cbb9ee; }
 html[data-theme="dark"] #workspace-new:hover { border-color: #9b7cff; background: #382d5c; }
-html[data-theme="dark"] #workspace-import { color: #d0d5db; border-color: #6c7680; background: #2b3138; }
-html[data-theme="dark"] #workspace-import:hover,
-html[data-theme="dark"] #workspace-import:active { color: #fff; border-color: #697581; background: #59636e; }
+html[data-theme="dark"] #workspace-import { color: #d0d5db; background: transparent; }
+html[data-theme="dark"] #workspace-import:hover { color: #fff; background: #38414a; }
+html[data-theme="dark"] #workspace-import:active { background: #46515c; }
 html[data-theme="dark"] .workspace-context-menu { border-color: #4a535d; background: #252a30; box-shadow: 0 12px 34px rgba(0, 0, 0, .42); }
 html[data-theme="dark"] .workspace-context-action { color: #e6e9ed; }
 html[data-theme="dark"] .workspace-context-action kbd { color: #9aa3ad; }
