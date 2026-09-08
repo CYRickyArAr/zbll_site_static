@@ -32,6 +32,7 @@
     var workspaceProgressState = null;
     var workspaceExportController = null;
     var workspaceContextTarget = null;
+    var workspaceShortcutTarget = null;
     var inlineEditor = null;
 
     function escapeHtml(value) {
@@ -626,6 +627,7 @@
     }
     async function openWorkspaceManager() {
         hideWorkspaceContextMenu();
+        workspaceShortcutTarget = null;
         setWorkspaceMessage('');
         if (workspaceProgressState) setWorkspaceProgress(workspaceProgressState.value, workspaceProgressState.text);
         else setWorkspaceProgress(null);
@@ -900,6 +902,7 @@
     }
     async function selectWorkspaceManagerItem(kind, id) {
         setWorkspaceMessage('');
+        workspaceShortcutTarget = { kind: kind, id: id };
         if (kind === 'public') {
             var publicMode = id || 'default';
             try { localStorage.setItem(publicModeKey, publicMode); } catch (ignore) {}
@@ -916,6 +919,7 @@
         if (!menu) return;
         setWorkspaceMessage('');
         workspaceContextTarget = { kind: kind, id: id };
+        workspaceShortcutTarget = workspaceContextTarget;
         Array.prototype.forEach.call(menu.querySelectorAll('[data-context-group]'), function (group) {
             group.hidden = group.dataset.contextGroup !== kind;
         });
@@ -957,16 +961,19 @@
         var menu = document.getElementById('workspace-context-menu');
         if (menu && !menu.hidden && workspaceContextTarget) return workspaceContextTarget;
         var active = document.activeElement;
-        if (!active || !active.closest) return null;
-        var item = active.closest('.workspace-list-item');
-        if (!item) {
-            var row = active.closest('.workspace-list-row');
-            item = row && row.querySelector('.workspace-list-item');
+        if (active && active.closest) {
+            var item = active.closest('.workspace-list-item');
+            if (!item) {
+                var row = active.closest('.workspace-list-row');
+                item = row && row.querySelector('.workspace-list-item');
+            }
+            if (item) {
+                return item.hasAttribute('data-public-library')
+                    ? { kind: 'public', id: item.dataset.publicLibrary || 'default' }
+                    : { kind: 'custom', id: item.dataset.workspaceId };
+            }
         }
-        if (!item) return null;
-        return item.hasAttribute('data-public-library')
-            ? { kind: 'public', id: item.dataset.publicLibrary || 'default' }
-            : { kind: 'custom', id: item.dataset.workspaceId };
+        return workspaceShortcutTarget;
     }
     function runWorkspaceShortcut(action, target) {
         if (!target) return false;
@@ -980,6 +987,7 @@
         var button = document.getElementById(buttonId);
         if (!button) return false;
         workspaceContextTarget = target;
+        workspaceShortcutTarget = target;
         button.disabled = false;
         button.click();
         return true;
@@ -1043,6 +1051,7 @@
                 if (!window.confirm('删除选中的大神版副本？导出的 .zbll 文件不受影响。')) return;
                 var removedPublicId = publicToDelete.id;
                 await WS.remove(removedPublicId);
+                if (workspaceShortcutTarget && workspaceShortcutTarget.kind === 'public' && workspaceShortcutTarget.id === removedPublicId) workspaceShortcutTarget = null;
                 try { if (localStorage.getItem(publicModeKey) === removedPublicId) localStorage.setItem(publicModeKey, 'default'); } catch (e) {}
                 if (publicCopy && publicCopy.id === removedPublicId) { publicCopy = null; router(); }
                 await refreshWorkspaceList();
@@ -1066,6 +1075,7 @@
                 if (!window.confirm('删除选中的自定义公式库？导出的 .zbll 文件不受影响。')) return;
                 var removedId = selectedToDelete.id;
                 await WS.remove(removedId);
+                if (workspaceShortcutTarget && workspaceShortcutTarget.kind === 'custom' && workspaceShortcutTarget.id === removedId) workspaceShortcutTarget = null;
                 try { if (localStorage.getItem(selectedWorkspaceKey) === removedId) localStorage.removeItem(selectedWorkspaceKey); } catch (e) {}
                 if (activeWorkspace && activeWorkspace.id === removedId) { activeWorkspace = null; await WS.activate(null); var publicCopies = await WS.listPublicCopies(DATA); var publicMode = selectedPublicId(publicCopies); publicCopy = publicMode === 'default' ? null : await WS.getPublicCopy(DATA, publicMode); router(); }
                 await refreshWorkspaceList();
