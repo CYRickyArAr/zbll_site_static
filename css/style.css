@@ -1449,7 +1449,7 @@ html[data-theme="dark"] .sortable-ghost { background: #303840; border-color: #4e
     .formula-card > .row { gap: 12px; }
     .formula-card.has-card-editor .action-buttons-row { left: 12px; }
     .category-title-row { align-items: flex-start; flex-direction: column; }
-    .collapse-all-btn { top: 110px; right: 12px; }
+    .collapse-all-btn { display: none; }
     .formula-image { height: 140px; }
     .formula-id { font-size: 1.2rem; }
     .formula-line-alg { font-size: 1.05rem; }
