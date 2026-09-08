@@ -1011,7 +1011,7 @@ html:not([data-theme="dark"]) .workspace-nav-btn:focus-visible {
 .workspace-list-row:focus-within .workspace-item-menu-trigger { opacity: .72; }
 .workspace-item-menu-trigger:hover,
 .workspace-item-menu-trigger:focus-visible { opacity: 1; background: rgba(108, 117, 125, .15); outline: none; }
-.workspace-list-item:hover { border-color: transparent; background: #e5e8ec; }
+.workspace-list-item:hover { border-color: transparent; border-radius: 6px; background: #e5e8ec; }
 .workspace-list-item:hover small { color: #495057; }
 .workspace-public-list .workspace-list-item.active {
     border-color: #7cb3ff;
