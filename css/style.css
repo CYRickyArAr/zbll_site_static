@@ -1015,7 +1015,7 @@ html:not([data-theme="dark"]) .workspace-nav-btn:focus-visible {
 .workspace-dialog-header .workspace-message { flex: 1 1 auto; min-width: 0; }
 .workspace-close { border: 0; background: transparent; color: var(--text-muted); font-size: 1.8rem; line-height: 1; cursor: pointer; }
 .workspace-help-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; margin-bottom: 14px; }
-.workspace-help-box { flex: 1 1 360px; min-width: 0; padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-muted); }
+.workspace-help-box { flex: 1 1 auto; min-width: 0; padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-muted); }
 .workspace-help { margin: 0; overflow: hidden; color: var(--text-muted); line-height: 1.45; text-overflow: ellipsis; white-space: nowrap; }
 .workspace-help + .workspace-help { margin-top: 2px; }
 .workspace-panels { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; margin-bottom: 16px; align-items: stretch; }
@@ -1469,6 +1469,14 @@ html[data-theme="dark"] .sortable-ghost { background: #303840; border-color: #4e
         overflow: hidden;
         padding: 4px 0.5em;
         font-size: .68rem;
+    }
+    .workspace-help-box {
+        flex-basis: 100%;
+    }
+    .workspace-help {
+        overflow: visible;
+        text-overflow: clip;
+        white-space: normal;
     }
 }
 
