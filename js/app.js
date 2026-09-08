@@ -335,13 +335,14 @@
         });
         html += '</div></div>';
         appEl.innerHTML = html;
+        updateToggleAllButton();
     }
 
     function renderCategory(catId) {
         var cat = findCategory(catId);
-        if (!cat) { appEl.innerHTML = '<div class="container"><div class="empty-state">分类不存在：' + escapeHtml(catId) + '</div></div>'; return; }
+        if (!cat) { appEl.innerHTML = '<div class="container"><div class="empty-state">分类不存在：' + escapeHtml(catId) + '</div></div>'; updateToggleAllButton(); return; }
         var html = '<div class="container"><nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="#/">首页</a></li><li class="breadcrumb-item active">' + escapeHtml(cat.id) + ' Case</li></ol></nav>';
-        html += '<div class="category-title-row"><h1 class="category-title">' + escapeHtml(cat.id) + ' Case</h1><button type="button" class="btn btn-outline-secondary collapse-all-btn" id="toggle-all-subcategories">全部展开</button></div>';
+        html += '<div class="category-title-row"><h1 class="category-title">' + escapeHtml(cat.id) + ' Case</h1></div>';
         (cat.subcategories || []).forEach(function (sub) {
             var total = sub.formulas.length, learned = sub.formulas.filter(function (formula) { return formula.learned; }).length;
             var saved = null; try { saved = localStorage.getItem('subcat_' + sub.id); } catch (e) {}
@@ -438,8 +439,16 @@
         var button = document.getElementById('toggle-all-subcategories');
         if (!button) return;
         var headers = document.querySelectorAll('.sticky-header[id^="header-"]'), openCount = 0;
+        button.hidden = !headers.length;
+        if (!headers.length) return;
         headers.forEach(function (header) { var content = document.getElementById('subcat-' + header.dataset.subcat); if (content && content.style.display !== 'none') openCount++; });
-        button.textContent = headers.length && openCount === headers.length ? '全部折叠' : '全部展开';
+        var collapse = openCount === headers.length;
+        var label = collapse ? '全部折叠' : '全部展开';
+        button.setAttribute('aria-label', label);
+        button.title = label;
+        button.innerHTML = collapse
+            ? '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"></rect><path d="M8 12h8"></path></svg>'
+            : '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"></rect><path d="M12 8v8M8 12h8"></path></svg>';
     }
     function toggleAllSubcategories() {
         var headers = document.querySelectorAll('.sticky-header[id^="header-"]'), openCount = 0;

@@ -90,7 +90,7 @@ html[data-render-snapshot="pending"] .main-content {
 .navbar-left {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 10px;
 }
 
 .navbar-center {
@@ -114,6 +114,26 @@ html[data-render-snapshot="pending"] .main-content {
 .navbar-logo:hover {
     color: #00d8ff;
 }
+
+.collapse-all-btn {
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 6px;
+    background: transparent;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+}
+.collapse-all-btn[hidden] { display: none; }
+.collapse-all-btn svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.collapse-all-btn:hover,
+.collapse-all-btn:focus-visible { background: rgba(255, 255, 255, 0.24); border-color: rgba(255, 255, 255, 0.65); color: #fff; }
 
 .navbar-right {
     display: flex;
@@ -875,6 +895,9 @@ html:not([data-theme="dark"]) .navbar-external:hover,
 html:not([data-theme="dark"]) .navbar-external:focus-visible { color: #111827; }
 html:not([data-theme="dark"]) .navbar-bili:hover,
 html:not([data-theme="dark"]) .navbar-bili:focus-visible { color: #00a1d6; }
+html:not([data-theme="dark"]) .collapse-all-btn { background: #ffffff; border-color: #cbd5e1; color: #334155; }
+html:not([data-theme="dark"]) .collapse-all-btn:hover,
+html:not([data-theme="dark"]) .collapse-all-btn:focus-visible { background: #eef2f7; border-color: #94a3b8; color: #0f172a; }
 html:not([data-theme="dark"]) .theme-toggle {
     background: #ffffff;
     border-color: #cbd5e1;
@@ -1294,7 +1317,6 @@ html[data-theme="dark"] .variant-add-form {
 /* PythonAnywhere category.html 卡片结构的同款规则。工作区和公开卡片共用这套尺寸。 */
 .category-title-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 25px; }
 .category-title-row .category-title { margin-bottom: 0; }
-.collapse-all-btn { position: fixed; top: 72px; right: 18px; z-index: 900; flex-shrink: 0; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
 .sticky-header .badge { font-size: 1rem; margin-left: 10px; }
 .formula-card > .row { display: flex; flex-wrap: nowrap; gap: 16px; align-items: flex-start; margin: 0; --bs-gutter-x: 0; }
 .formula-card > .row > .col-4 { width: 140px; flex: 0 0 140px; padding: 0; }
@@ -1367,7 +1389,7 @@ html[data-theme="dark"] .sortable-ghost { background: #303840; border-color: #4e
         min-width: 0;
     }
     .navbar-left {
-        gap: 0;
+        gap: 4px;
         overflow: hidden;
     }
     .navbar-logo {
@@ -1407,6 +1429,15 @@ html[data-theme="dark"] .sortable-ghost { background: #303840; border-color: #4e
         width: 26px;
         height: 26px;
         flex-basis: 26px;
+    }
+    .collapse-all-btn {
+        width: 26px;
+        height: 26px;
+        flex-basis: 26px;
+    }
+    .collapse-all-btn svg {
+        width: 17px;
+        height: 17px;
     }
     .workspace-nav-btn {
         width: 6.4em;
@@ -1449,7 +1480,6 @@ html[data-theme="dark"] .sortable-ghost { background: #303840; border-color: #4e
     .formula-card > .row { gap: 12px; }
     .formula-card.has-card-editor .action-buttons-row { left: 12px; }
     .category-title-row { align-items: flex-start; flex-direction: column; }
-    .collapse-all-btn { display: none; }
     .formula-image { height: 140px; }
     .formula-id { font-size: 1.2rem; }
     .formula-line-alg { font-size: 1.05rem; }
