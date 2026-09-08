@@ -337,7 +337,7 @@
                 if (signal && signal.aborted) throw new DOMException('导出已取消', 'AbortError');
             }
             checkCancelled();
-            progress(5, '准备工作区数据');
+            progress(0, '准备工作区数据');
             var output = clone(workspace);
             var formulaQueue = [], formulasDone = 0;
             for (var countCi = 0; countCi < output.categories.length; countCi++) {
@@ -375,7 +375,7 @@
                     }
                     formulasDone++;
                     if (formulasDone === 1 || formulasDone === formulasTotal || formulasDone % 12 === 0) {
-                        progress(10 + Math.round((formulasDone / Math.max(1, formulasTotal)) * 65), '整理图片和公式 ' + formulasDone + '/' + formulasTotal);
+                        progress(Math.round((formulasDone / Math.max(1, formulasTotal)) * 100), '整理图片和公式 ' + formulasDone + '/' + formulasTotal);
                         await new Promise(function (resolve) { setTimeout(resolve, 0); });
                     }
                 }
@@ -385,10 +385,10 @@
             for (var wi = 0; wi < workerCount; wi++) workers.push(processImages());
             await Promise.all(workers);
             checkCancelled();
-            progress(82, '生成 .zbll 文件');
+            progress(100, '生成 .zbll 文件');
             var blob = new Blob([JSON.stringify(output, null, 2)], { type: 'application/json;charset=utf-8' });
             checkCancelled();
-            progress(92, '准备下载');
+            progress(100, '准备下载');
             var url = URL.createObjectURL(blob);
             var link = document.createElement('a');
             link.href = url;
