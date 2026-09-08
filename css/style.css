@@ -217,6 +217,10 @@ html[data-render-snapshot="pending"] .main-content {
     stroke-linejoin: miter;
 }
 
+.theme-toggle-icon-light {
+    transform: translateX(0.8px);
+}
+
 .theme-toggle-icon-dark {
     display: none;
 }
