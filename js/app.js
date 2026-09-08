@@ -645,7 +645,7 @@
         var selected = list.find(function (item) { return item.id === selectedId; });
         if (publicListEl) {
             publicListEl.innerHTML =
-                '<div class="workspace-list-row"><button type="button" class="workspace-list-item' + (selectedPublic === 'default' ? ' active' : '') + '" data-public-library="default"><span>大神版</span><small>默认</small></button><button type="button" class="workspace-item-menu-trigger" data-workspace-menu="public" data-target-id="default" aria-haspopup="menu" aria-label="大神版的更多操作" title="更多操作">…</button></div>' +
+                '<div class="workspace-list-row"><button type="button" class="workspace-list-item' + (selectedPublic === 'default' ? ' active' : '') + '" data-public-library="default"><span>默认大神版</span><small>仅预览</small></button><button type="button" class="workspace-item-menu-trigger" data-workspace-menu="public" data-target-id="default" aria-haspopup="menu" aria-label="默认大神版的更多操作" title="更多操作">…</button></div>' +
                 publicCopies.map(function (item) {
                     return '<div class="workspace-list-row"><button type="button" class="workspace-list-item' + (selectedPublic === item.id ? ' active' : '') + '" data-public-library="' + escapeHtml(item.id) + '"><span>' + escapeHtml(item.name || '大神版（已编辑）') + '</span><small>' + escapeHtml(new Date(item.updatedAt).toLocaleString()) + '</small></button><button type="button" class="workspace-item-menu-trigger" data-workspace-menu="public" data-target-id="' + escapeHtml(item.id) + '" aria-haspopup="menu" aria-label="' + escapeHtml(item.name || '大神版（已编辑）') + '的更多操作" title="更多操作">…</button></div>';
                 }).join('');
