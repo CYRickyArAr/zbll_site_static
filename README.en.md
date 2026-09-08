@@ -15,11 +15,17 @@ Algorithms and competitor annotations are sourced from [reco.nz](https://reco.nz
 - **Complete set of 472 cases**: each case comes with a top-layer state diagram and multi-line algorithms.
 - **7 main categories**: H (40 cases), and U / T / L / Pi / S / AS (72 cases each).
 - **Competitor annotations**: each algorithm is marked with the competitors who used it; when several competitors share the same algorithm, the names are merged (e.g., "Geng Tymon Fan").
+- **Local libraries**: supports default Expert preview, personal Expert copies, custom libraries, and `.zbll` import / export.
 
 ## Usage
 
-Open the site to browse all categories. Click a category to view its algorithms; click a sub-category title to collapse / expand. Use the top navigation to switch between the Expert Library and Custom mode.
+Open the site to browse all categories. Click a category to view its algorithms; click a sub-category title to collapse / expand, or use the top button to expand / collapse all. The top navigation can switch between Expert and Custom modes, and filter by All / Learned / Unlearned.
 
-Open Local Libraries from the upper-right corner to create or choose multiple libraries. Custom libraries support editing algorithms, images, and notes; Expert Libraries store your personal learned status and ordering. Everything stays in the current browser only. Export a `.zbll` file, then import it on another device to continue editing.
+Open the Local Workspace from the upper-right corner:
+
+- **Default Expert Library**: preview only; the original database is not edited directly.
+- **Expert Library copy**: created from the default Expert Library; supports editing notes, ordering, and learned status only.
+- **Custom Library**: supports free editing of algorithms, images, and notes.
+- **Import / export `.zbll`**: local data is stored in the current browser. Export a `.zbll` file to continue editing on another device.
 
 > Online: [https://cyrickyarar.github.io/zbll_site_static/](https://cyrickyarar.github.io/zbll_site_static/)
