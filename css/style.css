@@ -1038,13 +1038,15 @@ html:not([data-theme="dark"]) .workspace-nav-btn:focus-visible {
 .workspace-context-menu { position: fixed; z-index: 1300; min-width: 150px; padding: 5px; border: 1px solid #c9ced4; border-radius: 8px; background: #fff; box-shadow: 0 10px 30px rgba(15, 23, 42, .18); }
 .workspace-context-menu[hidden],
 .workspace-context-menu [hidden] { display: none; }
-.workspace-context-action { width: 100%; display: block; padding: 8px 12px; border: 0; border-radius: 5px; background: transparent; color: #343a40; text-align: left; font: inherit; cursor: pointer; }
+.workspace-context-action { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 28px; padding: 8px 12px; border: 0; border-radius: 5px; background: transparent; color: #343a40; text-align: left; font: inherit; cursor: pointer; }
+.workspace-context-action kbd { padding: 0; border: 0; background: transparent; color: #7a828a; font: inherit; font-size: .84em; white-space: nowrap; }
 .workspace-context-action:hover,
 .workspace-context-action:focus-visible { background: #e9ecef; outline: none; }
 .workspace-context-action.is-danger { color: #b02a37; }
 .workspace-context-action.is-danger:hover,
 .workspace-context-action.is-danger:focus-visible { background: #fbeaec; color: #a11f2d; }
 .workspace-context-action:disabled { color: #adb5bd; background: transparent; cursor: default; }
+.workspace-context-action:disabled kbd { color: inherit; }
 .workspace-message { min-height: 1.4em; margin-top: 12px; color: #198754; }
 .workspace-message.is-error { color: #dc3545; }
 .workspace-progress { margin-top: 10px; }
@@ -1266,6 +1268,7 @@ html[data-theme="dark"] #workspace-import:hover,
 html[data-theme="dark"] #workspace-import:active { color: #fff; border-color: #697581; background: #59636e; }
 html[data-theme="dark"] .workspace-context-menu { border-color: #4a535d; background: #252a30; box-shadow: 0 12px 34px rgba(0, 0, 0, .42); }
 html[data-theme="dark"] .workspace-context-action { color: #e6e9ed; }
+html[data-theme="dark"] .workspace-context-action kbd { color: #9aa3ad; }
 html[data-theme="dark"] .workspace-context-action:hover,
 html[data-theme="dark"] .workspace-context-action:focus-visible { background: #38414a; }
 html[data-theme="dark"] .workspace-context-action.is-danger { color: #f1a6ad; }

@@ -953,6 +953,37 @@
         if (target && target.kind === 'custom') return await WS.get(target.id);
         return getSelectedWorkspace();
     }
+    function focusedWorkspaceTarget() {
+        var menu = document.getElementById('workspace-context-menu');
+        if (menu && !menu.hidden && workspaceContextTarget) return workspaceContextTarget;
+        var active = document.activeElement;
+        if (!active || !active.closest) return null;
+        var item = active.closest('.workspace-list-item');
+        if (!item) {
+            var row = active.closest('.workspace-list-row');
+            item = row && row.querySelector('.workspace-list-item');
+        }
+        if (!item) return null;
+        return item.hasAttribute('data-public-library')
+            ? { kind: 'public', id: item.dataset.publicLibrary || 'default' }
+            : { kind: 'custom', id: item.dataset.workspaceId };
+    }
+    function runWorkspaceShortcut(action, target) {
+        if (!target) return false;
+        if (target.kind === 'public' && target.id === 'default') {
+            setWorkspaceMessage(action === 'rename' ? '默认大神版不能重命名。' : '默认大神版不能删除。', true);
+            return true;
+        }
+        var buttonId = target.kind === 'public'
+            ? (action === 'rename' ? 'workspace-public-rename' : 'workspace-public-delete')
+            : (action === 'rename' ? 'workspace-rename' : 'workspace-delete');
+        var button = document.getElementById(buttonId);
+        if (!button) return false;
+        workspaceContextTarget = target;
+        button.disabled = false;
+        button.click();
+        return true;
+    }
 
     async function handleWorkspaceManagerClick(e) {
         var menuTrigger = e.target.closest('[data-workspace-menu]');
@@ -1163,6 +1194,11 @@
                 var id = kind === 'public' ? item.dataset.publicLibrary : item.dataset.workspaceId;
                 openWorkspaceContextMenu(kind, id, rect.left + 28, rect.top + 28, true);
             }
+            return;
+        }
+        if ((e.key === 'F2' || e.key === 'Delete') && !document.getElementById('workspace-overlay').hidden) {
+            var shortcutTarget = focusedWorkspaceTarget();
+            if (shortcutTarget && runWorkspaceShortcut(e.key === 'F2' ? 'rename' : 'delete', shortcutTarget)) e.preventDefault();
             return;
         }
         if (menu && !menu.hidden && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
