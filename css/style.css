@@ -218,7 +218,7 @@ html[data-render-snapshot="pending"] .main-content {
 }
 
 .theme-toggle-icon-light {
-    transform: translateX(0.2px);
+    transform: translateX(0.1px);
 }
 
 .theme-toggle-icon-dark {
