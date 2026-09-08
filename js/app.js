@@ -605,13 +605,13 @@
         var selected = list.find(function (item) { return item.id === selectedId; });
         if (publicListEl) {
             publicListEl.innerHTML =
-                '<button type="button" class="workspace-list-item' + (selectedPublic === 'default' ? ' active' : '') + '" data-public-library="default"><span>大神版</span><small>默认</small></button>' +
+                '<div class="workspace-list-row"><button type="button" class="workspace-list-item' + (selectedPublic === 'default' ? ' active' : '') + '" data-public-library="default"><span>大神版</span><small>默认</small></button><button type="button" class="workspace-item-menu-trigger" data-workspace-menu="public" data-target-id="default" aria-haspopup="menu" aria-label="大神版的更多操作" title="更多操作">…</button></div>' +
                 publicCopies.map(function (item) {
-                    return '<button type="button" class="workspace-list-item' + (selectedPublic === item.id ? ' active' : '') + '" data-public-library="' + escapeHtml(item.id) + '"><span>' + escapeHtml(item.name || '大神版（已编辑）') + '</span><small>' + escapeHtml(new Date(item.updatedAt).toLocaleString()) + '</small></button>';
+                    return '<div class="workspace-list-row"><button type="button" class="workspace-list-item' + (selectedPublic === item.id ? ' active' : '') + '" data-public-library="' + escapeHtml(item.id) + '"><span>' + escapeHtml(item.name || '大神版（已编辑）') + '</span><small>' + escapeHtml(new Date(item.updatedAt).toLocaleString()) + '</small></button><button type="button" class="workspace-item-menu-trigger" data-workspace-menu="public" data-target-id="' + escapeHtml(item.id) + '" aria-haspopup="menu" aria-label="' + escapeHtml(item.name || '大神版（已编辑）') + '的更多操作" title="更多操作">…</button></div>';
                 }).join('');
         }
         listEl.innerHTML = list.length ? list.map(function (item) {
-            return '<button type="button" class="workspace-list-item' + (selectedId === item.id ? ' active' : '') + '" data-workspace-id="' + escapeHtml(item.id) + '"><span>' + escapeHtml(item.name) + '</span><small>' + escapeHtml(new Date(item.updatedAt).toLocaleString()) + '</small></button>';
+            return '<div class="workspace-list-row"><button type="button" class="workspace-list-item' + (selectedId === item.id ? ' active' : '') + '" data-workspace-id="' + escapeHtml(item.id) + '"><span>' + escapeHtml(item.name) + '</span><small>' + escapeHtml(new Date(item.updatedAt).toLocaleString()) + '</small></button><button type="button" class="workspace-item-menu-trigger" data-workspace-menu="custom" data-target-id="' + escapeHtml(item.id) + '" aria-haspopup="menu" aria-label="' + escapeHtml(item.name) + '的更多操作" title="更多操作">…</button></div>';
         }).join('') : '<div class="workspace-empty">暂无自定义公式库</div>';
         var selectedExists = !!selected;
         var publicExportButton = document.getElementById('workspace-public-export');
@@ -624,6 +624,7 @@
         updateWorkspaceNav();
     }
     async function openWorkspaceManager() {
+        hideWorkspaceContextMenu();
         setWorkspaceMessage('');
         if (workspaceProgressState) setWorkspaceProgress(workspaceProgressState.value, workspaceProgressState.text);
         else setWorkspaceProgress(null);
@@ -891,25 +892,70 @@
         await persistCurrentData(); renderCategory(catId);
     }
 
-    async function handleWorkspaceManagerClick(e) {
-        var publicItem = e.target.closest('[data-public-library]');
-        if (publicItem) {
-            var publicMode = publicItem.dataset.publicLibrary || 'default';
-            setWorkspaceMessage('');
+    function hideWorkspaceContextMenu() {
+        var menu = document.getElementById('workspace-context-menu');
+        if (menu) menu.hidden = true;
+    }
+    async function selectWorkspaceManagerItem(kind, id) {
+        setWorkspaceMessage('');
+        if (kind === 'public') {
+            var publicMode = id || 'default';
             try { localStorage.setItem(publicModeKey, publicMode); } catch (ignore) {}
             if (!activeWorkspace) await activatePublicLibrary(publicMode);
             else await refreshWorkspaceList();
             return;
         }
-        var item = e.target.closest('[data-workspace-id]');
-        if (item) {
-            setWorkspaceMessage('');
-            try { localStorage.setItem(selectedWorkspaceKey, item.dataset.workspaceId); } catch (ignore) {}
-            if (activeWorkspace) await activateWorkspace(item.dataset.workspaceId);
-            else await refreshWorkspaceList();
+        try { localStorage.setItem(selectedWorkspaceKey, id); } catch (ignore) {}
+        if (activeWorkspace) await activateWorkspace(id);
+        else await refreshWorkspaceList();
+    }
+    async function openWorkspaceContextMenu(kind, id, clientX, clientY, focusMenu) {
+        try {
+            await selectWorkspaceManagerItem(kind, id);
+        } catch (error) {
+            setWorkspaceMessage(error && error.message ? error.message : '无法打开公式库操作菜单', true);
             return;
         }
-        var id = e.target.id;
+        var menu = document.getElementById('workspace-context-menu');
+        if (!menu) return;
+        Array.prototype.forEach.call(menu.querySelectorAll('[data-context-group]'), function (group) {
+            group.hidden = group.dataset.contextGroup !== kind;
+        });
+        menu.hidden = false;
+        menu.style.left = '0px';
+        menu.style.top = '0px';
+        var margin = 8;
+        var left = Math.max(margin, Math.min(clientX, window.innerWidth - menu.offsetWidth - margin));
+        var top = Math.max(margin, Math.min(clientY, window.innerHeight - menu.offsetHeight - margin));
+        menu.style.left = left + 'px';
+        menu.style.top = top + 'px';
+        if (focusMenu) {
+            var first = menu.querySelector('[data-context-group]:not([hidden]) .workspace-context-action:not(:disabled)');
+            if (first) first.focus();
+        }
+    }
+
+    async function handleWorkspaceManagerClick(e) {
+        var menuTrigger = e.target.closest('[data-workspace-menu]');
+        if (menuTrigger) {
+            var triggerRect = menuTrigger.getBoundingClientRect();
+            await openWorkspaceContextMenu(menuTrigger.dataset.workspaceMenu, menuTrigger.dataset.targetId, triggerRect.right - 4, triggerRect.bottom + 4, false);
+            return;
+        }
+        if (!e.target.closest('#workspace-context-menu')) hideWorkspaceContextMenu();
+        var publicItem = e.target.closest('[data-public-library]');
+        if (publicItem) {
+            await selectWorkspaceManagerItem('public', publicItem.dataset.publicLibrary || 'default');
+            return;
+        }
+        var item = e.target.closest('[data-workspace-id]');
+        if (item) {
+            await selectWorkspaceManagerItem('custom', item.dataset.workspaceId);
+            return;
+        }
+        var control = e.target.closest('[id]');
+        var id = control ? control.id : '';
+        if (control && control.classList.contains('workspace-context-action')) hideWorkspaceContextMenu();
         try {
             if (id === 'workspace-public-new') return createPublicLibrary();
             if (id === 'workspace-new') return createWorkspace();
@@ -917,16 +963,16 @@
             if (id === 'workspace-export-cancel') {
                 if (workspaceExportController) {
                     workspaceExportController.abort();
-                    e.target.disabled = true;
+                    control.disabled = true;
                     setWorkspaceMessage('正在取消导出…');
                 }
                 return;
             }
             if (id === 'workspace-public-export') {
-                return exportWorkspace(WS.exportPublic(DATA, await getSelectedPublicCopy()), e.target);
+                return exportWorkspace(WS.exportPublic(DATA, await getSelectedPublicCopy()), control);
             }
             if (id === 'workspace-custom-export') {
-                return exportWorkspace(await getSelectedWorkspace(), e.target);
+                return exportWorkspace(await getSelectedWorkspace(), control);
             }
             if (id === 'workspace-public-rename') {
                 var selectedPublicCopy = await getSelectedPublicCopy();
@@ -974,7 +1020,7 @@
                 await refreshWorkspaceList();
                 return;
             }
-            if (id === 'workspace-close') return showOverlay('workspace-overlay', false);
+            if (id === 'workspace-close') { hideWorkspaceContextMenu(); return showOverlay('workspace-overlay', false); }
         } catch (error) { setWorkspaceMessage(error.message || '工作区操作失败', true); setWorkspaceProgress(null); await refreshWorkspaceList(); }
     }
     async function importWorkspaceFile(e) {
@@ -1036,9 +1082,18 @@
         var add = e.target.closest('.workspace-add'); if (add) { handleWorkspaceAction(add); return; }
         if (e.target.closest('#workspace-open')) { openWorkspaceManager(); return; }
     });
-    document.getElementById('workspace-overlay').addEventListener('click', function (e) { if (e.target === this) showOverlay('workspace-overlay', false); });
+    document.getElementById('workspace-overlay').addEventListener('click', function (e) { if (e.target === this) { hideWorkspaceContextMenu(); showOverlay('workspace-overlay', false); } });
     document.getElementById('workspace-file').addEventListener('change', importWorkspaceFile);
     document.getElementById('workspace-overlay').addEventListener('click', handleWorkspaceManagerClick);
+    document.getElementById('workspace-overlay').addEventListener('contextmenu', function (e) {
+        var item = e.target.closest('.workspace-list-item');
+        if (!item) return;
+        e.preventDefault();
+        var kind = item.hasAttribute('data-public-library') ? 'public' : 'custom';
+        var id = kind === 'public' ? item.dataset.publicLibrary : item.dataset.workspaceId;
+        openWorkspaceContextMenu(kind, id, e.clientX, e.clientY, false);
+    });
+    document.getElementById('workspace-overlay').addEventListener('scroll', hideWorkspaceContextMenu, true);
     document.addEventListener('change', function (e) {
         if (!e.target.classList.contains('inline-image-input') || !e.target.files || !e.target.files[0]) return;
         updateInlineImage(e.target.files[0], e.target.closest('.inline-image-drop'));
@@ -1062,6 +1117,7 @@
         if (files && files[0]) updateInlineImage(files[0], area);
     });
     window.addEventListener('hashchange', router);
+    window.addEventListener('resize', hideWorkspaceContextMenu);
     var scrollTimer = null;
     window.addEventListener('scroll', function () { if (scrollTimer) clearTimeout(scrollTimer); scrollTimer = setTimeout(saveScroll, 150); });
     window.addEventListener('pagehide', function () { saveScroll(); saveRenderSnapshot(); });
@@ -1077,7 +1133,30 @@
         });
     });
     document.addEventListener('keydown', function (e) {
+        var menu = document.getElementById('workspace-context-menu');
+        if ((e.key === 'ContextMenu' || (e.shiftKey && e.key === 'F10')) && !document.getElementById('workspace-overlay').hidden) {
+            var item = e.target.closest('.workspace-list-item');
+            if (item) {
+                e.preventDefault();
+                var rect = item.getBoundingClientRect();
+                var kind = item.hasAttribute('data-public-library') ? 'public' : 'custom';
+                var id = kind === 'public' ? item.dataset.publicLibrary : item.dataset.workspaceId;
+                openWorkspaceContextMenu(kind, id, rect.left + 28, rect.top + 28, true);
+            }
+            return;
+        }
+        if (menu && !menu.hidden && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+            var actions = Array.prototype.filter.call(menu.querySelectorAll('[data-context-group]:not([hidden]) .workspace-context-action'), function (button) { return !button.disabled; });
+            if (actions.length) {
+                e.preventDefault();
+                var current = actions.indexOf(document.activeElement);
+                var next = e.key === 'ArrowDown' ? (current + 1) % actions.length : (current <= 0 ? actions.length - 1 : current - 1);
+                actions[next].focus();
+            }
+            return;
+        }
         if (e.key !== 'Escape') return;
+        if (menu && !menu.hidden) { hideWorkspaceContextMenu(); return; }
         if (inlineEditor) { cancelInlineEditor(findInlineCard(inlineEditor.uid)); return; }
         showOverlay('workspace-overlay', false);
     });
