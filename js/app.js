@@ -1052,7 +1052,7 @@
             if (id === 'workspace-public-rename') {
                 var selectedPublicCopy = await getContextPublicCopy(contextTarget);
                 if (!selectedPublicCopy) { setWorkspaceMessage('默认大神版不能重命名，请先选择一个大神版副本。', true); await refreshWorkspaceList(); return; }
-                var publicName = window.prompt('新的大神版名称', selectedPublicCopy.name || '大神版（已编辑）');
+                var publicName = window.prompt('新的大神版公式库名称', selectedPublicCopy.name || '大神版（已编辑）');
                 if (publicName && publicName.trim()) {
                     selectedPublicCopy.name = publicName.trim();
                     await WS.putPublicCopy(selectedPublicCopy);
@@ -1087,7 +1087,7 @@
             if (id === 'workspace-rename') {
                 var selectedWorkspace = await getContextWorkspace(contextTarget);
                 if (!selectedWorkspace) { setWorkspaceMessage('请先选择要重命名的自定义公式库。', true); await refreshWorkspaceList(); return; }
-                var name = window.prompt('新的工作区名称', selectedWorkspace.name);
+                var name = window.prompt('新的自定义公式库名称', selectedWorkspace.name);
                 if (name && name.trim()) {
                     selectedWorkspace.name = name.trim();
                     await WS.put(selectedWorkspace);
