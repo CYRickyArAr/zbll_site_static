@@ -159,6 +159,35 @@
     }
     initTheme();
 
+    var workspaceHelpFitCanvas = null;
+    var workspaceHelpFitTimer = null;
+    function fitWorkspaceHelpText() {
+        var help = document.querySelector('.workspace-help');
+        if (!help) return;
+        help.style.removeProperty('--workspace-help-font-size');
+        var available = help.clientWidth;
+        var text = help.textContent || '';
+        if (!available || !text.trim()) return;
+        var style = window.getComputedStyle(help);
+        var maxSize = parseFloat(style.fontSize) || 15.2;
+        var minSize = 8;
+        if (!workspaceHelpFitCanvas) workspaceHelpFitCanvas = document.createElement('canvas');
+        var context = workspaceHelpFitCanvas.getContext('2d');
+        if (!context) return;
+        context.font = style.font;
+        var textWidth = context.measureText(text).width;
+        if (!textWidth || textWidth <= available) return;
+        var fittedSize = Math.max(minSize, Math.floor((available / textWidth) * maxSize * 100) / 100);
+        help.style.setProperty('--workspace-help-font-size', fittedSize + 'px');
+    }
+    function scheduleWorkspaceHelpFit() {
+        if (workspaceHelpFitTimer) window.cancelAnimationFrame(workspaceHelpFitTimer);
+        workspaceHelpFitTimer = window.requestAnimationFrame(function () {
+            workspaceHelpFitTimer = null;
+            fitWorkspaceHelpText();
+        });
+    }
+
     function getZbllFilter() {
         var filter = 'all';
         try { filter = localStorage.getItem(filterKey) || 'all'; } catch (e) {}
@@ -641,7 +670,9 @@
         if (workspaceProgressState) setWorkspaceProgress(workspaceProgressState.value, workspaceProgressState.text);
         else setWorkspaceProgress(null);
         showOverlay('workspace-overlay', true);
+        scheduleWorkspaceHelpFit();
         await refreshWorkspaceList();
+        scheduleWorkspaceHelpFit();
     }
     async function getSelectedWorkspace() {
         var id = '';
@@ -1234,7 +1265,10 @@
         if (files && files[0]) updateInlineImage(files[0], area);
     });
     window.addEventListener('hashchange', router);
-    window.addEventListener('resize', hideWorkspaceContextMenu);
+    window.addEventListener('resize', function () {
+        hideWorkspaceContextMenu();
+        scheduleWorkspaceHelpFit();
+    });
     var scrollTimer = null;
     window.addEventListener('scroll', function () { if (scrollTimer) clearTimeout(scrollTimer); scrollTimer = setTimeout(saveScroll, 150); });
     window.addEventListener('pagehide', function () { saveScroll(); saveRenderSnapshot(); });
