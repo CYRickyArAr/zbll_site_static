@@ -653,7 +653,7 @@
         setWorkspaceProgress(0, '开始导出');
         try {
             await WS.exportFile(target, setWorkspaceProgress, workspaceExportController.signal);
-            setWorkspaceMessage('已开始下载 ' + (target.name || 'zbll-workspace').replace(/[\\/:*?"<>|]/g, '_') + '.zbll');
+            setWorkspaceMessage('已下载 ' + (target.name || 'zbll-workspace').replace(/[\\/:*?"<>|]/g, '_') + '.zbll');
             setTimeout(function () { if (!workspaceExportController) setWorkspaceProgress(null); }, 1200);
         } catch (error) {
             if (workspaceExportController.signal.aborted || (error && error.name === 'AbortError')) {
