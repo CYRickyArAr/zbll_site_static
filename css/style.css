@@ -221,6 +221,10 @@ html[data-render-snapshot="pending"] .main-content {
     transform: translateX(0.2px);
 }
 
+.theme-toggle-icon-light-text {
+    display: none;
+}
+
 .theme-toggle-icon-dark {
     display: none;
 }
@@ -1445,6 +1449,13 @@ html[data-theme="dark"] .sortable-ghost { background: #303840; border-color: #4e
         width: 26px;
         height: 26px;
         flex-basis: 26px;
+    }
+    .theme-toggle svg.theme-toggle-icon-light {
+        display: none;
+    }
+    .theme-toggle-icon-light-text {
+        display: inline;
+        transform: none;
     }
     .theme-toggle svg.theme-toggle-icon {
         width: 16px;
