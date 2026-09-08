@@ -221,19 +221,12 @@ html[data-theme="dark"] .theme-toggle-icon-dark {
     transition: background-color .15s ease, color .15s ease, box-shadow .15s ease;
 }
 
-.view-mode-btn#nav-public-mode:hover {
-    background: #173b67;
-    color: #dbeafe;
-    box-shadow: inset 0 0 0 1px rgba(78, 156, 255, .75);
+.view-mode-btn:not(.active):hover,
+.zbll-filter-btn:not(.active):hover {
+    background: #38414a;
+    color: #d7dce2;
+    box-shadow: none;
 }
-.view-mode-btn#nav-workspace-mode:hover {
-    background: #30284f;
-    color: #ede9fe;
-    box-shadow: inset 0 0 0 1px rgba(155, 124, 255, .7);
-}
-.zbll-filter-btn[data-filter="all"]:hover { background: #173b67; color: #dbeafe; box-shadow: inset 0 0 0 1px rgba(78, 156, 255, .75); }
-.zbll-filter-btn[data-filter="learned"]:hover { background: #173b27; color: #dcfce7; box-shadow: inset 0 0 0 1px rgba(66, 199, 122, .75); }
-.zbll-filter-btn[data-filter="unlearned"]:hover { background: #4a3415; color: #fff1c2; box-shadow: inset 0 0 0 1px rgba(229, 168, 59, .8); }
 .view-mode-btn#nav-public-mode.active {
     background: #173b67;
     color: #dbeafe;
@@ -900,19 +893,12 @@ html:not([data-theme="dark"]) .zbll-filter {
 }
 html:not([data-theme="dark"]) .view-mode-btn,
 html:not([data-theme="dark"]) .zbll-filter-btn { color: #5f6874; }
-html:not([data-theme="dark"]) .view-mode-btn#nav-public-mode:hover {
-    background: #eaf3ff;
-    color: #0a58ca;
-    box-shadow: inset 0 0 0 1px #7cb3ff;
+html:not([data-theme="dark"]) .view-mode-btn:not(.active):hover,
+html:not([data-theme="dark"]) .zbll-filter-btn:not(.active):hover {
+    background: #e5e8ec;
+    color: #495057;
+    box-shadow: none;
 }
-html:not([data-theme="dark"]) .view-mode-btn#nav-workspace-mode:hover {
-    background: #f0ebfa;
-    color: #513783;
-    box-shadow: inset 0 0 0 1px #a88cda;
-}
-html:not([data-theme="dark"]) .zbll-filter-btn[data-filter="all"]:hover { background: #eaf3ff; color: #0a58ca; box-shadow: inset 0 0 0 1px #7cb3ff; }
-html:not([data-theme="dark"]) .zbll-filter-btn[data-filter="learned"]:hover { background: #e8f7ee; color: #146c43; box-shadow: inset 0 0 0 1px #75c493; }
-html:not([data-theme="dark"]) .zbll-filter-btn[data-filter="unlearned"]:hover { background: #fff4dc; color: #8a5a00; box-shadow: inset 0 0 0 1px #e2b75f; }
 html:not([data-theme="dark"]) .view-mode-btn#nav-public-mode.active {
     background: #eaf3ff;
     color: #0a58ca;
