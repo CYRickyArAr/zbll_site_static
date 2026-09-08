@@ -64,7 +64,7 @@ html[data-render-snapshot="pending"] .main-content {
 .navbar {
     background-color: #1a1a2e;
     color: white;
-    padding: 0 24px !important;
+    padding: 0 18px 0 24px !important;
     display: flex !important;
     flex-direction: row !important;
     flex-wrap: nowrap !important;
