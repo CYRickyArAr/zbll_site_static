@@ -709,7 +709,7 @@
         setWorkspaceMessage('请先在右侧选择或新建一个自定义公式库。', true);
     }
     async function createWorkspace() {
-        var name = window.prompt('请输入自定义公式库名称', '');
+        var name = window.prompt('请输入新建自定义公式库名称', '');
         if (!name || !name.trim()) return;
         name = name.trim();
         var workspace = await WS.create(DATA, name);
@@ -719,7 +719,7 @@
         await refreshWorkspaceList();
     }
     async function createPublicLibrary() {
-        var name = window.prompt('请输入大神版公式库名称', '');
+        var name = window.prompt('请输入新建大神版公式库名称', '');
         if (!name || !name.trim()) return;
         var copy = await WS.createPublicCopy(DATA, name.trim());
         setWorkspaceMessage('');
