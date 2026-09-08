@@ -223,7 +223,7 @@ html[data-theme="dark"] .theme-toggle-icon-dark {
 
 .view-mode-btn:not(.active):hover,
 .zbll-filter-btn:not(.active):hover {
-    background: #38414a;
+    background: #3a3a42;
     color: #d7dce2;
     box-shadow: none;
 }
@@ -1233,7 +1233,7 @@ html:not([data-theme="dark"]) .workspace-nav-btn:focus-visible {
 
 html[data-theme="dark"] .workspace-dialog { background: var(--surface); color: var(--text); }
 html[data-theme="dark"] .workspace-list-item { background: transparent; color: var(--text); }
-html[data-theme="dark"] .workspace-list-item:hover { border-color: transparent; background: #38414a; }
+html[data-theme="dark"] .workspace-list-item:hover { border-color: transparent; background: #3a3a42; }
 html[data-theme="dark"] .workspace-list-item:hover small { color: #d7dce2; }
 html[data-theme="dark"] .workspace-public-list .workspace-list-item.active {
     border-color: #4e9cff;
@@ -1252,13 +1252,13 @@ html[data-theme="dark"] #workspace-public-new:hover { border-color: #4e9cff; bac
 html[data-theme="dark"] #workspace-new { color: #cbb9ee; }
 html[data-theme="dark"] #workspace-new:hover { border-color: #9b7cff; background: #382d5c; }
 html[data-theme="dark"] #workspace-import { color: #d0d5db; background: transparent; }
-html[data-theme="dark"] #workspace-import:hover { color: #fff; background: #38414a; }
+html[data-theme="dark"] #workspace-import:hover { color: #fff; background: #3a3a42; }
 html[data-theme="dark"] #workspace-import:active { background: #46515c; }
 html[data-theme="dark"] .workspace-context-menu { border-color: #4a535d; background: #252a30; box-shadow: 0 12px 34px rgba(0, 0, 0, .42); }
 html[data-theme="dark"] .workspace-context-action { color: #e6e9ed; }
 html[data-theme="dark"] .workspace-context-action kbd { color: #9aa3ad; }
 html[data-theme="dark"] .workspace-context-action:hover,
-html[data-theme="dark"] .workspace-context-action:focus-visible { background: #38414a; }
+html[data-theme="dark"] .workspace-context-action:focus-visible { background: #3a3a42; }
 html[data-theme="dark"] .workspace-context-action.is-danger { color: #f1a6ad; }
 html[data-theme="dark"] .workspace-context-action.is-danger:hover,
 html[data-theme="dark"] .workspace-context-action.is-danger:focus-visible { background: #442b2f; color: #ffc1c6; }
