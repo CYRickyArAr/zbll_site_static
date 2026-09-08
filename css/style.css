@@ -971,8 +971,9 @@ html:not([data-theme="dark"]) .workspace-nav-btn:focus-visible {
     box-shadow: 0 12px 36px rgba(0, 0, 0, .3);
     padding: 22px;
 }
-.workspace-dialog-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
-.workspace-dialog-header h2 { margin: 0; font-size: 1.35rem; }
+.workspace-dialog-header { display: flex; align-items: center; gap: 16px; margin-bottom: 12px; }
+.workspace-dialog-header h2 { flex: 0 0 auto; margin: 0; font-size: 1.35rem; }
+.workspace-dialog-header .workspace-message { flex: 1 1 auto; min-width: 0; }
 .workspace-close { border: 0; background: transparent; color: var(--text-muted); font-size: 1.8rem; line-height: 1; cursor: pointer; }
 .workspace-help-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; margin-bottom: 14px; }
 .workspace-help { flex: 1 1 320px; min-width: 0; margin: 0; color: var(--text-muted); }
@@ -1035,7 +1036,7 @@ html:not([data-theme="dark"]) .workspace-nav-btn:focus-visible {
 .workspace-context-action.is-danger:focus-visible { background: #fbeaec; color: #a11f2d; }
 .workspace-context-action:disabled { color: #adb5bd; background: transparent; cursor: default; }
 .workspace-context-action:disabled kbd { color: inherit; }
-.workspace-message { min-height: 1.4em; margin-top: 12px; color: #198754; }
+.workspace-message { min-height: 1.4em; margin-left: 2px; color: #198754; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .workspace-message.is-error { color: #dc3545; }
 .workspace-progress { margin-top: 10px; }
 .workspace-progress-track { height: 8px; border-radius: 999px; overflow: hidden; background: var(--surface-muted); border: 1px solid var(--border); }
