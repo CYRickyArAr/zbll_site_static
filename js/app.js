@@ -975,6 +975,22 @@
         }
         return workspaceShortcutTarget;
     }
+    function workspaceDeletionSelectionPlan(target) {
+        var list = document.getElementById(target.kind === 'public' ? 'workspace-public-list' : 'workspace-list');
+        if (!list) return { wasSelected: false, next: null };
+        var items = Array.prototype.slice.call(list.querySelectorAll('.workspace-list-item'));
+        var index = items.findIndex(function (item) {
+            return target.kind === 'public'
+                ? item.dataset.publicLibrary === target.id
+                : item.dataset.workspaceId === target.id;
+        });
+        if (index < 0) return { wasSelected: false, next: null };
+        var nextItem = items[index + 1] || items[index - 1] || null;
+        var nextTarget = nextItem ? (target.kind === 'public'
+            ? { kind: 'public', id: nextItem.dataset.publicLibrary || 'default' }
+            : { kind: 'custom', id: nextItem.dataset.workspaceId }) : null;
+        return { wasSelected: items[index].classList.contains('active'), next: nextTarget };
+    }
     function runWorkspaceShortcut(action, target) {
         if (!target) return false;
         if (target.kind === 'public' && target.id === 'default') {
@@ -1050,10 +1066,21 @@
                 if (!publicToDelete) { setWorkspaceMessage('默认大神版不能删除，请先选择一个大神版副本。', true); await refreshWorkspaceList(); return; }
                 if (!window.confirm('删除选中的大神版副本？导出的 .zbll 文件不受影响。')) return;
                 var removedPublicId = publicToDelete.id;
+                var publicSelectionPlan = workspaceDeletionSelectionPlan({ kind: 'public', id: removedPublicId });
                 await WS.remove(removedPublicId);
-                if (workspaceShortcutTarget && workspaceShortcutTarget.kind === 'public' && workspaceShortcutTarget.id === removedPublicId) workspaceShortcutTarget = null;
-                try { if (localStorage.getItem(publicModeKey) === removedPublicId) localStorage.setItem(publicModeKey, 'default'); } catch (e) {}
-                if (publicCopy && publicCopy.id === removedPublicId) { publicCopy = null; router(); }
+                if (publicSelectionPlan.wasSelected) {
+                    var nextPublicTarget = publicSelectionPlan.next || { kind: 'public', id: 'default' };
+                    workspaceShortcutTarget = nextPublicTarget;
+                    try { localStorage.setItem(publicModeKey, nextPublicTarget.id); } catch (e) {}
+                } else if (workspaceShortcutTarget && workspaceShortcutTarget.kind === 'public' && workspaceShortcutTarget.id === removedPublicId) {
+                    workspaceShortcutTarget = null;
+                }
+                if (publicCopy && publicCopy.id === removedPublicId) {
+                    publicCopy = publicSelectionPlan.next && publicSelectionPlan.next.id !== 'default'
+                        ? await WS.getPublicCopy(DATA, publicSelectionPlan.next.id)
+                        : null;
+                    router();
+                }
                 await refreshWorkspaceList();
                 return;
             }
@@ -1074,10 +1101,30 @@
                 if (!selectedToDelete) { setWorkspaceMessage('请先选择要删除的自定义公式库。', true); await refreshWorkspaceList(); return; }
                 if (!window.confirm('删除选中的自定义公式库？导出的 .zbll 文件不受影响。')) return;
                 var removedId = selectedToDelete.id;
+                var customSelectionPlan = workspaceDeletionSelectionPlan({ kind: 'custom', id: removedId });
                 await WS.remove(removedId);
-                if (workspaceShortcutTarget && workspaceShortcutTarget.kind === 'custom' && workspaceShortcutTarget.id === removedId) workspaceShortcutTarget = null;
-                try { if (localStorage.getItem(selectedWorkspaceKey) === removedId) localStorage.removeItem(selectedWorkspaceKey); } catch (e) {}
-                if (activeWorkspace && activeWorkspace.id === removedId) { activeWorkspace = null; await WS.activate(null); var publicCopies = await WS.listPublicCopies(DATA); var publicMode = selectedPublicId(publicCopies); publicCopy = publicMode === 'default' ? null : await WS.getPublicCopy(DATA, publicMode); router(); }
+                if (customSelectionPlan.wasSelected) {
+                    workspaceShortcutTarget = customSelectionPlan.next;
+                    try {
+                        if (customSelectionPlan.next) localStorage.setItem(selectedWorkspaceKey, customSelectionPlan.next.id);
+                        else localStorage.removeItem(selectedWorkspaceKey);
+                    } catch (e) {}
+                } else if (workspaceShortcutTarget && workspaceShortcutTarget.kind === 'custom' && workspaceShortcutTarget.id === removedId) {
+                    workspaceShortcutTarget = null;
+                }
+                if (activeWorkspace && activeWorkspace.id === removedId) {
+                    if (customSelectionPlan.next) {
+                        publicCopy = null;
+                        activeWorkspace = await WS.activate(customSelectionPlan.next.id);
+                    } else {
+                        activeWorkspace = null;
+                        await WS.activate(null);
+                        var publicCopies = await WS.listPublicCopies(DATA);
+                        var publicMode = selectedPublicId(publicCopies);
+                        publicCopy = publicMode === 'default' ? null : await WS.getPublicCopy(DATA, publicMode);
+                    }
+                    router();
+                }
                 await refreshWorkspaceList();
                 return;
             }
