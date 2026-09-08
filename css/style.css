@@ -64,7 +64,7 @@ html[data-render-snapshot="pending"] .main-content {
 .navbar {
     background-color: #1a1a2e;
     color: white;
-    padding: 0 24px !important;
+    padding: 0 12px 0 24px !important;
     display: flex !important;
     flex-direction: row !important;
     flex-wrap: nowrap !important;
@@ -1293,7 +1293,7 @@ html[data-theme="dark"] .variant-add-form {
 /* PythonAnywhere category.html 卡片结构的同款规则。工作区和公开卡片共用这套尺寸。 */
 .category-title-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 25px; }
 .category-title-row .category-title { margin-bottom: 0; }
-.collapse-all-btn { position: fixed; top: 72px; right: 24px; z-index: 900; flex-shrink: 0; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.collapse-all-btn { position: fixed; top: 72px; right: 12px; z-index: 900; flex-shrink: 0; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
 .sticky-header .badge { font-size: 1rem; margin-left: 10px; }
 .formula-card > .row { display: flex; flex-wrap: nowrap; gap: 16px; align-items: flex-start; margin: 0; --bs-gutter-x: 0; }
 .formula-card > .row > .col-4 { width: 140px; flex: 0 0 140px; padding: 0; }
