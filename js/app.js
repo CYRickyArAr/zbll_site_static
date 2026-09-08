@@ -61,7 +61,7 @@
         var nav = document.getElementById('workspace-open');
         var publicBtn = document.getElementById('nav-public-mode');
         var workspaceBtn = document.getElementById('nav-workspace-mode');
-        var publicLabel = publicCopy ? (publicCopy.name || '大神版（已编辑）') : '大神版';
+        var publicLabel = publicCopy ? (publicCopy.name || '大神版（已编辑）') : '默认大神版';
         if (nav) {
             var navText = activeWorkspace ? activeWorkspace.name : publicLabel;
             var label = nav.querySelector('.workspace-nav-label');
