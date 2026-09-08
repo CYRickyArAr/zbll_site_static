@@ -392,10 +392,11 @@
             var url = URL.createObjectURL(blob);
             var link = document.createElement('a');
             link.href = url;
-            link.download = (workspace.name || 'zbll-workspace').replace(/[\\/:*?"<>|]/g, '_') + '.zbll';
+            var downloadName = (workspace.name || 'zbll-workspace').replace(/[\\/:*?"<>|]/g, '_') + '.zbll';
+            link.download = downloadName;
             checkCancelled();
             link.click();
-            progress(100, '已开始下载');
+            progress(100, '已下载 ' + downloadName);
             setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
         }
     };
