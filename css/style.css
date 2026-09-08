@@ -127,6 +127,8 @@ html[data-render-snapshot="pending"] .main-content {
     border-radius: 6px;
     background: transparent;
     color: #fff;
+    font-size: 1rem;
+    line-height: 1;
     cursor: pointer;
     transition: background-color 0.2s, border-color 0.2s, color 0.2s;
 }
@@ -192,6 +194,8 @@ html[data-render-snapshot="pending"] .main-content {
     border-radius: 6px;
     background: transparent;
     color: #fff;
+    font-size: 1rem;
+    line-height: 1;
     cursor: pointer;
     transition: background-color 0.2s, border-color 0.2s, color 0.2s;
 }
@@ -203,7 +207,7 @@ html[data-render-snapshot="pending"] .main-content {
     color: #fff;
 }
 
-.theme-toggle-icon {
+.theme-toggle svg.theme-toggle-icon {
     width: 18px;
     height: 18px;
     fill: none;
@@ -1438,7 +1442,7 @@ html[data-theme="dark"] .sortable-ghost { background: #303840; border-color: #4e
         height: 26px;
         flex-basis: 26px;
     }
-    .theme-toggle-icon {
+    .theme-toggle svg.theme-toggle-icon {
         width: 16px;
         height: 16px;
     }
