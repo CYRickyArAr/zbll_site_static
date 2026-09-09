@@ -58,7 +58,7 @@ window.ZBLL_DATA = {
       },
       {
         "label": "董",
-        "count": 173,
+        "count": 179,
         "wca": "2023DONG20"
       },
       {
@@ -112,8 +112,8 @@ window.ZBLL_DATA = {
         "wca": "2025LIAN01"
       }
     ],
-    "generatedAt": "2026-09-09T17:12:37+08:00",
-    "fingerprint": "c94cf271544aabe61b313851695b3ea2dbbf6f4f49e23cd17b06e627150e8bad"
+    "generatedAt": "2026-09-09T17:29:55+08:00",
+    "fingerprint": "817c61f2bf2bbd8a9a943dfcb472eb1542c5945ab827e019d4d0eedf0e372c39"
   },
   "categories": [
     {
@@ -153,7 +153,8 @@ window.ZBLL_DATA = {
                 {
                   "alg": "U2 R U' L' U R' U' L R' U' R U' R' U2 R",
                   "marks": [
-                    "耿"
+                    "耿",
+                    "董"
                   ]
                 },
                 {
@@ -1100,6 +1101,7 @@ window.ZBLL_DATA = {
                     "Tymon",
                     "杜",
                     "藩",
+                    "董",
                     "Feliks",
                     "Park"
                   ]
@@ -2065,7 +2067,8 @@ window.ZBLL_DATA = {
                   "alg": "U2 R U R D R' U2 R D' R' U' R' U R U' R' U' R U' R'",
                   "marks": [
                     "耿",
-                    "杜"
+                    "杜",
+                    "董"
                   ]
                 },
                 {
@@ -4188,7 +4191,8 @@ window.ZBLL_DATA = {
                     "耿",
                     "Tymon",
                     "杜",
-                    "藩"
+                    "藩",
+                    "董"
                   ]
                 }
               ]
@@ -6734,7 +6738,8 @@ window.ZBLL_DATA = {
                 {
                   "alg": "R' U2 F' R U R' U' R' F R U2 R",
                   "marks": [
-                    "耿"
+                    "耿",
+                    "董"
                   ]
                 }
               ]
@@ -8246,6 +8251,12 @@ window.ZBLL_DATA = {
                   "alg": "U2 R U D' R U' R' D U2 R2 U' R U R",
                   "marks": [
                     "Tymon"
+                  ]
+                },
+                {
+                  "alg": "U' r' F R F' r U2 R' U R' U' R2 U' R' U R' U R",
+                  "marks": [
+                    "董"
                   ]
                 }
               ]
