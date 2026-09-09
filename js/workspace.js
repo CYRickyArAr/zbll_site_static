@@ -121,6 +121,7 @@
                                 copied.notes = typeof copied.notes === 'string' ? copied.notes : '';
                                 copied.lines = Array.isArray(copied.lines) ? copied.lines : [];
                                 copied.learned = copied.learned === true;
+                                normalizeSelectedLineIndex(copied);
                                 return copied;
                             })
                         };
@@ -158,6 +159,8 @@
                     var old = oldByKey[formulaKey(formula)];
                     if (old) {
                         formula.learned = old.learned === true;
+                        formula.selectedLineIndex = old.selectedLineIndex;
+                        normalizeSelectedLineIndex(formula);
                         var preserveLocalNote = old.localNoteEdited === true ||
                             (sameSource && typeof old.notes === 'string' && old.notes !== formula.notes);
                         if (preserveLocalNote) {
@@ -189,6 +192,7 @@
         workspace.kind = 'public-copy';
         workspace.name = copy ? (copy.name || '大神版（已编辑）') : '大神版';
         workspace.sourceFingerprint = data.meta && data.meta.fingerprint || workspace.sourceFingerprint || '';
+        if (!copy) stripSelectedLineIndexes(workspace);
         return workspace;
     }
 
@@ -199,6 +203,24 @@
     function validLine(line) {
         return line && typeof line === 'object' && typeof line.alg === 'string' &&
             Array.isArray(line.marks) && line.marks.every(function (mark) { return typeof mark === 'string'; });
+    }
+
+    function normalizeSelectedLineIndex(formula) {
+        if (!formula || typeof formula !== 'object') return;
+        var index = Number(formula.selectedLineIndex);
+        if (Number.isInteger(index) && Array.isArray(formula.lines) && index >= 0 && index < formula.lines.length) {
+            formula.selectedLineIndex = index;
+        } else {
+            delete formula.selectedLineIndex;
+        }
+    }
+
+    function stripSelectedLineIndexes(workspace) {
+        (workspace.categories || []).forEach(function (category) {
+            (category.subcategories || []).forEach(function (subcat) {
+                (subcat.formulas || []).forEach(function (formula) { delete formula.selectedLineIndex; });
+            });
+        });
     }
 
     function normalizeImported(raw) {
@@ -236,6 +258,7 @@
                     formula.image = typeof formula.image === 'string' ? formula.image : '';
                     formula.notes = typeof formula.notes === 'string' ? formula.notes : '';
                     formula.learned = formula.learned === true;
+                    normalizeSelectedLineIndex(formula);
                 });
             });
         });
@@ -343,7 +366,9 @@
             for (var countCi = 0; countCi < output.categories.length; countCi++) {
                 var countCategory = output.categories[countCi];
                 for (var countSi = 0; countSi < countCategory.subcategories.length; countSi++) {
-                    formulaQueue = formulaQueue.concat(countCategory.subcategories[countSi].formulas);
+                    var formulas = countCategory.subcategories[countSi].formulas;
+                    formulas.forEach(normalizeSelectedLineIndex);
+                    formulaQueue = formulaQueue.concat(formulas);
                 }
             }
             var formulasTotal = formulaQueue.length;

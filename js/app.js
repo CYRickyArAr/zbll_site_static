@@ -34,8 +34,6 @@
     var workspaceContextTarget = null;
     var workspaceShortcutTarget = null;
     var inlineEditor = null;
-    var selectedFormulaLineKeys = {};
-
     function escapeHtml(value) {
         if (value === null || value === undefined) return '';
         return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;')
@@ -304,7 +302,7 @@
             var sub = cat.subcategories[i];
             if (sub.id !== subId) continue;
             for (var j = 0; j < sub.formulas.length; j++) {
-                if (sub.formulas[j].uid === uid) return { category: cat, subcat: sub, formula: sub.formulas[j], index: j };
+                if (sub.formulas[j].uid === uid || sub.formulas[j].id === uid) return { category: cat, subcat: sub, formula: sub.formulas[j], index: j };
             }
         }
         return null;
@@ -431,11 +429,13 @@
             html += '<textarea class="workspace-textarea form-control inline-formula-input" rows="4" placeholder="输入公式">' + escapeHtml((formula.lines || []).map(lineText).join('\n')) + '</textarea>';
         } else if (formula.lines && formula.lines.length) {
             html += '<div class="formula-lines">';
+            var canSelectLine = isWorkspace() || isPublicCopy();
             formula.lines.forEach(function (line, lineIndex) {
                 var cardKey = catId + '::' + subId + '::' + uid;
                 var lineKey = catId + '::' + subId + '::' + uid + '::' + lineIndex;
-                var selected = selectedFormulaLineKeys[cardKey] === lineKey;
-                html += '<div class="formula-line' + (selected ? ' selected' : '') + '" data-formula-card-key="' + escapeHtml(cardKey) + '" data-formula-line-key="' + escapeHtml(lineKey) + '" role="button" tabindex="0" aria-selected="' + (selected ? 'true' : 'false') + '"><span class="formula-line-alg">' + escapeHtml(line.alg) + '</span>';
+                var selected = canSelectLine && formula.selectedLineIndex === lineIndex;
+                var lineAttrs = canSelectLine ? ' data-category="' + escapeHtml(catId) + '" data-subcategory="' + escapeHtml(subId) + '" data-uid="' + escapeHtml(uid) + '" data-formula-card-key="' + escapeHtml(cardKey) + '" data-formula-line-key="' + escapeHtml(lineKey) + '" data-formula-line-index="' + lineIndex + '" role="button" tabindex="0" aria-selected="' + (selected ? 'true' : 'false') + '"' : '';
+                html += '<div class="formula-line' + (canSelectLine ? ' selectable' : '') + (selected ? ' selected' : '') + '"' + lineAttrs + '><span class="formula-line-alg">' + escapeHtml(line.alg) + '</span>';
                 if (line.marks && line.marks.length) {
                     html += '<span class="formula-marks-group">';
                     line.marks.forEach(function (mark) { html += '<span class="formula-marks" title="' + escapeHtml(LABEL_TO_NAME[mark] || mark) + '">' + escapeHtml(mark) + '</span>'; });
@@ -470,17 +470,23 @@
     }
     function selectFormulaLine(line) {
         if (!line || line.closest('.inline-editing')) return;
+        if (!isWorkspace() && !isPublicCopy()) return;
         var cardKey = line.getAttribute('data-formula-card-key') || '';
         var lineKey = line.getAttribute('data-formula-line-key') || null;
+        var lineIndex = parseInt(line.getAttribute('data-formula-line-index'), 10);
         if (!cardKey || !lineKey) return;
-        var shouldClear = selectedFormulaLineKeys[cardKey] === lineKey;
-        if (shouldClear) delete selectedFormulaLineKeys[cardKey];
-        else selectedFormulaLineKeys[cardKey] = lineKey;
+        var ref = findFormula(line.getAttribute('data-category'), line.getAttribute('data-subcategory'), line.getAttribute('data-uid'));
+        if (!ref || !Number.isInteger(lineIndex) || lineIndex < 0 || lineIndex >= (ref.formula.lines || []).length) return;
+        var shouldClear = ref.formula.selectedLineIndex === lineIndex;
+        if (shouldClear) delete ref.formula.selectedLineIndex;
+        else ref.formula.selectedLineIndex = lineIndex;
         var card = line.closest('.formula-card');
         (card || document).querySelectorAll('.formula-line.selected').forEach(function (item) {
             item.classList.remove('selected');
             item.setAttribute('aria-selected', 'false');
         });
+        var saveResult = persistCurrentData();
+        if (saveResult && typeof saveResult.catch === 'function') saveResult.catch(function (error) { console.warn(error); });
         if (shouldClear) return;
         line.classList.add('selected');
         line.setAttribute('aria-selected', 'true');
@@ -859,6 +865,7 @@
         if (!state.notesOnly) {
             var formulaInput = card.querySelector('.inline-formula-input');
             ref.formula.lines = parseFormulaLines(formulaInput ? formulaInput.value : '');
+            if (!Number.isInteger(ref.formula.selectedLineIndex) || ref.formula.selectedLineIndex < 0 || ref.formula.selectedLineIndex >= ref.formula.lines.length) delete ref.formula.selectedLineIndex;
             if (state.imageCleared) ref.formula.image = '';
             else if (state.selectedImage) ref.formula.image = state.selectedImage;
         }
