@@ -602,7 +602,7 @@ html[data-zbll-filter="unlearned"] .sortable-item:has(.formula-card.learned) {
 
 .formula-line:hover {
     background: #e5e8ec;
-    border-color: #cfd6de;
+    border-color: #dee2e6;
 }
 
 .formula-line.selected,
@@ -756,7 +756,7 @@ html[data-theme="dark"] .formula-line {
 
 html[data-theme="dark"] .formula-line:hover {
     background: #3a3a42;
-    border-color: var(--border);
+    border-color: #3e4853;
 }
 
 html[data-theme="dark"] .formula-line.selected,
