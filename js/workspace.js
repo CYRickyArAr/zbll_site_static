@@ -121,7 +121,7 @@
                                 copied.notes = typeof copied.notes === 'string' ? copied.notes : '';
                                 copied.lines = Array.isArray(copied.lines) ? copied.lines : [];
                                 copied.learned = copied.learned === true;
-                                normalizeSelectedLineIndex(copied);
+                                normalizeSelectedLineSelection(copied);
                                 return copied;
                             })
                         };
@@ -133,6 +133,15 @@
 
     function formulaKey(formula) {
         return String(formula && (formula.uid || formula.id || ''));
+    }
+
+    function selectedLineAlgFromFormula(formula) {
+        if (!formula || typeof formula !== 'object') return undefined;
+        if (typeof formula.selectedLineAlg === 'string') return formula.selectedLineAlg;
+        var index = Number(formula.selectedLineIndex);
+        var lines = Array.isArray(formula.lines) ? formula.lines : [];
+        if (Number.isInteger(index) && index >= 0 && index < lines.length) return lines[index].alg;
+        return undefined;
     }
 
     function mergePublicCopy(data, existing) {
@@ -159,8 +168,8 @@
                     var old = oldByKey[formulaKey(formula)];
                     if (old) {
                         formula.learned = old.learned === true;
-                        formula.selectedLineIndex = old.selectedLineIndex;
-                        normalizeSelectedLineIndex(formula);
+                        formula.selectedLineAlg = selectedLineAlgFromFormula(old);
+                        normalizeSelectedLineSelection(formula);
                         var preserveLocalNote = old.localNoteEdited === true ||
                             (sameSource && typeof old.notes === 'string' && old.notes !== formula.notes);
                         if (preserveLocalNote) {
@@ -192,7 +201,7 @@
         workspace.kind = 'public-copy';
         workspace.name = copy ? (copy.name || '大神版（已编辑）') : '大神版';
         workspace.sourceFingerprint = data.meta && data.meta.fingerprint || workspace.sourceFingerprint || '';
-        if (!copy) stripSelectedLineIndexes(workspace);
+        if (!copy) stripSelectedLineSelections(workspace);
         return workspace;
     }
 
@@ -205,20 +214,28 @@
             Array.isArray(line.marks) && line.marks.every(function (mark) { return typeof mark === 'string'; });
     }
 
-    function normalizeSelectedLineIndex(formula) {
+    function normalizeSelectedLineSelection(formula) {
         if (!formula || typeof formula !== 'object') return;
-        var index = Number(formula.selectedLineIndex);
-        if (Number.isInteger(index) && Array.isArray(formula.lines) && index >= 0 && index < formula.lines.length) {
-            formula.selectedLineIndex = index;
+        var lines = Array.isArray(formula.lines) ? formula.lines : [];
+        if (typeof formula.selectedLineAlg !== 'string' && formula.selectedLineIndex !== undefined) {
+            var index = Number(formula.selectedLineIndex);
+            if (Number.isInteger(index) && index >= 0 && index < lines.length) formula.selectedLineAlg = lines[index].alg;
+        }
+        if (typeof formula.selectedLineAlg === 'string' && lines.some(function (line) { return line.alg === formula.selectedLineAlg; })) {
+            delete formula.selectedLineIndex;
         } else {
+            delete formula.selectedLineAlg;
             delete formula.selectedLineIndex;
         }
     }
 
-    function stripSelectedLineIndexes(workspace) {
+    function stripSelectedLineSelections(workspace) {
         (workspace.categories || []).forEach(function (category) {
             (category.subcategories || []).forEach(function (subcat) {
-                (subcat.formulas || []).forEach(function (formula) { delete formula.selectedLineIndex; });
+                (subcat.formulas || []).forEach(function (formula) {
+                    delete formula.selectedLineAlg;
+                    delete formula.selectedLineIndex;
+                });
             });
         });
     }
@@ -258,7 +275,7 @@
                     formula.image = typeof formula.image === 'string' ? formula.image : '';
                     formula.notes = typeof formula.notes === 'string' ? formula.notes : '';
                     formula.learned = formula.learned === true;
-                    normalizeSelectedLineIndex(formula);
+                    normalizeSelectedLineSelection(formula);
                 });
             });
         });
@@ -367,7 +384,7 @@
                 var countCategory = output.categories[countCi];
                 for (var countSi = 0; countSi < countCategory.subcategories.length; countSi++) {
                     var formulas = countCategory.subcategories[countSi].formulas;
-                    formulas.forEach(normalizeSelectedLineIndex);
+                    formulas.forEach(normalizeSelectedLineSelection);
                     formulaQueue = formulaQueue.concat(formulas);
                 }
             }

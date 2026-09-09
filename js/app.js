@@ -320,6 +320,20 @@
         var marks = line.marks && line.marks.length ? ' （' + line.marks.join(' ') + '）' : '';
         return (line.alg || '') + marks;
     }
+    function selectedFormulaLineIndex(formula) {
+        if (!formula || !Array.isArray(formula.lines)) return -1;
+        if (typeof formula.selectedLineAlg !== 'string' && formula.selectedLineIndex !== undefined) {
+            var legacyIndex = Number(formula.selectedLineIndex);
+            if (Number.isInteger(legacyIndex) && legacyIndex >= 0 && legacyIndex < formula.lines.length) formula.selectedLineAlg = formula.lines[legacyIndex].alg;
+        }
+        if (typeof formula.selectedLineAlg !== 'string') return -1;
+        for (var i = 0; i < formula.lines.length; i++) {
+            if (formula.lines[i].alg === formula.selectedLineAlg) return i;
+        }
+        delete formula.selectedLineAlg;
+        delete formula.selectedLineIndex;
+        return -1;
+    }
 
     function renderHome() {
         var data = viewData();
@@ -430,10 +444,11 @@
         } else if (formula.lines && formula.lines.length) {
             html += '<div class="formula-lines">';
             var canSelectLine = isWorkspace() || isPublicCopy();
+            var selectedLineIndex = canSelectLine ? selectedFormulaLineIndex(formula) : -1;
             formula.lines.forEach(function (line, lineIndex) {
                 var cardKey = catId + '::' + subId + '::' + uid;
                 var lineKey = catId + '::' + subId + '::' + uid + '::' + lineIndex;
-                var selected = canSelectLine && formula.selectedLineIndex === lineIndex;
+                var selected = canSelectLine && selectedLineIndex === lineIndex;
                 var lineAttrs = canSelectLine ? ' data-category="' + escapeHtml(catId) + '" data-subcategory="' + escapeHtml(subId) + '" data-uid="' + escapeHtml(uid) + '" data-formula-card-key="' + escapeHtml(cardKey) + '" data-formula-line-key="' + escapeHtml(lineKey) + '" data-formula-line-index="' + lineIndex + '" role="button" tabindex="0" aria-selected="' + (selected ? 'true' : 'false') + '"' : '';
                 html += '<div class="formula-line' + (canSelectLine ? ' selectable' : '') + (selected ? ' selected' : '') + '"' + lineAttrs + '><span class="formula-line-alg">' + escapeHtml(line.alg) + '</span>';
                 if (line.marks && line.marks.length) {
@@ -477,9 +492,11 @@
         if (!cardKey || !lineKey) return;
         var ref = findFormula(line.getAttribute('data-category'), line.getAttribute('data-subcategory'), line.getAttribute('data-uid'));
         if (!ref || !Number.isInteger(lineIndex) || lineIndex < 0 || lineIndex >= (ref.formula.lines || []).length) return;
-        var shouldClear = ref.formula.selectedLineIndex === lineIndex;
-        if (shouldClear) delete ref.formula.selectedLineIndex;
-        else ref.formula.selectedLineIndex = lineIndex;
+        var lineAlg = ref.formula.lines[lineIndex].alg;
+        var shouldClear = ref.formula.selectedLineAlg === lineAlg;
+        if (shouldClear) delete ref.formula.selectedLineAlg;
+        else ref.formula.selectedLineAlg = lineAlg;
+        delete ref.formula.selectedLineIndex;
         var card = line.closest('.formula-card');
         (card || document).querySelectorAll('.formula-line.selected').forEach(function (item) {
             item.classList.remove('selected');
@@ -865,7 +882,7 @@
         if (!state.notesOnly) {
             var formulaInput = card.querySelector('.inline-formula-input');
             ref.formula.lines = parseFormulaLines(formulaInput ? formulaInput.value : '');
-            if (!Number.isInteger(ref.formula.selectedLineIndex) || ref.formula.selectedLineIndex < 0 || ref.formula.selectedLineIndex >= ref.formula.lines.length) delete ref.formula.selectedLineIndex;
+            selectedFormulaLineIndex(ref.formula);
             if (state.imageCleared) ref.formula.image = '';
             else if (state.selectedImage) ref.formula.image = state.selectedImage;
         }
