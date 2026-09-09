@@ -750,7 +750,7 @@ html[data-theme="dark"] .toggle-icon {
 }
 
 html[data-theme="dark"] .formula-line {
-    background: var(--surface-muted);
+    background: var(--surface);
     border-color: var(--border);
 }
 
