@@ -588,11 +588,8 @@ html[data-zbll-filter="unlearned"] .sortable-item:has(.formula-card.learned) {
     border-radius: 6px;
     padding: 6px 8px;
     background: #ffffff;
-    transition: border-color 0.12s, background 0.12s;
-}
-
-.formula-line.selectable {
     cursor: pointer;
+    transition: border-color 0.12s, background 0.12s;
 }
 
 .formula-line:last-child {
