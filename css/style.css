@@ -542,10 +542,6 @@ html[data-zbll-filter="unlearned"] .sortable-item:has(.formula-card.learned) {
     flex-direction: column;
 }
 
-.formula-card:hover {
-    background: #f8f9fa;
-}
-
 .formula-top {
     display: flex;
     gap: 16px;
@@ -740,8 +736,7 @@ html[data-theme="dark"] .sticky-header {
     box-shadow: var(--shadow);
 }
 
-html[data-theme="dark"] .sticky-header:hover,
-html[data-theme="dark"] .formula-card:hover {
+html[data-theme="dark"] .sticky-header:hover {
     background: #272d34;
 }
 
