@@ -600,8 +600,13 @@ html[data-zbll-filter="unlearned"] .sortable-item:has(.formula-card.learned) {
     margin-bottom: 0;
 }
 
-.formula-line:hover,
-.formula-line.selected {
+.formula-line:hover {
+    background: #e5e8ec;
+    border-color: #cfd6de;
+}
+
+.formula-line.selected,
+.formula-line.selected:hover {
     background: #f0f7ff;
     border-color: #007bff;
 }
@@ -749,8 +754,13 @@ html[data-theme="dark"] .formula-line {
     border-color: var(--border);
 }
 
-html[data-theme="dark"] .formula-line:hover,
-html[data-theme="dark"] .formula-line.selected {
+html[data-theme="dark"] .formula-line:hover {
+    background: #3a3a42;
+    border-color: var(--border);
+}
+
+html[data-theme="dark"] .formula-line.selected,
+html[data-theme="dark"] .formula-line.selected:hover {
     background: var(--line-hover);
     border-color: #4e9cff;
 }
