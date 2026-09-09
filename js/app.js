@@ -485,7 +485,12 @@
     }
     function selectFormulaLine(line) {
         if (!line || line.closest('.inline-editing')) return;
-        if (!isWorkspace() && !isPublicCopy()) return;
+        if (!isWorkspace() && !isPublicCopy()) {
+            openWorkspaceManager().then(function () {
+                setWorkspaceMessage('默认大神版不能直接编辑，请先在左侧选择或新建一个大神版公式库。', true);
+            });
+            return;
+        }
         var cardKey = line.getAttribute('data-formula-card-key') || '';
         var lineKey = line.getAttribute('data-formula-line-key') || null;
         var lineIndex = parseInt(line.getAttribute('data-formula-line-index'), 10);
