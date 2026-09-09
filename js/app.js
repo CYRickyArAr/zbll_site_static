@@ -468,11 +468,14 @@
     }
     function selectFormulaLine(line) {
         if (!line || line.closest('.inline-editing')) return;
-        selectedFormulaLineKey = line.getAttribute('data-formula-line-key') || null;
+        var lineKey = line.getAttribute('data-formula-line-key') || null;
+        var shouldClear = selectedFormulaLineKey === lineKey;
+        selectedFormulaLineKey = shouldClear ? null : lineKey;
         document.querySelectorAll('.formula-line.selected').forEach(function (item) {
             item.classList.remove('selected');
             item.setAttribute('aria-selected', 'false');
         });
+        if (shouldClear) return;
         line.classList.add('selected');
         line.setAttribute('aria-selected', 'true');
     }
