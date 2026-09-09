@@ -34,7 +34,7 @@
     var workspaceContextTarget = null;
     var workspaceShortcutTarget = null;
     var inlineEditor = null;
-    var selectedFormulaLineKey = null;
+    var selectedFormulaLineKeys = {};
 
     function escapeHtml(value) {
         if (value === null || value === undefined) return '';
@@ -432,8 +432,10 @@
         } else if (formula.lines && formula.lines.length) {
             html += '<div class="formula-lines">';
             formula.lines.forEach(function (line, lineIndex) {
+                var cardKey = catId + '::' + subId + '::' + uid;
                 var lineKey = catId + '::' + subId + '::' + uid + '::' + lineIndex;
-                html += '<div class="formula-line' + (selectedFormulaLineKey === lineKey ? ' selected' : '') + '" data-formula-line-key="' + escapeHtml(lineKey) + '" role="button" tabindex="0" aria-selected="' + (selectedFormulaLineKey === lineKey ? 'true' : 'false') + '"><span class="formula-line-alg">' + escapeHtml(line.alg) + '</span>';
+                var selected = selectedFormulaLineKeys[cardKey] === lineKey;
+                html += '<div class="formula-line' + (selected ? ' selected' : '') + '" data-formula-card-key="' + escapeHtml(cardKey) + '" data-formula-line-key="' + escapeHtml(lineKey) + '" role="button" tabindex="0" aria-selected="' + (selected ? 'true' : 'false') + '"><span class="formula-line-alg">' + escapeHtml(line.alg) + '</span>';
                 if (line.marks && line.marks.length) {
                     html += '<span class="formula-marks-group">';
                     line.marks.forEach(function (mark) { html += '<span class="formula-marks" title="' + escapeHtml(LABEL_TO_NAME[mark] || mark) + '">' + escapeHtml(mark) + '</span>'; });
@@ -468,10 +470,14 @@
     }
     function selectFormulaLine(line) {
         if (!line || line.closest('.inline-editing')) return;
+        var cardKey = line.getAttribute('data-formula-card-key') || '';
         var lineKey = line.getAttribute('data-formula-line-key') || null;
-        var shouldClear = selectedFormulaLineKey === lineKey;
-        selectedFormulaLineKey = shouldClear ? null : lineKey;
-        document.querySelectorAll('.formula-line.selected').forEach(function (item) {
+        if (!cardKey || !lineKey) return;
+        var shouldClear = selectedFormulaLineKeys[cardKey] === lineKey;
+        if (shouldClear) delete selectedFormulaLineKeys[cardKey];
+        else selectedFormulaLineKeys[cardKey] = lineKey;
+        var card = line.closest('.formula-card');
+        (card || document).querySelectorAll('.formula-line.selected').forEach(function (item) {
             item.classList.remove('selected');
             item.setAttribute('aria-selected', 'false');
         });
