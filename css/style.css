@@ -1376,6 +1376,7 @@ html[data-theme="dark"] .formula-card.learned { background: #173b27; }
 html[data-theme="dark"] .learn-btn { background: var(--surface-muted); }
 html[data-theme="dark"] .learn-btn.learned { background: #198754; }
 html[data-theme="dark"] .drag-handle { color: #9ca6b0; }
+html[data-theme="dark"] .drag-handle:hover { color: #f1f5f9; background: rgba(255,255,255,.12); }
 html[data-theme="dark"] .sortable-ghost { background: #303840; border-color: #4e9cff; }
 
 @media (max-width: 1100px) {
