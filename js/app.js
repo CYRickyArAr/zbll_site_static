@@ -672,7 +672,7 @@
         var selected = list.find(function (item) { return item.id === selectedId; });
         if (publicListEl) {
             publicListEl.innerHTML =
-                '<div class="workspace-list-row"><button type="button" class="workspace-list-item' + (selectedPublic === 'default' ? ' active' : '') + '" data-public-library="default"><span>默认大神版</span><small>仅预览</small></button><button type="button" class="workspace-item-menu-trigger" data-workspace-menu="public" data-target-id="default" aria-haspopup="menu" aria-label="默认大神版的更多操作" title="更多操作">…</button></div>' +
+                '<div class="workspace-list-row"><button type="button" class="workspace-list-item' + (selectedPublic === 'default' ? ' active' : '') + '" data-public-library="default"><span>默认大神版</span><small>仅预览</small></button><span class="workspace-item-lock" aria-label="默认大神版仅预览" title="默认大神版仅预览"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg></span></div>' +
                 publicCopies.map(function (item) {
                     return '<div class="workspace-list-row"><button type="button" class="workspace-list-item' + (selectedPublic === item.id ? ' active' : '') + '" data-public-library="' + escapeHtml(item.id) + '"><span>' + escapeHtml(item.name || '大神版（已编辑）') + '</span><small>' + escapeHtml(new Date(item.updatedAt).toLocaleString()) + '</small></button><button type="button" class="workspace-item-menu-trigger" data-workspace-menu="public" data-target-id="' + escapeHtml(item.id) + '" aria-haspopup="menu" aria-label="' + escapeHtml(item.name || '大神版（已编辑）') + '的更多操作" title="更多操作">…</button></div>';
                 }).join('');
@@ -1061,10 +1061,7 @@
     }
     function runWorkspaceShortcut(action, target) {
         if (!target) return false;
-        if (target.kind === 'public' && target.id === 'default') {
-            setWorkspaceMessage(action === 'rename' ? '默认大神版不能重命名。' : '默认大神版不能删除。', true);
-            return true;
-        }
+        if (target.kind === 'public' && target.id === 'default') return false;
         var buttonId = target.kind === 'public'
             ? (action === 'rename' ? 'workspace-public-rename' : 'workspace-public-delete')
             : (action === 'rename' ? 'workspace-rename' : 'workspace-delete');
@@ -1269,6 +1266,7 @@
         e.preventDefault();
         var kind = item.hasAttribute('data-public-library') ? 'public' : 'custom';
         var id = kind === 'public' ? item.dataset.publicLibrary : item.dataset.workspaceId;
+        if (kind === 'public' && id === 'default') return;
         openWorkspaceContextMenu(kind, id, e.clientX, e.clientY, false);
     });
     document.getElementById('workspace-overlay').addEventListener('scroll', hideWorkspaceContextMenu, true);
@@ -1329,6 +1327,7 @@
                 var rect = item.getBoundingClientRect();
                 var kind = item.hasAttribute('data-public-library') ? 'public' : 'custom';
                 var id = kind === 'public' ? item.dataset.publicLibrary : item.dataset.workspaceId;
+                if (kind === 'public' && id === 'default') return;
                 openWorkspaceContextMenu(kind, id, rect.left + 28, rect.top + 28, true);
             }
             return;
