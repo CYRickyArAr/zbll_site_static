@@ -34,6 +34,7 @@
     var workspaceContextTarget = null;
     var workspaceShortcutTarget = null;
     var inlineEditor = null;
+    var selectedFormulaLineKey = null;
 
     function escapeHtml(value) {
         if (value === null || value === undefined) return '';
@@ -430,8 +431,9 @@
             html += '<textarea class="workspace-textarea form-control inline-formula-input" rows="4" placeholder="输入公式">' + escapeHtml((formula.lines || []).map(lineText).join('\n')) + '</textarea>';
         } else if (formula.lines && formula.lines.length) {
             html += '<div class="formula-lines">';
-            formula.lines.forEach(function (line) {
-                html += '<div class="formula-line"><span class="formula-line-alg">' + escapeHtml(line.alg) + '</span>';
+            formula.lines.forEach(function (line, lineIndex) {
+                var lineKey = catId + '::' + subId + '::' + uid + '::' + lineIndex;
+                html += '<div class="formula-line' + (selectedFormulaLineKey === lineKey ? ' selected' : '') + '" data-formula-line-key="' + escapeHtml(lineKey) + '" role="button" tabindex="0" aria-selected="' + (selectedFormulaLineKey === lineKey ? 'true' : 'false') + '"><span class="formula-line-alg">' + escapeHtml(line.alg) + '</span>';
                 if (line.marks && line.marks.length) {
                     html += '<span class="formula-marks-group">';
                     line.marks.forEach(function (mark) { html += '<span class="formula-marks" title="' + escapeHtml(LABEL_TO_NAME[mark] || mark) + '">' + escapeHtml(mark) + '</span>'; });
@@ -463,6 +465,16 @@
         content.style.display = open ? 'block' : 'none'; icon.textContent = open ? '▼' : '▶'; header.classList.toggle('sticky-header-collapsed', !open);
         try { localStorage.setItem('subcat_' + subcatId, open ? 'open' : 'closed'); } catch (e) {}
         updateToggleAllButton();
+    }
+    function selectFormulaLine(line) {
+        if (!line || line.closest('.inline-editing')) return;
+        selectedFormulaLineKey = line.getAttribute('data-formula-line-key') || null;
+        document.querySelectorAll('.formula-line.selected').forEach(function (item) {
+            item.classList.remove('selected');
+            item.setAttribute('aria-selected', 'false');
+        });
+        line.classList.add('selected');
+        line.setAttribute('aria-selected', 'true');
     }
     function updateToggleAllButton() {
         var button = document.getElementById('toggle-all-subcategories');
@@ -1218,6 +1230,8 @@
         var header = e.target.closest('.sticky-header');
         if (header && header.dataset.subcat) { toggleSubcategory(header.dataset.subcat); return; }
         if (e.target.closest('#toggle-all-subcategories')) { toggleAllSubcategories(); return; }
+        var formulaLine = e.target.closest('.formula-line');
+        if (formulaLine) { selectFormulaLine(formulaLine); return; }
         if (e.target.closest('.drag-handle') && !activeWorkspace && !publicCopy) {
             promptDefaultPublicDrag();
             return;
@@ -1245,6 +1259,13 @@
     document.addEventListener('change', function (e) {
         if (!e.target.classList.contains('inline-image-input') || !e.target.files || !e.target.files[0]) return;
         updateInlineImage(e.target.files[0], e.target.closest('.inline-image-drop'));
+    });
+    document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        var formulaLine = e.target.closest('.formula-line');
+        if (!formulaLine) return;
+        e.preventDefault();
+        selectFormulaLine(formulaLine);
     });
     document.addEventListener('dragover', function (e) {
         var area = e.target.closest('.inline-image-drop');
