@@ -77,6 +77,11 @@ window.ZBLL_DATA = {
         "wca": "2021ZHAN01"
       },
       {
+        "label": "昆",
+        "count": 40,
+        "wca": "2024LIZH03"
+      },
+      {
         "label": "Park",
         "count": 36,
         "wca": "2012PARK03"
@@ -90,11 +95,6 @@ window.ZBLL_DATA = {
         "label": "懿",
         "count": 29,
         "wca": "2026SHEN01"
-      },
-      {
-        "label": "昆",
-        "count": 28,
-        "wca": "2024LIZH03"
       },
       {
         "label": "Matty",
@@ -112,8 +112,8 @@ window.ZBLL_DATA = {
         "wca": "2025LIAN01"
       }
     ],
-    "generatedAt": "2026-09-18T15:17:21+08:00",
-    "fingerprint": "545b88d72b69a80ab93e57d970b871f79397c13c0cd09fc3a76210dba1b28694"
+    "generatedAt": "2026-09-18T15:44:48+08:00",
+    "fingerprint": "531a6edfc66afebdb2c0672a09fadcbb75b33e6a18e744a41181818c81e520d9"
   },
   "categories": [
     {
@@ -192,6 +192,7 @@ window.ZBLL_DATA = {
                   "alg": "U R U R2 D' R U R' D R2 U2 R'",
                   "marks": [
                     "耿",
+                    "昆",
                     "杜",
                     "藩",
                     "董"
@@ -1205,6 +1206,12 @@ window.ZBLL_DATA = {
                     "杜",
                     "Tymon"
                   ]
+                },
+                {
+                  "alg": "R2 D' r U2 r' R U' R' D R U R U' R' U' R",
+                  "marks": [
+                    "昆"
+                  ]
                 }
               ]
             },
@@ -1718,6 +1725,7 @@ window.ZBLL_DATA = {
                 {
                   "alg": "U R' U' R U' R' U' R U2 r' R' F R F' r",
                   "marks": [
+                    "昆",
                     "杜",
                     "董"
                   ]
@@ -2230,6 +2238,7 @@ window.ZBLL_DATA = {
                   "alg": "U2 L' R U R' U' L U R U R' U' R U' R'",
                   "marks": [
                     "耿",
+                    "昆",
                     "杜",
                     "董",
                     "南"
@@ -2284,6 +2293,7 @@ window.ZBLL_DATA = {
                 {
                   "alg": "U' R U R D R' U' R D' R' U2 R' U' R U' R'",
                   "marks": [
+                    "昆",
                     "Matty"
                   ]
                 }
@@ -2776,6 +2786,7 @@ window.ZBLL_DATA = {
                 {
                   "alg": "U R U R' U R' D' R U' R' D R U R U2 R'",
                   "marks": [
+                    "昆",
                     "杜",
                     "Luke"
                   ]
@@ -3818,6 +3829,7 @@ window.ZBLL_DATA = {
                   "marks": [
                     "耿",
                     "Tymon",
+                    "昆",
                     "杜",
                     "董"
                   ]
@@ -4218,6 +4230,7 @@ window.ZBLL_DATA = {
                   "marks": [
                     "耿",
                     "Tymon",
+                    "昆",
                     "杜",
                     "懿"
                   ]
@@ -4594,6 +4607,12 @@ window.ZBLL_DATA = {
                     "Tymon",
                     "杜",
                     "董"
+                  ]
+                },
+                {
+                  "alg": "U F R U R' U' R U' R' U2 R U2 R' U' F'",
+                  "marks": [
+                    "昆"
                   ]
                 }
               ]
@@ -5942,6 +5961,7 @@ window.ZBLL_DATA = {
                   "alg": "U2 R2 D R' U2 R D' R' U' R' U R2 D R' U2 R D' R2",
                   "marks": [
                     "耿",
+                    "昆",
                     "董"
                   ]
                 },
@@ -6071,6 +6091,7 @@ window.ZBLL_DATA = {
                   "alg": "U2 R U2 R' U R' D' R U R' D R2 U' R' U R U' R'",
                   "marks": [
                     "耿",
+                    "昆",
                     "杜"
                   ]
                 }
@@ -8840,6 +8861,7 @@ window.ZBLL_DATA = {
                   "alg": "F U' R' U R U F' R' U R U' R' U2 R",
                   "marks": [
                     "耿",
+                    "昆",
                     "杜",
                     "董",
                     "懿"
