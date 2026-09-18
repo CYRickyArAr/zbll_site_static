@@ -78,7 +78,7 @@ window.ZBLL_DATA = {
       },
       {
         "label": "昆",
-        "count": 40,
+        "count": 46,
         "wca": "2024LIZH03"
       },
       {
@@ -112,8 +112,8 @@ window.ZBLL_DATA = {
         "wca": "2025LIAN01"
       }
     ],
-    "generatedAt": "2026-09-18T15:44:48+08:00",
-    "fingerprint": "531a6edfc66afebdb2c0672a09fadcbb75b33e6a18e744a41181818c81e520d9"
+    "generatedAt": "2026-09-18T23:34:35+08:00",
+    "fingerprint": "c19b13cb9419025d0bbcaf894e43c1485ddb7128a7bc0aaa6703b89b3788c9f4"
   },
   "categories": [
     {
@@ -2143,6 +2143,7 @@ window.ZBLL_DATA = {
                   "marks": [
                     "耿",
                     "Tymon",
+                    "昆",
                     "杜",
                     "藩",
                     "Feliks"
@@ -2583,6 +2584,7 @@ window.ZBLL_DATA = {
                 {
                   "alg": "R' U2 R' D' R U2 R' D R' U R' U R U2 R'",
                   "marks": [
+                    "昆",
                     "杜"
                   ]
                 },
@@ -2988,7 +2990,8 @@ window.ZBLL_DATA = {
                   "alg": "U r U r' R U R' U' R U R' U' r U' r' F R U R' U' F'",
                   "marks": [
                     "耿",
-                    "懿"
+                    "懿",
+                    "昆"
                   ]
                 },
                 {
@@ -3735,6 +3738,7 @@ window.ZBLL_DATA = {
                   "marks": [
                     "耿",
                     "Tymon",
+                    "昆",
                     "杜",
                     "藩"
                   ]
@@ -3916,6 +3920,7 @@ window.ZBLL_DATA = {
                 {
                   "alg": "R' U' R U R' F2 R U2 R' U2 R' F2 R2",
                   "marks": [
+                    "昆",
                     "杜",
                     "南"
                   ]
@@ -4452,6 +4457,7 @@ window.ZBLL_DATA = {
                   "alg": "U r U2 r2 R F R' F' r2 U2 r'",
                   "marks": [
                     "耿",
+                    "昆",
                     "杜"
                   ]
                 }
