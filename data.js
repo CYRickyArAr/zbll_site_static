@@ -98,7 +98,7 @@ window.ZBLL_DATA = {
       },
       {
         "label": "昆",
-        "count": 18,
+        "count": 20,
         "wca": "2024LIZH03"
       },
       {
@@ -112,8 +112,8 @@ window.ZBLL_DATA = {
         "wca": "2025LIAN01"
       }
     ],
-    "generatedAt": "2026-09-15T17:56:06+08:00",
-    "fingerprint": "b5310d06b25df1087018b4f9f2f571c5be62ebb8cef7d0aa08d376fddaaaa863"
+    "generatedAt": "2026-09-18T15:05:13+08:00",
+    "fingerprint": "26927dfcd4c6ab5b10df2ed9ce9ec5115460a96ac6d14936d8bd0f3ef1baa213"
   },
   "categories": [
     {
@@ -8054,6 +8054,12 @@ window.ZBLL_DATA = {
                     "耿",
                     "杜"
                   ]
+                },
+                {
+                  "alg": "U' L' U' L U' L' U L2 F L' U' L' U L F' L' U L",
+                  "marks": [
+                    "昆"
+                  ]
                 }
               ]
             },
@@ -9186,7 +9192,8 @@ window.ZBLL_DATA = {
                 {
                   "alg": "U' F' r U R' U' r' F R2 U2 R' U' R U' R'",
                   "marks": [
-                    "耿"
+                    "耿",
+                    "昆"
                   ]
                 },
                 {
