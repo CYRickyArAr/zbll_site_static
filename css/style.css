@@ -1585,12 +1585,12 @@ html[data-theme="dark"] .sortable-ghost { background: #303840; border-color: #4e
 
 @media (max-width: 420px) {
     .navbar-logo {
-        width: 22px;
+        width: 24px;
         font-size: 0;
         overflow: hidden;
     }
     .navbar-logo::before {
-        content: 'Z';
+        content: 'ZB';
         font-size: 1rem;
         font-weight: 700;
     }
