@@ -171,6 +171,11 @@ html[data-render-snapshot="pending"] .main-content {
 
 .about-link:hover img,
 .about-link:focus-visible img {
+    filter: brightness(1.15);
+}
+
+.about-link:hover .about-wca-icon,
+.about-link:focus-visible .about-wca-icon {
     filter: brightness(1.04);
 }
 
