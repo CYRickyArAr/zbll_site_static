@@ -10,7 +10,7 @@ ZBLL (Zborowski–Bruchem Last Layer) is an algorithm set that solves the entire
 
 The algorithms are compiled from solve reconstructions on [reco.nz](https://reco.nz/) and solve replay data from **CubeStation** and **WCU CUBE**. **Every algorithm included in the database has a documented record of actual use by a solver** (although it may not be their current go-to algorithm).
 
-The content is provided for learning and reference purposes and will continue to be updated. **If you find an incorrect algorithm, missing information, or any other issue, feedback and corrections are welcome.**
+The content is provided for learning and reference purposes and will continue to be updated. **If you find an incorrect algorithm or any other issue, feedback and corrections are welcome.**
 
 ## Content
 
