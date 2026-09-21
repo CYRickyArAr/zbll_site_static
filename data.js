@@ -43,7 +43,7 @@ window.ZBLL_DATA = {
     "playerStats": [
       {
         "label": "耿",
-        "count": 471,
+        "count": 472,
         "wca": "2023GENG02"
       },
       {
@@ -112,8 +112,8 @@ window.ZBLL_DATA = {
         "wca": "2025LIAN01"
       }
     ],
-    "generatedAt": "2026-09-18T23:34:35+08:00",
-    "fingerprint": "c19b13cb9419025d0bbcaf894e43c1485ddb7128a7bc0aaa6703b89b3788c9f4"
+    "generatedAt": "2026-09-21T10:01:34+08:00",
+    "fingerprint": "7d39b5d4eca023f1db3ed6196d2ebc4ff02964eb7e8142a624d35b2b80281e69"
   },
   "categories": [
     {
@@ -8439,6 +8439,12 @@ window.ZBLL_DATA = {
               "image": "images/AS3-10.svg",
               "notes": "ZBLL AS 34",
               "lines": [
+                {
+                  "alg": "U' L' U R U' L U R' U' R U R' U R' U' R2 U' R' U R' U R",
+                  "marks": [
+                    "耿"
+                  ]
+                },
                 {
                   "alg": "R U R U' R2 D U2 R' U' R U D' R",
                   "marks": [
