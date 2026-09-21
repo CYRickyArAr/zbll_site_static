@@ -176,7 +176,7 @@ html[data-render-snapshot="pending"] .main-content {
 
 .about-link:hover .about-wca-icon,
 .about-link:focus-visible .about-wca-icon {
-    filter: brightness(1.04);
+    filter: brightness(1.08);
 }
 
 .about-bili:hover,
