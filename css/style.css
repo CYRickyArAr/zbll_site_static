@@ -187,7 +187,7 @@ html[data-render-snapshot="pending"] .main-content {
     cursor: pointer;
     transition: background-color .15s, color .15s;
 }
-.site-help-button svg { display: block; width: 28px; height: 28px; }
+.site-help-button svg { display: block; width: 18px; height: 18px; }
 .site-help-button:hover,
 .site-help-button:focus-visible {
     background: rgba(255, 255, 255, .1);
@@ -264,22 +264,22 @@ html:not([data-theme="dark"]) .site-help-button:focus-visible { background: #eef
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid rgba(255, 255, 255, 0.35);
-    border-radius: 6px;
+    border: 0;
+    border-radius: 50%;
     background: transparent;
-    color: #fff;
-    font-size: 1rem;
+    color: #c4cbd3;
+    font-size: 18px;
     line-height: 1;
     cursor: pointer;
-    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+    transition: background-color .15s, color .15s;
 }
 
 .theme-toggle:hover,
 .theme-toggle:focus-visible {
-    background: rgba(255, 255, 255, 0.24);
-    border-color: rgba(255, 255, 255, 0.65);
-    color: #fff;
+    background: rgba(255, 255, 255, .1);
+    color: #f1f3f5;
 }
+.theme-toggle:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
 
 .theme-toggle svg.theme-toggle-icon {
     width: 18px;
@@ -997,15 +997,13 @@ html:not([data-theme="dark"]) .collapse-all-btn { background: transparent; borde
 html:not([data-theme="dark"]) .collapse-all-btn:hover,
 html:not([data-theme="dark"]) .collapse-all-btn:focus-visible { background: #eef2f7; border-color: transparent; color: #0f172a; }
 html:not([data-theme="dark"]) .theme-toggle {
-    background: #ffffff;
-    border-color: #cbd5e1;
-    color: #334155;
+    background: transparent;
+    color: #4b5563;
 }
 html:not([data-theme="dark"]) .theme-toggle:hover,
 html:not([data-theme="dark"]) .theme-toggle:focus-visible {
     background: #eef2f7;
-    border-color: #94a3b8;
-    color: #0f172a;
+    color: #334155;
 }
 html:not([data-theme="dark"]) .view-mode-switch,
 html:not([data-theme="dark"]) .zbll-filter {
@@ -1537,7 +1535,8 @@ html[data-theme="dark"] .sortable-ghost { background: #303840; border-color: #4e
         width: 16px;
         height: 16px;
     }
-    .site-help-button svg { width: 22px; height: 22px; }
+    .site-help-button svg { width: 16px; height: 16px; }
+    .theme-toggle { font-size: 16px; }
     .site-help-dialog { padding: 20px; }
     .collapse-all-btn {
         width: 26px;
