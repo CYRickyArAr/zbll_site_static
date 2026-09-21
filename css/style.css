@@ -171,7 +171,7 @@ html[data-render-snapshot="pending"] .main-content {
 
 .about-link:hover img,
 .about-link:focus-visible img {
-    filter: brightness(1.15);
+    filter: brightness(1.04);
 }
 
 .about-bili:hover,
