@@ -2,6 +2,28 @@
 (function () {
     'use strict';
 
+    var siteHelpDialog = document.getElementById('site-help-dialog');
+    var siteHelpOpen = document.getElementById('site-help-open');
+    var siteHelpScrollOverflow = '';
+    siteHelpOpen.addEventListener('click', function () {
+        if (siteHelpDialog.open) return;
+        siteHelpScrollOverflow = document.body.style.overflow;
+        siteHelpDialog.showModal();
+        document.body.style.overflow = 'hidden';
+    });
+    document.getElementById('site-help-close').addEventListener('click', function () { siteHelpDialog.close(); });
+    siteHelpDialog.addEventListener('click', function (e) {
+        var rect = siteHelpDialog.getBoundingClientRect();
+        if (e.target === siteHelpDialog && (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom)) siteHelpDialog.close();
+    });
+    siteHelpDialog.addEventListener('close', function () {
+        document.body.style.overflow = siteHelpScrollOverflow;
+        siteHelpOpen.focus({ preventScroll: true });
+    });
+    siteHelpDialog.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') e.stopPropagation();
+    });
+
     var DATA = window.ZBLL_DATA;
     var WS = window.ZBLL_WORKSPACE;
     var appEl = document.getElementById('app');
