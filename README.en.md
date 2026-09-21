@@ -8,7 +8,7 @@ An online algorithm database covering **all 472 ZBLL cases**, with top-layer sta
 
 ZBLL (Zborowski–Bruchem Last Layer) is an algorithm set that solves the entire Last Layer in one step when all Last Layer edges are already oriented. This site follows the classification used by [pepkin88 zbll-explorer](https://pepkin88.me/zbll-explorer/) and includes all 472 ZBLL cases, with algorithms that have been used in actual solves by **top solvers** including Xuanyi Geng, Tymon Kolasiński, Feliks Zemdegs, Seung Hyuk Nahm, Max Park, and more.
 
-The algorithms are compiled from solve reconstructions on [reco.nz](https://reco.nz/) and solve replay data from **[CubeStation](https://cubestation.com/)** and **[WCU CUBE](https://wcucube.club/)**. **Every algorithm included in the database has a documented record of actual use by a solver** (although it may not be their current go-to algorithm).
+The algorithms are compiled from solve reconstructions on [reco.nz](https://reco.nz/) and solve replay data from [CubeStation](https://cubestation.com/) and [WCU CUBE](https://wcucube.club/). **Every algorithm included in the database has a documented record of actual use by a solver** (although it may not be their current go-to algorithm).
 
 The content is provided for learning and reference purposes and will continue to be updated. **If you find an incorrect algorithm or any other issue, feedback and corrections are welcome.**
 
