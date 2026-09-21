@@ -259,6 +259,7 @@ html:not([data-theme="dark"]) .site-help-button:focus-visible { background: #eef
 .theme-toggle {
     width: 32px;
     height: 32px;
+    margin-right: 8px;
     padding: 0;
     flex: 0 0 32px;
     display: inline-flex;
@@ -1536,7 +1537,7 @@ html[data-theme="dark"] .sortable-ghost { background: #303840; border-color: #4e
         height: 16px;
     }
     .site-help-button svg { width: 16px; height: 16px; }
-    .theme-toggle { font-size: 16px; }
+    .theme-toggle { font-size: 16px; margin-right: 5px; }
     .site-help-dialog { padding: 20px; }
     .collapse-all-btn {
         width: 26px;
@@ -1596,6 +1597,7 @@ html[data-theme="dark"] .sortable-ghost { background: #303840; border-color: #4e
 }
 
 @media (max-width: 360px) {
+    .theme-toggle { margin-right: 4px; }
     .navbar { padding: 0 6px !important; column-gap: 2px !important; }
     .navbar-left { gap: 2px; }
     .site-help-button,
