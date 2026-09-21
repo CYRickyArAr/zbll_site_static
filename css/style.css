@@ -140,7 +140,7 @@ html[data-render-snapshot="pending"] .main-content {
 .navbar-right {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 2px;
 }
 
 .about-link {
@@ -1472,7 +1472,7 @@ html[data-theme="dark"] .sortable-ghost { background: #303840; border-color: #4e
         font-size: 0.75rem;
     }
     .navbar-right {
-        gap: 6px;
+        gap: 2px;
     }
 }
 
