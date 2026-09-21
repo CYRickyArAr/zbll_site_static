@@ -4,12 +4,15 @@
 
     var siteHelpDialog = document.getElementById('site-help-dialog');
     var siteHelpOpen = document.getElementById('site-help-open');
-    var siteHelpScrollOverflow = '';
+    function syncModalScrollLock() {
+        var workspaceOverlay = document.getElementById('workspace-overlay');
+        var isOpen = siteHelpDialog.open || (workspaceOverlay && !workspaceOverlay.hidden);
+        document.documentElement.classList.toggle('has-modal', !!isOpen);
+    }
     siteHelpOpen.addEventListener('click', function () {
         if (siteHelpDialog.open) return;
-        siteHelpScrollOverflow = document.body.style.overflow;
         siteHelpDialog.showModal();
-        document.body.style.overflow = 'hidden';
+        syncModalScrollLock();
     });
     document.getElementById('site-help-close').addEventListener('click', function () { siteHelpDialog.close(); });
     siteHelpDialog.addEventListener('click', function (e) {
@@ -17,7 +20,7 @@
         if (e.target === siteHelpDialog && (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom)) siteHelpDialog.close();
     });
     siteHelpDialog.addEventListener('close', function () {
-        document.body.style.overflow = siteHelpScrollOverflow;
+        syncModalScrollLock();
         siteHelpOpen.focus({ preventScroll: true });
     });
     siteHelpDialog.addEventListener('keydown', function (e) {
@@ -683,7 +686,11 @@
         });
     }
 
-    function showOverlay(id, show) { var el = document.getElementById(id); if (el) el.hidden = !show; }
+    function showOverlay(id, show) {
+        var el = document.getElementById(id);
+        if (el) el.hidden = !show;
+        syncModalScrollLock();
+    }
     function setWorkspaceMessage(text, error) {
         var el = document.getElementById('workspace-message'); if (!el) return;
         el.textContent = text || ''; el.classList.toggle('is-error', !!error);
