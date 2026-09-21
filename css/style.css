@@ -180,17 +180,29 @@ html[data-render-snapshot="pending"] .main-content {
     align-items: center;
     justify-content: center;
     padding: 0;
-    border: 0;
-    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, .35);
+    border-radius: 6px;
     background: transparent;
     color: #fff;
     cursor: pointer;
+    transition: background-color .18s, border-color .18s, color .18s, box-shadow .18s;
 }
+.site-help-button svg { display: block; width: 24px; height: 24px; }
 .site-help-button:hover,
-.site-help-button:focus-visible { background: rgba(255, 255, 255, .16); }
-html:not([data-theme="dark"]) .site-help-button { color: #4b5563; }
+.site-help-button:focus-visible {
+    background: rgba(96, 165, 250, .14);
+    border-color: #7eabed;
+    color: #bfdbfe;
+    box-shadow: 0 0 0 2px rgba(96, 165, 250, .1);
+}
+.site-help-button:active { box-shadow: none; }
+.site-help-button:focus-visible { outline: 2px solid #669cff; outline-offset: 3px; }
+html:not([data-theme="dark"]) .site-help-button { background: #fff; border-color: #cbd5e1; color: #334155; }
 html:not([data-theme="dark"]) .site-help-button:hover,
-html:not([data-theme="dark"]) .site-help-button:focus-visible { background: #eef1f4; }
+html:not([data-theme="dark"]) .site-help-button:focus-visible { background: #eff6ff; border-color: #93b4e8; color: #3568b4; }
+@media (prefers-reduced-motion: reduce) {
+    .site-help-button { transition: none; }
+}
 
 .site-help-dialog {
     width: min(560px, calc(100% - 32px));
