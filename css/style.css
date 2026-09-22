@@ -266,10 +266,10 @@ html[data-theme="dark"] .site-help-section p a:hover { color: #bdd0ff; }
     padding-top: 12px;
     border-top: 1px solid var(--border);
     font-size: .875rem;
-    line-height: 1.65;
+    line-height: 1.75;
 }
 .site-help-section p.site-help-intro-note {
-    margin-top: 14px;
+    margin-top: 8px;
     font-size: .875rem;
     line-height: 1.75;
 }
