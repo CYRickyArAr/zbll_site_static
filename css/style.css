@@ -166,17 +166,13 @@ html[data-render-snapshot="pending"] .main-content {
 
 .about-link img {
     display: block;
-    transition: filter .2s, transform .2s;
+    filter: brightness(.8);
+    transition: filter .2s;
 }
-
-.author-icon-filters { position: absolute; pointer-events: none; }
-.author-icon-ink { flood-color: var(--note-text); }
-.about-wca-icon { filter: url(#author-wca-monochrome); }
-.about-cubing-icon { filter: url(#author-cubing-monochrome); }
 
 .about-link:hover img,
 .about-link:focus-visible img {
-    filter: none;
+    filter: brightness(1);
 }
 
 .about-bili:hover,
