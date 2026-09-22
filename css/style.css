@@ -255,7 +255,24 @@ html[data-theme="dark"] .site-help-section p a { color: #93b4ff; }
 html[data-theme="dark"] .site-help-section p a:hover { color: #bdd0ff; }
 .site-help-section p strong { color: var(--text); font-weight: 700; }
 .site-help-authenticity { white-space: nowrap; }
-.site-help-section p.site-help-disclaimer { margin-top: 6px; font-size: .875rem; line-height: 1.65; }
+.site-help-intro-card {
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface-muted);
+}
+.site-help-section p.site-help-disclaimer {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    font-size: .875rem;
+    line-height: 1.65;
+}
+.site-help-section p.site-help-intro-note {
+    margin-top: 14px;
+    font-size: .875rem;
+    line-height: 1.75;
+}
 .site-help-repo-link {
     display: flex;
     justify-content: flex-start;
