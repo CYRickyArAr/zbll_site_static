@@ -166,7 +166,7 @@ html[data-render-snapshot="pending"] .main-content {
 
 .about-link img {
     display: block;
-    filter: brightness(.8);
+    filter: brightness(.6);
     transition: filter .2s;
 }
 
