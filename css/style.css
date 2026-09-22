@@ -433,9 +433,10 @@ html[data-zbll-filter="unlearned"] .sortable-item:has(.formula-card.learned) {
     --progress-fill: #198754;
     --progress-track: #e9ecef;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 7px;
     min-width: 0;
 }
 html[data-theme="dark"] .learning-progress {
@@ -459,8 +460,8 @@ html[data-theme="dark"] .learning-progress {
 .learning-progress-count strong { color: var(--text); font-weight: 700; }
 .learning-progress-track {
     display: block;
-    width: 64px;
-    flex: 0 0 64px;
+    width: 100%;
+    flex: none;
     height: 5px;
     border: 0;
     border-radius: 999px;
@@ -475,6 +476,7 @@ html[data-theme="dark"] .learning-progress {
 .learning-progress-track::-moz-progress-bar { background: var(--progress-fill); border-radius: 999px; }
 .index-learning-progress {
     width: fit-content;
+    min-width: 112px;
     max-width: 100%;
     padding: 8px 12px;
     border: 1px solid var(--border);
@@ -482,12 +484,13 @@ html[data-theme="dark"] .learning-progress {
     background: var(--surface);
 }
 .category-learning-progress {
-    width: fit-content;
+    width: var(--category-summary-width);
     max-width: 100%;
     margin: 10px auto 12px;
 }
 
 .category-card {
+    --category-summary-width: 88px;
     transition: transform 0.2s;
     cursor: pointer;
     text-decoration: none;
@@ -529,7 +532,7 @@ html[data-theme="dark"] .learning-progress {
 /* 首页分类范围徽章统一宽度，避免 Pi/AS 等较长名称把框撑宽 */
 .category-card .badge {
     display: inline-block;
-    width: 88px;
+    width: var(--category-summary-width);
     text-align: center;
     white-space: nowrap;
 }
