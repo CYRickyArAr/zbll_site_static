@@ -432,6 +432,10 @@ html[data-zbll-filter="unlearned"] .sortable-item:has(.formula-card.learned) {
 .learning-progress {
     --progress-fill: #198754;
     --progress-track: #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
     min-width: 0;
 }
 html[data-theme="dark"] .learning-progress {
@@ -441,9 +445,8 @@ html[data-theme="dark"] .learning-progress {
 .learning-progress-meta {
     display: flex;
     align-items: baseline;
-    justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 7px;
+    gap: 4px;
+    white-space: nowrap;
     font-size: .875rem;
     line-height: 1.4;
 }
@@ -456,8 +459,9 @@ html[data-theme="dark"] .learning-progress {
 .learning-progress-count strong { color: var(--text); font-weight: 700; }
 .learning-progress-track {
     display: block;
-    width: 100%;
-    height: 6px;
+    width: 64px;
+    flex: 0 0 64px;
+    height: 5px;
     border: 0;
     border-radius: 999px;
     overflow: hidden;
@@ -470,15 +474,15 @@ html[data-theme="dark"] .learning-progress {
 .learning-progress-track::-webkit-progress-value { background: var(--progress-fill); border-radius: 999px; }
 .learning-progress-track::-moz-progress-bar { background: var(--progress-fill); border-radius: 999px; }
 .index-learning-progress {
-    width: 200px;
+    width: fit-content;
     max-width: 100%;
-    padding: 10px 14px;
+    padding: 8px 12px;
     border: 1px solid var(--border);
     border-radius: 10px;
     background: var(--surface);
 }
 .category-learning-progress {
-    width: 180px;
+    width: fit-content;
     max-width: 100%;
     margin: 10px auto 12px;
 }

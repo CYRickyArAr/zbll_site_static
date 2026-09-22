@@ -365,7 +365,7 @@
         learned = Math.min(total, Math.max(0, Number(learned) || 0));
         return '<div class="learning-progress ' + escapeHtml(className) + '">' +
             '<div class="learning-progress-meta"><span class="learning-progress-label">' + escapeHtml(label) + '</span>' +
-            '<span class="learning-progress-count"><strong>' + learned + '</strong><span> / ' + total + '</span></span></div>' +
+            '<span class="learning-progress-count"><strong>' + learned + '</strong><span>/' + total + '</span></span></div>' +
             '<progress class="learning-progress-track" value="' + learned + '" max="' + (total || 1) + '" aria-label="' + escapeHtml(scope) + '学习进度" aria-valuetext="已学 ' + learned + '/' + total + '个情况"></progress></div>';
     }
 
