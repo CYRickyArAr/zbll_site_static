@@ -533,6 +533,7 @@ html[data-theme="dark"] .learning-progress {
 .category-card .badge {
     display: inline-block;
     width: var(--category-summary-width);
+    margin-right: 0;
     text-align: center;
     white-space: nowrap;
 }
