@@ -268,11 +268,6 @@ html[data-theme="dark"] .site-help-section p a:hover { color: #bdd0ff; }
     font-size: .875rem;
     line-height: 1.75;
 }
-.site-help-section p.site-help-intro-note {
-    margin-top: 8px;
-    font-size: .875rem;
-    line-height: 1.75;
-}
 .site-help-repo-link {
     display: flex;
     justify-content: flex-start;
