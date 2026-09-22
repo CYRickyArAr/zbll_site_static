@@ -366,7 +366,7 @@
         return '<div class="learning-progress ' + escapeHtml(className) + '">' +
             '<div class="learning-progress-meta"><span class="learning-progress-label">' + escapeHtml(label) + '</span>' +
             '<span class="learning-progress-count"><strong>' + learned + '</strong><span>/' + total + '</span></span></div>' +
-            '<progress class="learning-progress-track" value="' + learned + '" max="' + (total || 1) + '" aria-label="' + escapeHtml(scope) + '学习进度" aria-valuetext="已学 ' + learned + '/' + total + '个情况"></progress></div>';
+            '<progress class="learning-progress-track" value="' + learned + '" max="' + (total || 1) + '" aria-label="' + escapeHtml(scope) + '学习进度" aria-valuetext="已学习 ' + learned + '/' + total + '个情况"></progress></div>';
     }
 
     function renderHome() {
@@ -406,7 +406,7 @@
             html += '<h2 class="card-title">' + escapeHtml(cat.id) + '</h2><img src="images/' + encodeURIComponent(cat.id) + '.svg" class="category-thumb" alt="' + escapeHtml(cat.id) + '">';
             var learned = 0;
             (cat.subcategories || []).forEach(function (sub) { learned += sub.formulas.filter(function (formula) { return formula.learned; }).length; });
-            html += usesLearnedStats() ? renderLearnedProgress(learned, total, '已学', 'category-learning-progress', cat.id + ' 分类') : '<p class="card-text">' + total + '个情况</p>';
+            html += usesLearnedStats() ? renderLearnedProgress(learned, total, '已学习', 'category-learning-progress', cat.id + ' 分类') : '<p class="card-text">' + total + '个情况</p>';
             html += '<span class="badge ' + (CAT_BADGE[cat.id] || 'bg-secondary') + '">' + escapeHtml(subcatRange(cat)) + '</span>';
             html += '</div></div></a></div>';
         });
