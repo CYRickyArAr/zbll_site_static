@@ -8,7 +8,7 @@
 
 ZBLL（Zborowski-Bruchem Last Layer）是一套在顶层棱块已定向的情况下，一步完成最后一层的公式体系。本站采用 [pepkin88 zbll-explorer](https://pepkin88.me/zbll-explorer/) 的分类方式，完整收录 472 个 ZBLL 情况，并标注 **多位顶尖选手**（耿暄一、Tymon Kolasiński、Feliks Zemdegs、南承赫、Max Park 等）实际使用过的公式。
 
-本站公式整理自 [reco.nz](https://reco.nz/)、[魔方星球](https://cubestation.com/)、[WCU Cube](https://wcucube.club/) 的复盘记录。**所有收录公式均有选手实际使用记录**（但不代表其当前仍作为主力公式）。
+本站公式整理自 [reco.nz](https://reco.nz/)、[魔方星球](https://cubestation.com/)、[WCU Cube](https://wcucube.club/) 的复盘记录，具有**100%真实性**（免责声明：只保证选手实战使用过，不保证是当前主力公式）。
 
 内容仅供学习与参考，本站将持续更新。**如发现公式错误或其他问题，欢迎反馈指正。**
 
