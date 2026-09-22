@@ -360,6 +360,15 @@
         return -1;
     }
 
+    function renderLearnedProgress(learned, total, label, className, scope) {
+        total = Math.max(0, Number(total) || 0);
+        learned = Math.min(total, Math.max(0, Number(learned) || 0));
+        return '<div class="learning-progress ' + escapeHtml(className) + '">' +
+            '<div class="learning-progress-meta"><span class="learning-progress-label">' + escapeHtml(label) + '</span>' +
+            '<span class="learning-progress-count"><strong>' + learned + '</strong><span> / ' + total + '</span></span></div>' +
+            '<progress class="learning-progress-track" value="' + learned + '" max="' + (total || 1) + '" aria-label="' + escapeHtml(scope) + '学习进度" aria-valuetext="已学 ' + learned + '/' + total + '个情况"></progress></div>';
+    }
+
     function renderHome() {
         var data = viewData();
         var totalCases = 0, learnedCases = 0;
@@ -370,7 +379,7 @@
             });
         });
         var html = '<div class="container mt-5">';
-        if (usesLearnedStats()) html += '<div class="index-title-wrap"><h1 class="text-center mb-5">ZBLL 公式数据库</h1><span class="index-learned-badge">已学习 ' + learnedCases + '/' + totalCases + '个情况</span></div>';
+        if (usesLearnedStats()) html += '<div class="index-title-wrap"><h1 class="text-center mb-5">ZBLL 公式数据库</h1>' + renderLearnedProgress(learnedCases, totalCases, '已学习', 'index-learning-progress', '全部情况') + '</div>';
         else html += '<h1 class="text-center mb-5">ZBLL 公式数据库</h1>';
         if (!isWorkspace()) {
             html += '<div class="player-stats">';
@@ -397,7 +406,8 @@
             html += '<h2 class="card-title">' + escapeHtml(cat.id) + '</h2><img src="images/' + encodeURIComponent(cat.id) + '.svg" class="category-thumb" alt="' + escapeHtml(cat.id) + '">';
             var learned = 0;
             (cat.subcategories || []).forEach(function (sub) { learned += sub.formulas.filter(function (formula) { return formula.learned; }).length; });
-            html += '<p class="card-text">' + (usesLearnedStats() ? '已学 ' + learned + '/' + total + '个情况' : total + '个情况') + '</p><span class="badge ' + (CAT_BADGE[cat.id] || 'bg-secondary') + '">' + escapeHtml(subcatRange(cat)) + '</span>';
+            html += usesLearnedStats() ? renderLearnedProgress(learned, total, '已学', 'category-learning-progress', cat.id + ' 分类') : '<p class="card-text">' + total + '个情况</p>';
+            html += '<span class="badge ' + (CAT_BADGE[cat.id] || 'bg-secondary') + '">' + escapeHtml(subcatRange(cat)) + '</span>';
             html += '</div></div></a></div>';
         });
         html += '</div></div>';
