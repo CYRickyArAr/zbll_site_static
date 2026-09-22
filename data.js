@@ -112,8 +112,8 @@ window.ZBLL_DATA = {
         "wca": "2025LIAN01"
       }
     ],
-    "generatedAt": "2026-09-22T17:32:49+08:00",
-    "fingerprint": "e5e1f9411df51c337da55443e659f3f6c2a2979a70bbb8f84633b5c2dfcf1690"
+    "generatedAt": "2026-09-22T18:32:27+08:00",
+    "fingerprint": "3a0ea2ea363ed31f782df61c708f2c1519bf2d0c034e34a2677c6c2160585059"
   },
   "categories": [
     {
@@ -1381,15 +1381,15 @@ window.ZBLL_DATA = {
                   ]
                 },
                 {
-                  "alg": "M' U R' U' F' U F R2 U R' U R U2 r'",
-                  "marks": [
-                    "杜"
-                  ]
-                },
-                {
                   "alg": "R' U' F' U F R U F U R U' R' U R U' R' F'",
                   "marks": [
                     "昆"
+                  ]
+                },
+                {
+                  "alg": "M' U R' U' F' U F R2 U R' U R U2 r'",
+                  "marks": [
+                    "杜"
                   ]
                 }
               ]
