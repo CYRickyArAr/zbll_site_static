@@ -483,8 +483,7 @@ html[data-theme="dark"] .learning-progress {
 .learning-progress-track::-webkit-progress-bar { background: var(--progress-track); border-radius: 999px; }
 .learning-progress-track::-webkit-progress-value { background: var(--progress-fill); border-radius: 999px; }
 .learning-progress-track::-moz-progress-bar { background: var(--progress-fill); border-radius: 999px; }
-.index-learning-progress,
-.subcategory-learning-progress {
+.index-learning-progress {
     width: fit-content;
     min-width: 112px;
     max-width: 100%;
@@ -686,6 +685,9 @@ html[data-theme="dark"] .learning-progress {
 }
 
 .subcategory-learning-progress {
+    width: 96px;
+    max-width: 100%;
+    padding-inline: 4px;
     flex: 0 0 auto;
     margin-left: 12px;
 }
