@@ -442,6 +442,10 @@ html[data-zbll-filter="unlearned"] .sortable-item:has(.formula-card.learned) {
     justify-content: center;
     gap: 7px;
     min-width: 0;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
 }
 html[data-theme="dark"] .learning-progress {
     --progress-fill: #65b883;
@@ -453,6 +457,7 @@ html[data-theme="dark"] .learning-progress {
     gap: 4px;
     white-space: nowrap;
     font-size: .875rem;
+    font-weight: 700;
     line-height: 1.4;
 }
 .learning-progress-label { color: var(--text-muted); }
@@ -461,7 +466,7 @@ html[data-theme="dark"] .learning-progress {
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
 }
-.learning-progress-count strong { color: var(--text); font-weight: 700; }
+.learning-progress-count strong { color: inherit; font-weight: 700; }
 .learning-progress-track {
     display: block;
     width: 100%;
@@ -478,18 +483,16 @@ html[data-theme="dark"] .learning-progress {
 .learning-progress-track::-webkit-progress-bar { background: var(--progress-track); border-radius: 999px; }
 .learning-progress-track::-webkit-progress-value { background: var(--progress-fill); border-radius: 999px; }
 .learning-progress-track::-moz-progress-bar { background: var(--progress-fill); border-radius: 999px; }
-.index-learning-progress {
+.index-learning-progress,
+.subcategory-learning-progress {
     width: fit-content;
     min-width: 112px;
     max-width: 100%;
-    padding: 8px 12px;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    background: var(--surface);
 }
 .category-learning-progress {
     width: var(--category-summary-width);
     max-width: 100%;
+    padding-inline: 4px;
     margin: 7px auto 10px;
 }
 
@@ -683,8 +686,7 @@ html[data-theme="dark"] .learning-progress {
 }
 
 .subcategory-learning-progress {
-    width: 124px;
-    flex: 0 0 124px;
+    flex: 0 0 auto;
     margin-left: 12px;
 }
 
