@@ -11,7 +11,8 @@
     --line-hover: #f0f7ff;
     --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     --modal-backdrop: rgba(0, 0, 0, .55);
-    --author-icon-brightness: .82;
+    --author-icon-brightness: 1;
+    --author-icon-hover-brightness: 1.08;
 }
 
 html[data-theme="dark"] {
@@ -27,6 +28,7 @@ html[data-theme="dark"] {
     --line-hover: #1c3657;
     --shadow: 0 2px 10px rgba(0, 0, 0, 0.32);
     --author-icon-brightness: .6;
+    --author-icon-hover-brightness: 1;
 }
 
 * {
@@ -174,7 +176,7 @@ html[data-render-snapshot="pending"] .main-content {
 
 .about-link:hover img,
 .about-link:focus-visible img {
-    filter: brightness(1);
+    filter: brightness(var(--author-icon-hover-brightness));
 }
 
 .about-bili:hover,
