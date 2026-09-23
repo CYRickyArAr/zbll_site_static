@@ -165,8 +165,8 @@
     function applyTheme(theme, persist) {
         theme = theme === 'dark' ? 'dark' : 'light';
         document.documentElement.setAttribute('data-theme', theme);
-        appEl.querySelectorAll('.category-thumb[data-category]').forEach(function (image) {
-            image.src = categoryImagePath(image.getAttribute('data-category'), theme);
+        appEl.querySelectorAll('.category-thumb[data-category], .subcat-thumb[data-subcategory]').forEach(function (image) {
+            image.src = categoryImagePath(image.getAttribute('data-category') || image.getAttribute('data-subcategory'), theme);
         });
         if (persist) { try { localStorage.setItem(themeKey, theme); } catch (e) {} }
         var button = document.getElementById('theme-toggle');
@@ -430,7 +430,7 @@
             var total = sub.formulas.length, learned = sub.formulas.filter(function (formula) { return formula.learned; }).length;
             var saved = null; try { saved = localStorage.getItem('subcat_' + sub.id); } catch (e) {}
             var open = saved === 'open';
-            html += '<div class="subcategory-card" id="card-' + escapeHtml(sub.id) + '"><div class="sticky-header' + (open ? '' : ' sticky-header-collapsed') + '" id="header-' + escapeHtml(sub.id) + '" data-subcat="' + escapeHtml(sub.id) + '"><div class="d-flex justify-content-between align-items-center"><div class="d-flex align-items-center"><h3>' + escapeHtml(sub.id) + '</h3><img src="images/' + encodeURIComponent(sub.id) + '.svg" class="subcat-thumb" alt="' + escapeHtml(sub.id) + '"><span class="badge bg-secondary">' + (usesLearnedStats() ? '已学 ' + learned + '/' + total + '个情况' : total + '个情况') + '</span></div><div class="d-flex align-items-center"><span class="toggle-icon" id="icon-' + escapeHtml(sub.id) + '">' + (open ? '▼' : '▶') + '</span></div></div></div>';
+            html += '<div class="subcategory-card" id="card-' + escapeHtml(sub.id) + '"><div class="sticky-header' + (open ? '' : ' sticky-header-collapsed') + '" id="header-' + escapeHtml(sub.id) + '" data-subcat="' + escapeHtml(sub.id) + '"><div class="d-flex justify-content-between align-items-center"><div class="d-flex align-items-center"><h3>' + escapeHtml(sub.id) + '</h3><img src="' + categoryImagePath(sub.id, document.documentElement.getAttribute('data-theme')) + '" class="subcat-thumb" data-subcategory="' + escapeHtml(sub.id) + '" alt="' + escapeHtml(sub.id) + '"><span class="badge bg-secondary">' + (usesLearnedStats() ? '已学 ' + learned + '/' + total + '个情况' : total + '个情况') + '</span></div><div class="d-flex align-items-center"><span class="toggle-icon" id="icon-' + escapeHtml(sub.id) + '">' + (open ? '▼' : '▶') + '</span></div></div></div>';
             html += '<div class="formula-grid" id="subcat-' + escapeHtml(sub.id) + '" style="display:' + (open ? 'block' : 'none') + '">';
             if (sub.formulas.length) {
                 html += '<div class="sortable-container" data-category="' + escapeHtml(cat.id) + '" data-subcategory="' + escapeHtml(sub.id) + '">';
