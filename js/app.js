@@ -403,7 +403,7 @@
             var total = 0;
             (cat.subcategories || []).forEach(function (sub) { total += sub.formulas.length; });
             html += '<div class="category-grid-item"><a href="#/category/' + encodeURIComponent(cat.id) + '" class="category-card"><div class="card"><div class="card-body category-card-body">';
-            html += '<img src="images/' + encodeURIComponent(cat.id) + '.svg" class="category-thumb" alt="' + escapeHtml(cat.id) + '"><div class="category-card-info"><h2 class="card-title">' + escapeHtml(cat.id) + '</h2>';
+            html += '<img src="images/' + encodeURIComponent(cat.id) + '.svg?v=2" class="category-thumb" alt="' + escapeHtml(cat.id) + '"><div class="category-card-info"><h2 class="card-title">' + escapeHtml(cat.id) + '</h2>';
             var learned = 0;
             (cat.subcategories || []).forEach(function (sub) { learned += sub.formulas.filter(function (formula) { return formula.learned; }).length; });
             html += usesLearnedStats() ? renderLearnedProgress(learned, total, '已学习', 'category-learning-progress', cat.id + ' 分类') : '<p class="card-text">' + total + '个情况</p>';
