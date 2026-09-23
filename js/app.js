@@ -162,6 +162,54 @@
     function categoryImagePath(categoryId, theme) {
         return 'images/' + (theme === 'dark' ? '' : 'light/') + encodeURIComponent(categoryId) + '.svg';
     }
+    var themeImageCache = Object.create(null);
+    var allThemeImagesScheduled = false;
+    var themeSwitchId = 0;
+    function preloadThemeImage(path) {
+        if (themeImageCache[path]) return themeImageCache[path].promise;
+        var image = new Image();
+        var promise = new Promise(function (resolve) {
+            image.onload = function () {
+                if (typeof image.decode === 'function') image.decode().then(function () { resolve(true); }, function () { resolve(true); });
+                else resolve(true);
+            };
+            image.onerror = function () { resolve(false); };
+            image.src = path;
+        });
+        themeImageCache[path] = { image: image, promise: promise };
+        return promise;
+    }
+    function visibleThemeImagePaths(theme) {
+        return Array.prototype.map.call(appEl.querySelectorAll('.category-thumb[data-category], .subcat-thumb[data-subcategory]'), function (image) {
+            return categoryImagePath(image.getAttribute('data-category') || image.getAttribute('data-subcategory'), theme);
+        });
+    }
+    function scheduleRemainingThemeImages() {
+        if (allThemeImagesScheduled) return;
+        allThemeImagesScheduled = true;
+        var paths = [];
+        (DATA.categories || []).forEach(function (category) {
+            [category.id].concat((category.subcategories || []).map(function (sub) { return sub.id; })).forEach(function (id) {
+                paths.push(categoryImagePath(id, 'light'), categoryImagePath(id, 'dark'));
+            });
+        });
+        var next = 0;
+        function preloadBatch() {
+            var end = Math.min(next + 8, paths.length);
+            while (next < end) preloadThemeImage(paths[next++]);
+            if (next < paths.length) scheduleBatch();
+        }
+        function scheduleBatch() {
+            if (window.requestIdleCallback) window.requestIdleCallback(preloadBatch, { timeout: 1000 });
+            else window.setTimeout(preloadBatch, 50);
+        }
+        scheduleBatch();
+    }
+    function warmThemeImages() {
+        var otherTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        visibleThemeImagePaths(otherTheme).forEach(preloadThemeImage);
+        scheduleRemainingThemeImages();
+    }
     function applyTheme(theme, persist) {
         theme = theme === 'dark' ? 'dark' : 'light';
         document.documentElement.setAttribute('data-theme', theme);
@@ -177,6 +225,22 @@
         button.setAttribute('title', label);
         button.setAttribute('aria-pressed', dark ? 'true' : 'false');
     }
+    function switchThemeWhenReady() {
+        var targetTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        var requestId = ++themeSwitchId;
+        function switchCurrentView() {
+            var paths = visibleThemeImagePaths(targetTheme);
+            Promise.all(paths.map(preloadThemeImage)).then(function () {
+                if (requestId !== themeSwitchId) return;
+                if (visibleThemeImagePaths(targetTheme).join('|') !== paths.join('|')) {
+                    switchCurrentView();
+                    return;
+                }
+                applyTheme(targetTheme, true);
+            });
+        }
+        switchCurrentView();
+    }
     function initTheme() {
         var saved = null;
         try { saved = localStorage.getItem(themeKey); } catch (e) {}
@@ -184,8 +248,9 @@
             (document.documentElement.getAttribute('data-theme') || systemTheme()), false);
         var button = document.getElementById('theme-toggle');
         if (button) button.addEventListener('click', function () {
-            applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark', true);
+            switchThemeWhenReady();
         });
+        warmThemeImages();
     }
     initTheme();
 
@@ -418,6 +483,7 @@
         });
         html += '</div></div>';
         appEl.innerHTML = html;
+        warmThemeImages();
         updateToggleAllButton();
     }
 
@@ -441,6 +507,7 @@
         });
         html += '</div>';
         appEl.innerHTML = html;
+        warmThemeImages();
         updateToggleAllButton();
         applyZbllFilter(getZbllFilter());
         if (activeWorkspace || publicCopy) bindSorting();
