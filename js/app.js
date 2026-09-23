@@ -398,17 +398,17 @@
             });
             html += '<div class="workspace-mode-hint">当前自定义公式库：' + escapeHtml(activeWorkspace.name) + '</div></div>';
         }
-        html += '<div class="row row-cols-1 row-cols-md-3 g-4">';
+        html += '<div class="category-grid">';
         (data.categories || []).forEach(function (cat) {
             var total = 0;
             (cat.subcategories || []).forEach(function (sub) { total += sub.formulas.length; });
-            html += '<div class="col"><a href="#/category/' + encodeURIComponent(cat.id) + '" class="category-card"><div class="card"><div class="card-body text-center">';
-            html += '<h2 class="card-title">' + escapeHtml(cat.id) + '</h2><img src="images/' + encodeURIComponent(cat.id) + '.svg" class="category-thumb" alt="' + escapeHtml(cat.id) + '">';
+            html += '<div class="category-grid-item"><a href="#/category/' + encodeURIComponent(cat.id) + '" class="category-card"><div class="card"><div class="card-body category-card-body">';
+            html += '<img src="images/' + encodeURIComponent(cat.id) + '.svg" class="category-thumb" alt="' + escapeHtml(cat.id) + '"><div class="category-card-info"><h2 class="card-title">' + escapeHtml(cat.id) + '</h2>';
             var learned = 0;
             (cat.subcategories || []).forEach(function (sub) { learned += sub.formulas.filter(function (formula) { return formula.learned; }).length; });
             html += usesLearnedStats() ? renderLearnedProgress(learned, total, '已学习', 'category-learning-progress', cat.id + ' 分类') : '<p class="card-text">' + total + '个情况</p>';
             html += '<span class="badge ' + (CAT_BADGE[cat.id] || 'bg-secondary') + '">' + escapeHtml(subcatRange(cat)) + '</span>';
-            html += '</div></div></a></div>';
+            html += '</div></div></div></a></div>';
         });
         html += '</div></div>';
         appEl.innerHTML = html;

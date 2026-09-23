@@ -486,11 +486,22 @@ html[data-theme="dark"] .learning-progress {
 .category-learning-progress {
     width: var(--category-summary-width);
     max-width: 100%;
-    margin: 10px auto 12px;
+    margin: 7px auto 10px;
 }
 
+.category-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    column-gap: 16px;
+    row-gap: 42px;
+    max-width: 1168px;
+    margin-inline: auto;
+}
+.category-grid-item { flex: 0 1 280px; min-width: 0; max-width: 100%; }
+
 .category-card {
-    --category-summary-width: 88px;
+    --category-summary-width: 96px;
     transition: transform 0.2s;
     cursor: pointer;
     text-decoration: none;
@@ -512,12 +523,23 @@ html[data-theme="dark"] .learning-progress {
     border-color: var(--border);
 }
 
-/* 首页分类卡片里的分类图（负 margin 抵消 SVG 自带的上下留白约 9px） */
+.category-card-body {
+    display: grid;
+    grid-template-columns: 104px minmax(0, 132px);
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 164px;
+    padding: 16px;
+}
+.category-card-info { min-width: 0; text-align: center; }
+
+/* 首页分类卡片里的分类图 */
 .category-thumb {
-    height: 90px;
-    width: auto;
+    height: 104px;
+    width: 104px;
     display: block;
-    margin: -9px auto -9px;
+    object-fit: contain;
 }
 
 /* 首页分类卡片内元素间距统一调小 */
@@ -544,7 +566,7 @@ html[data-theme="dark"] .learning-progress {
     flex-wrap: wrap;
     justify-content: center;
     gap: 8px;
-    margin: -1.5rem 0 30px;
+    margin: -1.5rem 0 42px;
 }
 
 .player-stat-box {
