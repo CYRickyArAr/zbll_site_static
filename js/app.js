@@ -159,9 +159,15 @@
     function systemTheme() {
         return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
+    function categoryImagePath(categoryId, theme) {
+        return 'images/' + (theme === 'dark' ? '' : 'light/') + encodeURIComponent(categoryId) + '.svg';
+    }
     function applyTheme(theme, persist) {
         theme = theme === 'dark' ? 'dark' : 'light';
         document.documentElement.setAttribute('data-theme', theme);
+        appEl.querySelectorAll('.category-thumb[data-category]').forEach(function (image) {
+            image.src = categoryImagePath(image.getAttribute('data-category'), theme);
+        });
         if (persist) { try { localStorage.setItem(themeKey, theme); } catch (e) {} }
         var button = document.getElementById('theme-toggle');
         if (!button) return;
@@ -403,7 +409,7 @@
             var total = 0;
             (cat.subcategories || []).forEach(function (sub) { total += sub.formulas.length; });
             html += '<div class="category-grid-item"><a href="#/category/' + encodeURIComponent(cat.id) + '" class="category-card"><div class="card"><div class="card-body category-card-body">';
-            html += '<img src="images/' + encodeURIComponent(cat.id) + '.svg" class="category-thumb" alt="' + escapeHtml(cat.id) + '"><div class="category-card-info"><h2 class="card-title">' + escapeHtml(cat.id) + '</h2>';
+            html += '<img src="' + categoryImagePath(cat.id, document.documentElement.getAttribute('data-theme')) + '" class="category-thumb" data-category="' + escapeHtml(cat.id) + '" alt="' + escapeHtml(cat.id) + '"><div class="category-card-info"><h2 class="card-title">' + escapeHtml(cat.id) + '</h2>';
             var learned = 0;
             (cat.subcategories || []).forEach(function (sub) { learned += sub.formulas.filter(function (formula) { return formula.learned; }).length; });
             html += usesLearnedStats() ? renderLearnedProgress(learned, total, '已学习', 'category-learning-progress', cat.id + ' 分类') : '<p class="card-text">' + total + '个情况</p>';
