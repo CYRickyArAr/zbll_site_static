@@ -160,7 +160,7 @@
         return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
     function categoryImagePath(categoryId, theme) {
-        return 'images/' + (theme === 'dark' ? '' : 'light/') + encodeURIComponent(categoryId) + '.svg';
+        return 'images/' + (theme === 'dark' ? '' : 'light/') + encodeURIComponent(categoryId) + '.svg?v=20260923';
     }
     var themeImageCache = Object.create(null);
     var allThemeImagesScheduled = false;
@@ -496,7 +496,7 @@
             var total = sub.formulas.length, learned = sub.formulas.filter(function (formula) { return formula.learned; }).length;
             var saved = null; try { saved = localStorage.getItem('subcat_' + sub.id); } catch (e) {}
             var open = saved === 'open';
-            html += '<div class="subcategory-card" id="card-' + escapeHtml(sub.id) + '"><div class="sticky-header' + (open ? '' : ' sticky-header-collapsed') + '" id="header-' + escapeHtml(sub.id) + '" data-subcat="' + escapeHtml(sub.id) + '"><div class="d-flex justify-content-between align-items-center"><div class="d-flex align-items-center"><h3>' + escapeHtml(sub.id) + '</h3><img src="' + categoryImagePath(sub.id, document.documentElement.getAttribute('data-theme')) + '" class="subcat-thumb" data-subcategory="' + escapeHtml(sub.id) + '" alt="' + escapeHtml(sub.id) + '"><span class="badge bg-secondary">' + (usesLearnedStats() ? '已学 ' + learned + '/' + total + '个情况' : total + '个情况') + '</span></div><div class="d-flex align-items-center"><span class="toggle-icon" id="icon-' + escapeHtml(sub.id) + '">' + (open ? '▼' : '▶') + '</span></div></div></div>';
+            html += '<div class="subcategory-card" id="card-' + escapeHtml(sub.id) + '"><div class="sticky-header' + (open ? '' : ' sticky-header-collapsed') + '" id="header-' + escapeHtml(sub.id) + '" data-subcat="' + escapeHtml(sub.id) + '"><div class="d-flex justify-content-between align-items-center"><div class="d-flex align-items-center"><h3>' + escapeHtml(sub.id) + '</h3><img src="' + categoryImagePath(sub.id, document.documentElement.getAttribute('data-theme')) + '" class="subcat-thumb" data-subcategory="' + escapeHtml(sub.id) + '" alt="' + escapeHtml(sub.id) + '">' + renderLearnedProgress(learned, total, '已学习', 'subcategory-learning-progress', sub.id + ' 子分类') + '</div><div class="d-flex align-items-center"><span class="toggle-icon" id="icon-' + escapeHtml(sub.id) + '">' + (open ? '▼' : '▶') + '</span></div></div></div>';
             html += '<div class="formula-grid" id="subcat-' + escapeHtml(sub.id) + '" style="display:' + (open ? 'block' : 'none') + '">';
             if (sub.formulas.length) {
                 html += '<div class="sortable-container" data-category="' + escapeHtml(cat.id) + '" data-subcategory="' + escapeHtml(sub.id) + '">';
