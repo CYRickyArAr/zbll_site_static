@@ -254,6 +254,55 @@
     }
     initTheme();
 
+    var formulaImagePreloadCache = Object.create(null);
+    var formulaImagePreloadRun = 0;
+    function cancelFormulaImagePreload() {
+        formulaImagePreloadRun++;
+    }
+    function preloadFormulaImage(path) {
+        if (!path || /^(?:data|blob):/i.test(path)) return Promise.resolve(false);
+        if (formulaImagePreloadCache[path]) return formulaImagePreloadCache[path];
+        var image = new Image();
+        var promise = new Promise(function (resolve) {
+            image.onload = function () {
+                if (typeof image.decode === 'function') image.decode().then(function () { resolve(true); }, function () { resolve(true); });
+                else resolve(true);
+            };
+            image.onerror = function () { resolve(false); };
+            image.src = path;
+        });
+        formulaImagePreloadCache[path] = promise;
+        return promise;
+    }
+    function scheduleCategoryFormulaImages(cat) {
+        var run = ++formulaImagePreloadRun;
+        var connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+        if (connection && connection.saveData) return;
+        var paths = [], seen = Object.create(null);
+        (cat.subcategories || []).forEach(function (sub) {
+            (sub.formulas || []).forEach(function (formula) {
+                var path = formula.image || '';
+                if (!path || seen[path]) return;
+                seen[path] = true;
+                paths.push(path);
+            });
+        });
+        if (!paths.length) return;
+        var next = 0;
+        function scheduleBatch() {
+            if (run !== formulaImagePreloadRun) return;
+            if (window.requestIdleCallback) window.requestIdleCallback(preloadBatch, { timeout: 1200 });
+            else window.setTimeout(preloadBatch, 150);
+        }
+        function preloadBatch() {
+            if (run !== formulaImagePreloadRun) return;
+            var end = Math.min(next + 6, paths.length);
+            while (next < end) preloadFormulaImage(paths[next++]);
+            if (next < paths.length) scheduleBatch();
+        }
+        scheduleBatch();
+    }
+
     var workspaceHelpFitCanvas = null;
     var workspaceHelpFitTimer = null;
     function fitWorkspaceHelpText() {
@@ -441,6 +490,7 @@
     }
 
     function renderHome() {
+        cancelFormulaImagePreload();
         var data = viewData();
         var totalCases = 0, learnedCases = 0;
         (data.categories || []).forEach(function (cat) {
@@ -489,7 +539,7 @@
 
     function renderCategory(catId) {
         var cat = findCategory(catId);
-        if (!cat) { appEl.innerHTML = '<div class="container"><div class="empty-state">分类不存在：' + escapeHtml(catId) + '</div></div>'; updateToggleAllButton(); return; }
+        if (!cat) { cancelFormulaImagePreload(); appEl.innerHTML = '<div class="container"><div class="empty-state">分类不存在：' + escapeHtml(catId) + '</div></div>'; updateToggleAllButton(); return; }
         var html = '<div class="container"><nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="#/">首页</a></li><li class="breadcrumb-item active">' + escapeHtml(cat.id) + ' Case</li></ol></nav>';
         html += '<div class="category-title-row"><h1 class="category-title">' + escapeHtml(cat.id) + ' Case</h1></div>';
         (cat.subcategories || []).forEach(function (sub) {
@@ -507,6 +557,7 @@
         });
         html += '</div>';
         appEl.innerHTML = html;
+        scheduleCategoryFormulaImages(cat);
         warmThemeImages();
         updateToggleAllButton();
         applyZbllFilter(getZbllFilter());
