@@ -160,7 +160,7 @@
         return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
     function categoryImagePath(categoryId, theme) {
-        return 'images/' + (theme === 'dark' ? '' : 'light/') + encodeURIComponent(categoryId) + '.svg?v=20260923';
+        return 'images/' + (theme === 'dark' ? '' : 'light/') + encodeURIComponent(categoryId) + '.svg?v=20260924';
     }
     var themeImageCache = Object.create(null);
     var allThemeImagesScheduled = false;
