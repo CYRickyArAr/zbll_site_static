@@ -49,6 +49,7 @@
     var currentView = '';
     var activeWorkspace = null;
     var publicCopy = null;
+    var subcategoryRenderCache = {}; // 阶段2：DOM 缓存，记录已渲染的子分类
     var themeKey = 'zbll_theme';
     var filterKey = 'zbll_filter';
     var selectedWorkspaceKey = 'zbll_selected_workspace';
@@ -490,6 +491,10 @@
     function renderCategory(catId) {
         var cat = findCategory(catId);
         if (!cat) { appEl.innerHTML = '<div class="container"><div class="empty-state">分类不存在：' + escapeHtml(catId) + '</div></div>'; updateToggleAllButton(); return; }
+        
+        // 清空缓存（切换分类时重置）
+        subcategoryRenderCache = {};
+        
         var html = '<div class="container"><nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="#/">首页</a></li><li class="breadcrumb-item active">' + escapeHtml(cat.id) + ' Case</li></ol></nav>';
         html += '<div class="category-title-row"><h1 class="category-title">' + escapeHtml(cat.id) + ' Case</h1></div>';
         (cat.subcategories || []).forEach(function (sub) {
@@ -500,7 +505,14 @@
             html += '<div class="formula-grid" id="subcat-' + escapeHtml(sub.id) + '" style="display:' + (open ? 'block' : 'none') + '">';
             if (sub.formulas.length) {
                 html += '<div class="sortable-container" data-category="' + escapeHtml(cat.id) + '" data-subcategory="' + escapeHtml(sub.id) + '">';
-                sub.formulas.forEach(function (formula, index) { html += renderFormulaCard(cat.id, sub.id, formula, index); });
+                // 阶段1：延迟渲染 - 只渲染展开的子分类
+                if (open) {
+                    sub.formulas.forEach(function (formula, index) { html += renderFormulaCard(cat.id, sub.id, formula, index); });
+                    subcategoryRenderCache[sub.id] = true; // 标记为已渲染
+                } else {
+                    // 折叠状态：不渲染内容，使用占位符
+                    html += '<!-- lazy-render -->';
+                }
                 html += '</div>';
             } else html += '<div class="empty-state"><p class="mb-0">该子分类下暂无公式</p></div>';
             html += '</div></div>';
@@ -587,7 +599,47 @@
         var content = document.getElementById('subcat-' + subcatId), icon = document.getElementById('icon-' + subcatId), header = document.getElementById('header-' + subcatId);
         if (!content || !icon || !header) return;
         var open = content.style.display === 'none';
-        content.style.display = open ? 'block' : 'none'; icon.textContent = open ? '▼' : '▶'; header.classList.toggle('sticky-header-collapsed', !open);
+        
+        if (open) {
+            // 阶段1+2：展开时检查是否需要渲染
+            if (!subcategoryRenderCache[subcatId]) {
+                // 第一次展开，渲染内容
+                var container = content.querySelector('.sortable-container');
+                if (container && container.innerHTML.indexOf('lazy-render') !== -1) {
+                    var catId = container.getAttribute('data-category');
+                    var cat = findCategory(catId);
+                    if (cat) {
+                        var sub = null;
+                        for (var i = 0; i < cat.subcategories.length; i++) {
+                            if (cat.subcategories[i].id === subcatId) {
+                                sub = cat.subcategories[i];
+                                break;
+                            }
+                        }
+                        if (sub && sub.formulas && sub.formulas.length) {
+                            var html = '';
+                            sub.formulas.forEach(function (formula, index) {
+                                html += renderFormulaCard(catId, subcatId, formula, index);
+                            });
+                            container.innerHTML = html;
+                            subcategoryRenderCache[subcatId] = true; // 标记为已渲染
+                            
+                            // 渲染后需要重新绑定排序和筛选
+                            applyZbllFilter(getZbllFilter());
+                            if (activeWorkspace || publicCopy) bindSorting();
+                        }
+                    }
+                }
+            }
+            // 阶段2：如果已缓存，直接显示（不重新渲染）
+            content.style.display = 'block';
+        } else {
+            // 折叠：只隐藏，不销毁 DOM（保持缓存）
+            content.style.display = 'none';
+        }
+        
+        icon.textContent = open ? '▼' : '▶'; 
+        header.classList.toggle('sticky-header-collapsed', !open);
         try { localStorage.setItem('subcat_' + subcatId, open ? 'open' : 'closed'); } catch (e) {}
         updateToggleAllButton();
     }
@@ -641,10 +693,13 @@
         headers.forEach(function (header) { var content = document.getElementById('subcat-' + header.dataset.subcat); if (content && content.style.display !== 'none') openCount++; });
         var shouldOpen = openCount !== headers.length;
         headers.forEach(function (header) {
-            var id = header.dataset.subcat, content = document.getElementById('subcat-' + id), icon = document.getElementById('icon-' + id);
-            if (!content || !icon) return;
-            content.style.display = shouldOpen ? 'block' : 'none'; icon.textContent = shouldOpen ? '▼' : '▶'; header.classList.toggle('sticky-header-collapsed', !shouldOpen);
-            try { localStorage.setItem('subcat_' + id, shouldOpen ? 'open' : 'closed'); } catch (e) {}
+            var id = header.dataset.subcat;
+            // 使用 toggleSubcategory 统一处理，确保延迟渲染和缓存生效
+            var content = document.getElementById('subcat-' + id);
+            var isCurrentlyOpen = content && content.style.display !== 'none';
+            if (shouldOpen !== isCurrentlyOpen) {
+                toggleSubcategory(id);
+            }
         });
         updateToggleAllButton();
     }
