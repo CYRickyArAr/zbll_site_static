@@ -76,6 +76,23 @@ html[data-render-snapshot="pending"] .main-content {
     visibility: hidden;
 }
 
+/* 图片合集初始化状态不参与布局，完成后移除。 */
+.image-library-status {
+    position: fixed;
+    top: calc(var(--nav-height) + 24px);
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: calc(100% - 32px);
+    padding: 10px 16px;
+    color: var(--text-muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    z-index: 1100;
+    text-align: center;
+}
+body.zbll-has-snapshot:not(.zbll-ready) .image-library-status { display: none; }
+
 /* ===== 顶部导航栏 ===== */
 .navbar {
     background-color: #1a1a2e;

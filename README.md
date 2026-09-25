@@ -34,4 +34,12 @@ ZBLL（Zborowski-Bruchem Last Layer）是一套在顶层棱块已定向的情况
 - **公式选中**：在大神版个人副本或自定义公式库中，每个情况可独立选中一条公式并持续高亮，再次点击可取消；选中不会改变公式顺序，选中状态随 `.zbll` 文件保存。
 - **导入 / 导出 `.zbll`**：数据保存在当前浏览器中，可通过 `.zbll` 文件进行备份，或迁移至其他设备继续使用。
 
+## 图片加载
+
+内置的 472 张公式图及 94 张深浅色缩略图收录在 `images/image-library.json.gz` 中。支持的浏览器一次下载约 28KB 的合集，首屏显示前准备好图片数据，之后切换分类不再逐张请求内置图片。
+
+不支持 gzip 解压或压缩文件加载失败时，使用 JSON 合集；合集不可用时回退到原图。原始 `images/` 文件及公式数据中的图片路径保留，自定义上传图片不受影响。
+
+图片合集按固定资源单独生成，不接入数据导出流程；`export_data.py` 与桌面 `publish_static.bat` 均保持原样。
+
 > 在线访问：[https://cyrickyarar.github.io/zbll_site_static/](https://cyrickyarar.github.io/zbll_site_static/)

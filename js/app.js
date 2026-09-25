@@ -53,7 +53,7 @@
     var filterKey = 'zbll_filter';
     var selectedWorkspaceKey = 'zbll_selected_workspace';
     var publicModeKey = 'zbll_public_mode';
-    var renderSnapshotKey = 'zbll_render_snapshot_v1';
+    var renderSnapshotKey = 'zbll_render_snapshot_v2';
     var workspaceProgressState = null;
     var workspaceExportController = null;
     var workspaceContextTarget = null;
@@ -170,6 +170,9 @@
     function systemTheme() {
         return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
+    var imageLibrary = window.ZBLL_IMAGE_LIBRARY;
+    function imageSource(path) { return imageLibrary ? imageLibrary.source(path) : path; }
+    function bundledImage(path) { return !!(imageLibrary && imageLibrary.has(path)); }
     function categoryImagePath(categoryId, theme) {
         return 'images/' + (theme === 'dark' ? '' : 'light/') + encodeURIComponent(categoryId) + '.svg?v=20260924';
     }
@@ -187,7 +190,7 @@
         return image.getAttribute('data-category') || image.getAttribute('data-thumb');
     }
     function scheduleRemainingThemeImages() {
-        if (allThemeImagesScheduled || lowDataMode() || slowLink()) return;
+        if ((imageLibrary && imageLibrary.state !== 'fallback') || allThemeImagesScheduled || lowDataMode() || slowLink()) return;
         allThemeImagesScheduled = true;
         var paths = [];
         (DATA.categories || []).forEach(function (category) {
@@ -200,7 +203,7 @@
         schedulePrefetchTick();
     }
     function warmThemeImages() {
-        if (lowDataMode()) return;
+        if ((imageLibrary && imageLibrary.state !== 'fallback') || lowDataMode()) return;
         var otherTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
         // 另一套主题的缩略图也走统一队列：之前是 forEach 一次性全部发出，
         // 在慢网络下会形成并发尖峰、跟当前可见内容抢带宽。
@@ -212,7 +215,7 @@
         theme = theme === 'dark' ? 'dark' : 'light';
         document.documentElement.setAttribute('data-theme', theme);
         appEl.querySelectorAll('.category-thumb[data-category], .case-thumb[data-thumb]').forEach(function (image) {
-            image.src = categoryImagePath(themeImageId(image), theme);
+            image.src = imageSource(categoryImagePath(themeImageId(image), theme));
         });
         if (persist) { try { localStorage.setItem(themeKey, theme); } catch (e) {} }
         var button = document.getElementById('theme-toggle');
@@ -279,7 +282,7 @@
                 else finish(true);
             };
             image.onerror = function () { finish(false); };
-            image.src = path;
+            image.src = imageSource(path);
         });
         formulaImagePreloadCache[path] = promise;
         return promise;
@@ -325,14 +328,14 @@
     }
     function queuePrefetchTail(paths) {
         (paths || []).forEach(function (path) {
-            if (!path || formulaImagePreloadCache[path] || prefetchQueue.indexOf(path) !== -1) return;
+            if (!path || bundledImage(path) || formulaImagePreloadCache[path] || prefetchQueue.indexOf(path) !== -1) return;
             prefetchQueue.push(path);
         });
     }
     function queuePrefetchFront(paths) {
         var incoming = [];
         (paths || []).forEach(function (path) {
-            if (!path || formulaImagePreloadCache[path]) return;
+            if (!path || bundledImage(path) || formulaImagePreloadCache[path]) return;
             if (incoming.indexOf(path) !== -1) return;
             incoming.push(path);
             // 已排在队列里（但位置靠后）的要提出来重新排到队首，
@@ -343,7 +346,7 @@
         if (incoming.length) prefetchQueue = incoming.concat(prefetchQueue);
     }
     function pumpPrefetch() {
-        if (!pageLoaded || lowDataMode() || document.hidden) return;
+        if ((imageLibrary && imageLibrary.state === 'loading') || !pageLoaded || lowDataMode() || document.hidden) return;
         while (!prefetchPaused && prefetchBusy < PREFETCH_CONCURRENCY && prefetchQueue.length) {
             (function (path) {
                 prefetchBusy++;
@@ -587,7 +590,7 @@
             var total = 0;
             (cat.subcategories || []).forEach(function (sub) { total += sub.formulas.length; });
             html += '<div class="category-grid-item"><a href="#/category/' + encodeURIComponent(cat.id) + '" class="category-card"><div class="card"><div class="card-body category-card-body">';
-            html += '<img src="' + categoryImagePath(cat.id, document.documentElement.getAttribute('data-theme')) + '" class="category-thumb" data-category="' + escapeHtml(cat.id) + '" alt="' + escapeHtml(cat.id) + '"><div class="category-card-info"><h2 class="card-title">' + escapeHtml(cat.id) + '</h2>';
+            html += '<img src="' + escapeHtml(imageSource(categoryImagePath(cat.id, document.documentElement.getAttribute('data-theme')))) + '" class="category-thumb" data-category="' + escapeHtml(cat.id) + '" alt="' + escapeHtml(cat.id) + '"><div class="category-card-info"><h2 class="card-title">' + escapeHtml(cat.id) + '</h2>';
             var learned = 0;
             (cat.subcategories || []).forEach(function (sub) { learned += sub.formulas.filter(function (formula) { return formula.learned; }).length; });
             html += usesLearnedStats() ? renderLearnedProgress(learned, total, '已学习', 'category-learning-progress', cat.id + ' 分类') : '<p class="card-text">' + total + '个情况</p>';
@@ -608,7 +611,7 @@
     function renderCaseChip(attrs, label, countText, current, thumbId) {
         var theme = document.documentElement.getAttribute('data-theme');
         var thumb = thumbId
-            ? '<img class="case-thumb" src="' + categoryImagePath(thumbId, theme) + '" data-thumb="' + escapeHtml(thumbId) + '" alt="">'
+            ? '<img class="case-thumb" src="' + escapeHtml(imageSource(categoryImagePath(thumbId, theme))) + '" data-thumb="' + escapeHtml(thumbId) + '" alt="">'
             : '';
         return '<button type="button" class="case-chip' + (current ? ' is-current' : '') + '" ' + attrs
             + ' aria-current="' + (current ? 'true' : 'false') + '"'
@@ -779,11 +782,11 @@
         if (editing && !notesOnly) {
             var editImage = inlineEditor.imageCleared ? '' : (inlineEditor.selectedImage || formula.image || '');
             html += '<div class="inline-image-editor"><label class="drag-area inline-image-drop" title="点击选择图片">';
-            html += '<img class="inline-image-preview" alt="图片预览"' + (editImage ? ' src="' + escapeHtml(editImage) + '"' : ' hidden') + '>';
+            html += '<img class="inline-image-preview" alt="图片预览"' + (editImage ? ' src="' + escapeHtml(imageSource(editImage)) + '"' : ' hidden') + '>';
             html += '<span class="inline-image-prompt"' + (editImage ? ' hidden' : '') + '>📷<small>选择图片</small></span>';
             html += '<input type="file" class="inline-image-input d-none" accept="image/png,image/jpeg,image/gif,image/svg+xml"></label>';
             html += '<button type="button" class="btn btn-sm btn-outline-secondary workspace-action inline-image-clear" data-action="clear-inline-image">清除图片</button></div>';
-        } else if (formula.image) html += '<img src="' + escapeHtml(formula.image) + '" class="formula-image" alt="' + escapeHtml(id) + '">';
+        } else if (formula.image) html += '<img src="' + escapeHtml(imageSource(formula.image)) + '" class="formula-image" alt="' + escapeHtml(id) + '">';
         else html += '<div class="formula-image d-flex align-items-center justify-content-center bg-light"><span class="text-muted">无图</span></div>';
         html += '</div><div class="col-8"><div class="formula-id">' + escapeHtml(id) + '</div>';
         if (editing) {
@@ -1617,7 +1620,37 @@
         updateWorkspaceNav();
     }
     function initWorkspace() {
-        return WS.ready.then(async function () { var id = WS.activeId(); activeWorkspace = id ? await WS.get(id) : null; if (activeWorkspace) publicCopy = null; else { if (id) await WS.activate(null); var publicCopies = await WS.listPublicCopies(DATA); var publicMode = selectedPublicId(publicCopies); publicCopy = publicMode === 'default' ? null : await WS.getPublicCopy(DATA, publicMode); } router(); }).catch(function (error) { console.warn(error); router(); }).finally(function () { document.body.classList.add('zbll-ready'); document.body.classList.remove('zbll-has-snapshot'); });
+        // IndexedDB 与图片合集并行准备，不等待几百次独立图片请求。
+        return Promise.all([WS.ready, imageLibrary ? imageLibrary.ready : Promise.resolve(false)]).then(async function () {
+            var id = WS.activeId();
+            activeWorkspace = id ? await WS.get(id) : null;
+            if (activeWorkspace) publicCopy = null;
+            else {
+                if (id) await WS.activate(null);
+                var publicCopies = await WS.listPublicCopies(DATA);
+                var publicMode = selectedPublicId(publicCopies);
+                publicCopy = publicMode === 'default' ? null : await WS.getPublicCopy(DATA, publicMode);
+            }
+            router();
+        }).catch(function (error) { console.warn(error); router(); }).finally(async function () {
+            // 只解码当前屏幕要显示的图；其余图片的字节已经在内存中。
+            var images = Array.prototype.slice.call(appEl.querySelectorAll('img'));
+            await Promise.race([
+                Promise.all(images.map(function (image) {
+                    return typeof image.decode === 'function' ? image.decode().catch(function () {}) : Promise.resolve();
+                })),
+                new Promise(function (resolve) { window.setTimeout(resolve, 1500); })
+            ]);
+            document.body.classList.add('zbll-ready');
+            document.body.classList.remove('zbll-has-snapshot');
+            var status = document.getElementById('image-library-status');
+            if (status) {
+                if (imageLibrary && imageLibrary.state === 'fallback') {
+                    status.textContent = '图片合集暂时不可用，正在使用原图。';
+                    window.setTimeout(function () { status.hidden = true; }, 5000);
+                } else status.hidden = true;
+            }
+        });
     }
 
     var defaultDragPromptAt = 0;
