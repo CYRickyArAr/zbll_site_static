@@ -59,6 +59,17 @@
     var workspaceContextTarget = null;
     var workspaceShortcutTarget = null;
     var inlineEditor = null;
+
+    // initTheme() 会调用预热，因此状态必须在任何 init 调用之前初始化。
+    var formulaImagePreloadCache = Object.create(null);
+    var selectionRequestId = 0;
+    var prefetchTickPending = false;
+    var pageLoaded = document.readyState === 'complete';
+    window.addEventListener('load', function () { pageLoaded = true; schedulePrefetchTick(); }, { once: true });
+    var prefetchQueue = [];
+    var prefetchBusy = 0;
+    var prefetchPaused = 0;
+    var PREFETCH_CONCURRENCY = 2;
     function escapeHtml(value) {
         if (value === null || value === undefined) return '';
         return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;')
@@ -162,22 +173,10 @@
     function categoryImagePath(categoryId, theme) {
         return 'images/' + (theme === 'dark' ? '' : 'light/') + encodeURIComponent(categoryId) + '.svg?v=20260924';
     }
-    var themeImageCache = Object.create(null);
     var allThemeImagesScheduled = false;
     var themeSwitchId = 0;
     function preloadThemeImage(path) {
-        if (themeImageCache[path]) return themeImageCache[path].promise;
-        var image = new Image();
-        var promise = new Promise(function (resolve) {
-            image.onload = function () {
-                if (typeof image.decode === 'function') image.decode().then(function () { resolve(true); }, function () { resolve(true); });
-                else resolve(true);
-            };
-            image.onerror = function () { resolve(false); };
-            image.src = path;
-        });
-        themeImageCache[path] = { image: image, promise: promise };
-        return promise;
+        return preloadFormulaImage(path);
     }
     function visibleThemeImagePaths(theme) {
         return Array.prototype.map.call(appEl.querySelectorAll('.category-thumb[data-category], .case-thumb[data-thumb]'), function (image) {
@@ -188,7 +187,7 @@
         return image.getAttribute('data-category') || image.getAttribute('data-thumb');
     }
     function scheduleRemainingThemeImages() {
-        if (allThemeImagesScheduled) return;
+        if (allThemeImagesScheduled || lowDataMode() || slowLink()) return;
         allThemeImagesScheduled = true;
         var paths = [];
         (DATA.categories || []).forEach(function (category) {
@@ -196,22 +195,18 @@
                 paths.push(categoryImagePath(id, 'light'), categoryImagePath(id, 'dark'));
             });
         });
-        var next = 0;
-        function preloadBatch() {
-            var end = Math.min(next + 8, paths.length);
-            while (next < end) preloadThemeImage(paths[next++]);
-            if (next < paths.length) scheduleBatch();
-        }
-        function scheduleBatch() {
-            if (window.requestIdleCallback) window.requestIdleCallback(preloadBatch, { timeout: 1000 });
-            else window.setTimeout(preloadBatch, 50);
-        }
-        scheduleBatch();
+        // 两套主题的缩略图优先级最低：排在公式图后面，队尾追加。
+        queuePrefetchTail(paths);
+        schedulePrefetchTick();
     }
     function warmThemeImages() {
+        if (lowDataMode()) return;
         var otherTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-        visibleThemeImagePaths(otherTheme).forEach(preloadThemeImage);
+        // 另一套主题的缩略图也走统一队列：之前是 forEach 一次性全部发出，
+        // 在慢网络下会形成并发尖峰、跟当前可见内容抢带宽。
+        queuePrefetchTail(visibleThemeImagePaths(otherTheme));
         scheduleRemainingThemeImages();
+        schedulePrefetchTick();
     }
     function applyTheme(theme, persist) {
         theme = theme === 'dark' ? 'dark' : 'light';
@@ -257,54 +252,116 @@
     }
     initTheme();
 
-    var formulaImagePreloadCache = Object.create(null);
-    var formulaImagePreloadRun = 0;
     function cancelFormulaImagePreload() {
-        formulaImagePreloadRun++;
+        prefetchQueue = [];
+        allThemeImagesScheduled = false;
     }
     function preloadFormulaImage(path) {
         if (!path || /^(?:data|blob):/i.test(path)) return Promise.resolve(false);
         if (formulaImagePreloadCache[path]) return formulaImagePreloadCache[path];
         var image = new Image();
         var promise = new Promise(function (resolve) {
+            var settled = false;
+            var timer = window.setTimeout(function () { finish(false); }, 10000);
+            function finish(ok) {
+                if (settled) return;
+                settled = true;
+                window.clearTimeout(timer);
+                image.onload = image.onerror = null;
+                if (!ok) {
+                    image.removeAttribute('src');
+                    delete formulaImagePreloadCache[path];
+                }
+                resolve(ok);
+            }
             image.onload = function () {
-                if (typeof image.decode === 'function') image.decode().then(function () { resolve(true); }, function () { resolve(true); });
-                else resolve(true);
+                if (typeof image.decode === 'function') image.decode().then(function () { finish(true); }, function () { finish(true); });
+                else finish(true);
             };
-            image.onerror = function () { resolve(false); };
+            image.onerror = function () { finish(false); };
             image.src = path;
         });
         formulaImagePreloadCache[path] = promise;
         return promise;
     }
-    function scheduleCategoryFormulaImages(cat, subs) {
-        var run = ++formulaImagePreloadRun;
-        var connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-        if (connection && connection.saveData) return;
-        var paths = [], seen = Object.create(null);
-        (subs || cat.subcategories || []).forEach(function (sub) {
-            (sub.formulas || []).forEach(function (formula) {
-                var path = formula.image || '';
-                if (!path || seen[path]) return;
-                seen[path] = true;
-                paths.push(path);
-            });
-        });
-        if (!paths.length) return;
-        var next = 0;
-        function scheduleBatch() {
-            if (run !== formulaImagePreloadRun) return;
-            if (window.requestIdleCallback) window.requestIdleCallback(preloadBatch, { timeout: 1200 });
-            else window.setTimeout(preloadBatch, 150);
+    function scheduleCategoryFormulaImages(cat) {
+        if (!cat || lowDataMode()) return;
+        // 本分类（全部子分类）优先：切子分类是最高频操作；
+        // 再按显示顺序由近及远铺开其它分类，让相邻大类的切换也变快。
+        var cats = viewData().categories || [];
+        var index = 0;
+        cats.forEach(function (item, i) { if (item.id === cat.id) index = i; });
+        var priority = formulaPathsOf(cat.subcategories);
+        if (!slowLink()) {
+            cats.map(function (item, i) { return { item: item, distance: Math.abs(i - index) }; })
+                .filter(function (entry) { return entry.item.id !== cat.id; })
+                .sort(function (a, z) { return a.distance - z.distance; })
+                .forEach(function (entry) { priority = priority.concat(formulaPathsOf(entry.item.subcategories)); });
         }
-        function preloadBatch() {
-            if (run !== formulaImagePreloadRun) return;
-            var end = Math.min(next + 6, paths.length);
-            while (next < end) preloadFormulaImage(paths[next++]);
-            if (next < paths.length) scheduleBatch();
-        }
-        scheduleBatch();
+        queuePrefetchFront(priority);
+        schedulePrefetchTick();
     }
+
+    // ===== 图片预取队列 =====
+    // 后台预取最多 2 个并发，首屏 load 后才在空闲时推进。
+    // 切换时暂停新后台请求；已经发出的请求不能据此取消。
+    function prefetchConnection() {
+        return navigator.connection || navigator.mozConnection || navigator.webkitConnection || null;
+    }
+    function lowDataMode() {
+        var c = prefetchConnection();
+        return !!(c && c.saveData);
+    }
+    function slowLink() {
+        var c = prefetchConnection();
+        return !!(c && /(slow-2g|2g|3g)$/.test(c.effectiveType || ''));
+    }
+    function formulaPathsOf(subs) {
+        var paths = [];
+        (subs || []).forEach(function (sub) {
+            (sub.formulas || []).forEach(function (formula) { if (formula.image) paths.push(formula.image); });
+        });
+        return paths;
+    }
+    function queuePrefetchTail(paths) {
+        (paths || []).forEach(function (path) {
+            if (!path || formulaImagePreloadCache[path] || prefetchQueue.indexOf(path) !== -1) return;
+            prefetchQueue.push(path);
+        });
+    }
+    function queuePrefetchFront(paths) {
+        var incoming = [];
+        (paths || []).forEach(function (path) {
+            if (!path || formulaImagePreloadCache[path]) return;
+            if (incoming.indexOf(path) !== -1) return;
+            incoming.push(path);
+            // 已排在队列里（但位置靠后）的要提出来重新排到队首，
+            // 否则跳到远处的分类时，它的图还压在队尾。
+            var at = prefetchQueue.indexOf(path);
+            if (at !== -1) prefetchQueue.splice(at, 1);
+        });
+        if (incoming.length) prefetchQueue = incoming.concat(prefetchQueue);
+    }
+    function pumpPrefetch() {
+        if (!pageLoaded || lowDataMode() || document.hidden) return;
+        while (!prefetchPaused && prefetchBusy < PREFETCH_CONCURRENCY && prefetchQueue.length) {
+            (function (path) {
+                prefetchBusy++;
+                preloadFormulaImage(path).then(function () {
+                    prefetchBusy--;
+                    if (prefetchQueue.length && !prefetchPaused) schedulePrefetchTick();
+                });
+            })(prefetchQueue.shift());
+        }
+    }
+    function schedulePrefetchTick() {
+        if (!pageLoaded || lowDataMode() || prefetchTickPending || !prefetchQueue.length) return;
+        prefetchTickPending = true;
+        function tick() { prefetchTickPending = false; pumpPrefetch(); }
+        if (window.requestIdleCallback) window.requestIdleCallback(tick, { timeout: 2500 });
+        else window.setTimeout(tick, 250);
+    }
+    document.addEventListener('visibilitychange', function () { if (!document.hidden) schedulePrefetchTick(); });
 
     var workspaceHelpFitCanvas = null;
     var workspaceHelpFitTimer = null;
@@ -494,6 +551,8 @@
     }
 
     function renderHome() {
+        selectionRequestId++;
+        clearSorting();
         cancelFormulaImagePreload();
         var data = viewData();
         var totalCases = 0, learnedCases = 0;
@@ -608,11 +667,11 @@
         if (!target) return;
         window.scrollTo(0, Math.max(0, window.pageYOffset + target.getBoundingClientRect().top - navOffset()));
     }
-    // 一页要用到的全部图片（横栏 13 张 + 当前子分类的公式图）。
+    // 当前视图实际显示的缩略图和公式图。
     function categoryViewImagePaths(cat, activeSub) {
         var theme = document.documentElement.getAttribute('data-theme');
         var paths = [];
-        (viewData().categories || []).forEach(function (item) { paths.push(categoryImagePath(item.id, theme)); });
+        if (SHOW_CATEGORY_THUMB) (viewData().categories || []).forEach(function (item) { paths.push(categoryImagePath(item.id, theme)); });
         (cat.subcategories || []).forEach(function (sub) { paths.push(categoryImagePath(sub.id, theme)); });
         (activeSub ? [activeSub] : (cat.subcategories || [])).forEach(function (sub) {
             (sub.formulas || []).forEach(function (formula) { if (formula.image) paths.push(formula.image); });
@@ -623,8 +682,12 @@
     // 不预热就会出现“空白一两帧”的闪烁。已缓存时这一步几乎零耗时。
     function preloadCategoryView(cat, activeSub) {
         if (!cat) return Promise.resolve(false);
+        // 交互请求优先：暂停后台预取，拿到带宽后立即开始加载这一屏要用的图。
+        prefetchPaused++;
+        var release = function () { prefetchPaused = Math.max(0, prefetchPaused - 1); schedulePrefetchTick(); };
         var all = Promise.all(categoryViewImagePaths(cat, activeSub).map(preloadFormulaImage));
-        // 网络慢时不拖住跳转，最多等 150ms。
+        // 渲染最多等 150ms，但后台要等目标图加载结束才恢复，避免再次抢带宽。
+        all.then(release, release);
         return Promise.race([all, new Promise(function (resolve) { window.setTimeout(resolve, 150, false); })]);
     }
 
@@ -632,31 +695,31 @@
     function selectSubcategory(catId, subId) {
         var cat = findCategory(catId);
         var sub = cat ? (cat.subcategories || []).filter(function (item) { return item.id === subId; })[0] : null;
+        if (!cat || !sub) return;
+        var requestId = ++selectionRequestId, hash = location.hash, data = viewData();
         preloadCategoryView(cat, sub).then(function () {
+            if (requestId !== selectionRequestId || hash !== location.hash || data !== viewData()) return;
             try { localStorage.setItem('zbll_active_subcat_' + catId, subId); } catch (e) {}
             renderCategory(catId);
             scrollToContentTop();
         });
     }
 
-    // 把新 DOM 里的 <img> 换成页面上同序号的旧元素，只改属性。
-    // 关键：给已有 <img> 换 src 时，浏览器会保留旧图直到新图就绪；
-    // 而 innerHTML 会把 <img> 销毁重建，新元素先画空白再画图 → 视觉上“一闪”。
-    // 两边的图片集合用同一个选择器按文档顺序配对（顶栏缩略图 + 公式图），
-    // 首页卡片图用的是 .category-thumb，不在此列，因此跨页导航不会误配。
+    // 分别复用缩略图、公式图，不能把无图占位 div 当成 img，也不跨角色配对。
     function adoptImages(staging) {
-        var selector = '.case-thumb, .formula-image';
-        var oldImages = Array.prototype.slice.call(appEl.querySelectorAll(selector));
-        var newImages = Array.prototype.slice.call(staging.querySelectorAll(selector));
-        newImages.forEach(function (image, index) {
-            var old = oldImages[index];
-            if (!old) return;
-            ['src', 'alt', 'class', 'data-thumb', 'data-category', 'data-subcategory'].forEach(function (attr) {
-                var value = image.getAttribute(attr);
-                if (value === null) old.removeAttribute(attr);
-                else if (old.getAttribute(attr) !== value) old.setAttribute(attr, value);
+        ['img.case-thumb', 'img.formula-image'].forEach(function (selector) {
+            var oldImages = Array.prototype.slice.call(appEl.querySelectorAll(selector));
+            var newImages = Array.prototype.slice.call(staging.querySelectorAll(selector));
+            newImages.forEach(function (image, index) {
+                var old = oldImages[index];
+                if (!old) return;
+                ['src', 'alt', 'class', 'data-thumb', 'data-category', 'data-subcategory'].forEach(function (attr) {
+                    var value = image.getAttribute(attr);
+                    if (value === null) old.removeAttribute(attr);
+                    else if (old.getAttribute(attr) !== value || (attr === 'src' && old.complete && !old.naturalWidth)) old.setAttribute(attr, value);
+                });
+                image.parentNode.replaceChild(old, image);
             });
-            image.parentNode.replaceChild(old, image);
         });
     }
     // 统一入口：先在游离容器里建好新 DOM，回收旧 <img> 后整体提交。
@@ -668,6 +731,9 @@
     }
 
     function renderCategory(catId) {
+        selectionRequestId++;
+        clearSorting();
+        cancelFormulaImagePreload();
         var cat = findCategory(catId);
         if (!cat) { cancelFormulaImagePreload(); appEl.innerHTML = '<div class="container"><div class="empty-state">分类不存在：' + escapeHtml(catId) + '</div></div>'; currentCatId = ''; currentSubId = ''; return; }
         var activeSub = activeSubcatOf(cat);
@@ -690,7 +756,7 @@
         commitHtml(html);
         currentCatId = cat.id;
         currentSubId = activeSub ? activeSub.id : '';
-        scheduleCategoryFormulaImages(cat, activeSub ? [activeSub] : []);
+        scheduleCategoryFormulaImages(cat);
         warmThemeImages();
         applyZbllFilter(getZbllFilter());
         if (activeWorkspace || publicCopy) bindSorting();
@@ -797,6 +863,28 @@
         line.setAttribute('aria-selected', 'true');
     }
     var sortableInstances = [];
+    var sortableLoadPromise = null;
+    var sortableBindToken = 0;
+    // SortableJS 仅在可编辑视图加载，不阻塞只读首屏。
+    function ensureSortable() {
+        if (window.Sortable) return Promise.resolve(true);
+        if (sortableLoadPromise) return sortableLoadPromise;
+        sortableLoadPromise = new Promise(function (resolve) {
+            var script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js';
+            script.onload = function () {
+                if (!window.Sortable) { sortableLoadPromise = null; script.remove(); }
+                resolve(!!window.Sortable);
+            };
+            script.onerror = function () {
+                sortableLoadPromise = null;
+                script.remove();
+                resolve(false);
+            };
+            document.head.appendChild(script);
+        });
+        return sortableLoadPromise;
+    }
     var isDraggingFormula = false;
     var dragMouseY = -1;
     var scrollRafId = null;
@@ -817,7 +905,25 @@
         scrollRafId = window.requestAnimationFrame(edgeScrollWhileDragging);
     }
 
+    function clearSorting() {
+        sortableBindToken++;
+        sortableInstances.forEach(function (instance) { instance.destroy(); });
+        sortableInstances = [];
+        if (isDraggingFormula) {
+            isDraggingFormula = false;
+            if (scrollRafId) window.cancelAnimationFrame(scrollRafId);
+            scrollRafId = null;
+            document.documentElement.style.scrollBehavior = '';
+        }
+    }
     function bindSorting() {
+        clearSorting();
+        var token = sortableBindToken;
+        ensureSortable().then(function (ready) {
+            if (ready && token === sortableBindToken && (activeWorkspace || publicCopy)) bindSortingInstances();
+        });
+    }
+    function bindSortingInstances() {
         sortableInstances.forEach(function (instance) { instance.destroy(); });
         sortableInstances = [];
         if (!sortingScrollBound) {
@@ -1532,6 +1638,7 @@
         // 两级选择器：第一行切分类（走 hash 路由），第二行切子分类（原地重渲染）。
         var caseChip = e.target.closest('.case-chip');
         if (caseChip) {
+            var requestId = ++selectionRequestId, hash = location.hash, data = viewData();
             var nextCat = caseChip.getAttribute('data-case-category');
             var nextSub = caseChip.getAttribute('data-case-subcategory');
             if (nextCat) {
@@ -1539,6 +1646,7 @@
                 var targetCat = findCategory(nextCat);
                 // 先预热目标分类的图，再改 hash 触发路由渲染，避免切换时图片闪一下。
                 preloadCategoryView(targetCat, targetCat ? activeSubcatOf(targetCat) : null).then(function () {
+                    if (requestId !== selectionRequestId || hash !== location.hash || data !== viewData()) return;
                     pendingSelectionScroll = true;
                     location.hash = '#/category/' + encodeURIComponent(nextCat);
                 });
