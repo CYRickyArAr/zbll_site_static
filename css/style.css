@@ -64,8 +64,7 @@ body {
 }
 
 /* 等待 IndexedDB 恢复上次工作区后再显示首帧，避免刷新时先闪过大神版。 */
-body:not(.zbll-ready):not(.zbll-has-snapshot) .navbar-center,
-body:not(.zbll-ready):not(.zbll-has-snapshot) .navbar-right,
+body:not(.zbll-ready):not(.zbll-has-snapshot) .navbar,
 body:not(.zbll-ready):not(.zbll-has-snapshot) .main-content {
     visibility: hidden;
 }
@@ -76,22 +75,76 @@ html[data-render-snapshot="pending"] .main-content {
     visibility: hidden;
 }
 
-/* 图片合集初始化状态不参与布局，完成后移除。 */
+/* 首次加载用内联 SVG + CSS，不为加载动画增加图片或脚本请求。 */
 .image-library-status {
     position: fixed;
-    top: calc(var(--nav-height) + 24px);
-    left: 50%;
-    transform: translateX(-50%);
-    max-width: calc(100% - 32px);
-    padding: 10px 16px;
-    color: var(--text-muted);
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    z-index: 1100;
+    inset: 0;
+    z-index: 2000;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: var(--site-bg);
+    color: var(--text);
     text-align: center;
+    opacity: 1;
+    transition: opacity 180ms ease;
 }
+.image-library-status[hidden],
 body.zbll-has-snapshot:not(.zbll-ready) .image-library-status { display: none; }
+.image-library-status.is-complete {
+    opacity: 0;
+    pointer-events: none;
+}
+.site-loader-content { transform: translateY(-12px); }
+.site-loader-cube {
+    display: block;
+    width: clamp(64px, 12vw, 80px);
+    height: auto;
+    margin: 0 auto 24px;
+}
+.site-loader-tiles rect {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: loader-tile-wave 1600ms ease-in-out infinite;
+    animation-delay: calc(var(--tile) * 100ms);
+}
+.site-loader-title {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    line-height: 1.5;
+}
+.site-loader-caption {
+    margin-top: 8px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--text-muted);
+}
+.site-loader-dots { display: inline-block; width: 1em; }
+@keyframes loader-tile-wave {
+    0%, 65%, 100% { opacity: 1; transform: scale(1); }
+    30% { opacity: .45; transform: scale(.82); }
+}
+/* 合集失败时保留轻量提示，不用全屏动画挡住已能使用的原图页面。 */
+.image-library-status.is-fallback {
+    inset: auto 16px 20px;
+    width: fit-content;
+    max-width: calc(100% - 32px);
+    margin: 0 auto;
+    padding: 10px 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text-muted);
+    font-size: 13px;
+    pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+    .site-loader-tiles rect { animation: none; }
+    .image-library-status { transition: none; }
+}
 
 /* ===== 顶部导航栏 ===== */
 .navbar {

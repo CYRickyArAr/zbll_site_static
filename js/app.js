@@ -1641,15 +1641,24 @@
                 })),
                 new Promise(function (resolve) { window.setTimeout(resolve, 1500); })
             ]);
-            document.body.classList.add('zbll-ready');
-            document.body.classList.remove('zbll-has-snapshot');
+            var hadSnapshot = document.body.classList.contains('zbll-has-snapshot');
             var status = document.getElementById('image-library-status');
             if (status) {
                 if (imageLibrary && imageLibrary.state === 'fallback') {
+                    status.classList.add('is-fallback');
                     status.textContent = '图片合集暂时不可用，正在使用原图。';
                     window.setTimeout(function () { status.hidden = true; }, 5000);
-                } else status.hidden = true;
+                } else {
+                    // 不设置最短等待时长；快加载/快照恢复不会为了动画额外等待。
+                    var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                    status.setAttribute('aria-hidden', 'true');
+                    status.classList.add('is-complete');
+                    if (hadSnapshot || reduceMotion) status.hidden = true;
+                    else window.setTimeout(function () { status.hidden = true; }, 180);
+                }
             }
+            document.body.classList.add('zbll-ready');
+            document.body.classList.remove('zbll-has-snapshot');
         });
     }
 
