@@ -721,12 +721,17 @@ html[data-zbll-filter="unlearned"] .sortable-item:has(.formula-card.learned) {
     height: var(--case-thumb, 40px);
     object-fit: contain;
 }
+/* 计数固定槽宽：tabular-nums 只能让 0-9 等宽，字符数变了（0/12 → 12/12）
+   仍会撑宽胶囊、把图标和文字整体推偏。4.8ch 覆盖最长的 “72/72”
+   （实测该串 = 4.64ch），且 ch 会随字体与字号自动缩放。 */
 .case-chip small {
     color: inherit;
     font-size: .82rem;
     font-weight: 400;
     opacity: .75;
     font-variant-numeric: tabular-nums;
+    min-width: 4.8ch;
+    text-align: center;
 }
 .case-bar-categories { --case-thumb: 30px; --case-pad: 13px; --case-font: 1.05rem; --case-gap: 8px; }
 /* 不显示分类图时（行上没有 has-thumb），胶囊按纯文字高度排版。 */
