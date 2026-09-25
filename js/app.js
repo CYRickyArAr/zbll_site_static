@@ -639,6 +639,34 @@
         });
     }
 
+    // 把新 DOM 里的 <img> 换成页面上同序号的旧元素，只改属性。
+    // 关键：给已有 <img> 换 src 时，浏览器会保留旧图直到新图就绪；
+    // 而 innerHTML 会把 <img> 销毁重建，新元素先画空白再画图 → 视觉上“一闪”。
+    // 两边的图片集合用同一个选择器按文档顺序配对（顶栏缩略图 + 公式图），
+    // 首页卡片图用的是 .category-thumb，不在此列，因此跨页导航不会误配。
+    function adoptImages(staging) {
+        var selector = '.case-thumb, .formula-image';
+        var oldImages = Array.prototype.slice.call(appEl.querySelectorAll(selector));
+        var newImages = Array.prototype.slice.call(staging.querySelectorAll(selector));
+        newImages.forEach(function (image, index) {
+            var old = oldImages[index];
+            if (!old) return;
+            ['src', 'alt', 'class', 'data-thumb', 'data-category', 'data-subcategory'].forEach(function (attr) {
+                var value = image.getAttribute(attr);
+                if (value === null) old.removeAttribute(attr);
+                else if (old.getAttribute(attr) !== value) old.setAttribute(attr, value);
+            });
+            image.parentNode.replaceChild(old, image);
+        });
+    }
+    // 统一入口：先在游离容器里建好新 DOM，回收旧 <img> 后整体提交。
+    function commitHtml(html) {
+        var staging = document.createElement('div');
+        staging.innerHTML = html;
+        adoptImages(staging);
+        appEl.replaceChildren.apply(appEl, Array.prototype.slice.call(staging.childNodes));
+    }
+
     function renderCategory(catId) {
         var cat = findCategory(catId);
         if (!cat) { cancelFormulaImagePreload(); appEl.innerHTML = '<div class="container"><div class="empty-state">分类不存在：' + escapeHtml(catId) + '</div></div>'; currentCatId = ''; currentSubId = ''; return; }
@@ -659,7 +687,7 @@
             html += '</div></div>';
         }
         html += '</div>';
-        appEl.innerHTML = html;
+        commitHtml(html);
         currentCatId = cat.id;
         currentSubId = activeSub ? activeSub.id : '';
         scheduleCategoryFormulaImages(cat, activeSub ? [activeSub] : []);
