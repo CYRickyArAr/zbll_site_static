@@ -756,7 +756,18 @@
             html += '</div></div>';
         }
         html += '</div>';
+        // 重建 DOM 前保留两行选择器的横向位置。手机点 U6 等靠右的按钮时，
+        // 不能随着内容重渲染跳回最左侧；切换大类则让新的子分类行从头显示。
+        var rowSelectors = ['.case-bar-categories .case-bar-scroll', '.case-bar-subcategories .case-bar-scroll'];
+        var rowScroll = rowSelectors.map(function (selector, index) {
+            var row = appEl.querySelector(selector);
+            return row && (index === 0 || currentCatId === cat.id) ? row.scrollLeft : 0;
+        });
         commitHtml(html);
+        rowSelectors.forEach(function (selector, index) {
+            var row = appEl.querySelector(selector);
+            if (row) row.scrollLeft = rowScroll[index];
+        });
         currentCatId = cat.id;
         currentSubId = activeSub ? activeSub.id : '';
         scheduleCategoryFormulaImages(cat);
