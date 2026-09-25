@@ -13,6 +13,9 @@
     --modal-backdrop: rgba(0, 0, 0, .55);
     --author-icon-brightness: 1;
     --author-icon-hover-brightness: 1.08;
+    --progress-fill: #198754;
+    --progress-track: #e9ecef;
+    --nav-height: 60px;
 }
 
 html[data-theme="dark"] {
@@ -29,6 +32,8 @@ html[data-theme="dark"] {
     --shadow: 0 2px 10px rgba(0, 0, 0, 0.32);
     --author-icon-brightness: .6;
     --author-icon-hover-brightness: 1;
+    --progress-fill: #65b883;
+    --progress-track: #37414b;
 }
 
 * {
@@ -115,6 +120,9 @@ html[data-render-snapshot="pending"] .main-content {
 }
 
 .navbar-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
     font-size: 1.3rem;
     font-weight: 600;
     color: white;
@@ -122,31 +130,22 @@ html[data-render-snapshot="pending"] .main-content {
     letter-spacing: 1px;
 }
 
+.navbar-logo-icon {
+    display: block;
+    flex: 0 0 auto;
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+}
+
+/* 深色模式下图标底色与导航栏都是 #1a1a2e，加一圈细描边避免糊在一起。 */
+html[data-theme="dark"] .navbar-logo-icon {
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, .22);
+}
+
 .navbar-logo:hover {
     color: #00d8ff;
 }
-
-.collapse-all-btn {
-    width: 32px;
-    height: 32px;
-    flex: 0 0 32px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    border: 1px solid transparent;
-    border-radius: 6px;
-    background: transparent;
-    color: #fff;
-    font-size: 1rem;
-    line-height: 1;
-    cursor: pointer;
-    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
-}
-.collapse-all-btn[hidden] { display: none; }
-.collapse-all-btn svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-.collapse-all-btn:hover,
-.collapse-all-btn:focus-visible { background: rgba(255, 255, 255, 0.24); border-color: transparent; color: #fff; }
 
 .navbar-right {
     display: flex;
@@ -455,8 +454,6 @@ html[data-zbll-filter="unlearned"] .sortable-item:has(.formula-card.learned) {
 }
 
 .learning-progress {
-    --progress-fill: #198754;
-    --progress-track: #e9ecef;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -467,10 +464,6 @@ html[data-zbll-filter="unlearned"] .sortable-item:has(.formula-card.learned) {
     border: 1px solid var(--border);
     border-radius: 10px;
     background: var(--surface);
-}
-html[data-theme="dark"] .learning-progress {
-    --progress-fill: #65b883;
-    --progress-track: #37414b;
 }
 .learning-progress-meta {
     display: flex;
@@ -634,95 +627,162 @@ html[data-theme="dark"] .learning-progress {
     padding: 0 15px;
 }
 
-.breadcrumb {
-    background: white;
-    padding: 12px 20px;
-    border-radius: 5px;
-    border: 1px solid #dee2e6;
-    margin-bottom: 25px;
-    font-family: 'Lato', sans-serif;
-}
-
-.breadcrumb a {
-    color: #007bff;
-    text-decoration: none;
-}
-
-.breadcrumb a:hover {
-    text-decoration: underline;
-}
-
-.category-title {
-    margin-bottom: 25px;
-    color: #333;
-    font-size: 2.2rem;
-    font-weight: 700;
-    font-family: 'Lato', sans-serif;
-}
-
 .subcategory-card {
     margin-bottom: 25px;
     border: 1px solid #dee2e6;
-    border-radius: 8px;
+    border-radius: 10px;
     background: white;
     overflow: visible;
 }
 
-/* 悬浮标题 */
-.sticky-header {
+/* 只给读屏用的隐藏文本（分类页的 h1） */
+.visually-hidden {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+/* ===== 分类页两级选择器（全页唯一吸顶元素） ===== */
+/* 像 Word 的功能区：全宽贴边、无圆角、无阴影，只用一条底边线和下方内容分隔。
+   （它必须渲染在 .container 外面，否则会受 max-width/左右 padding 限制而贴不到窗口边。） */
+.container-flush { margin-top: 0; }
+.case-bar {
     position: sticky;
-    top: 60px !important;
-    margin-top: 0 !important;
-    border-radius: 8px 8px 0 0 !important;
-    z-index: 100;
-    background: white;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    padding: 0 25px;
+    top: var(--nav-height, 60px);
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    /* 与公式面板留 8px：这个值必须和 JS 里 navOffset() 的 8 一致。
+       两者相等 ⇒ 页面顶端的自然位置正好就是“切子分类后面板应在的位置”，
+       于是切完没有滚动余量，往上滚也不会把这 8px 撞大。 */
+    margin-bottom: 8px;
+    padding: 5px 8px;
+    border: 0;
+    border-bottom: 1px solid var(--border);
     border-radius: 0;
-    cursor: pointer;
+    background: var(--surface);
 }
-
-/* 折叠状态的蓝线 */
-.sticky-header-collapsed {
-    border-bottom: 2px solid #007bff;
+.case-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
 }
-
-.sticky-header:hover {
-    background: #f8f9fa;
+/* 芯片滚动区：有富余时居中，需溢出时自动退化为左对齐（首尾 auto 外边距）。 */
+.case-bar-scroll {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
 }
-
-.sticky-header h3 {
-    margin: 0;
-    font-size: 1.5rem;
-    color: #007bff;
-}
-
-/* 分类页子分类横栏里的子分类图（纯魔方，无框） */
-.subcat-thumb {
-    height: 80px;
-    width: auto;
-    margin-left: 12px;
-    flex-shrink: 0;
-}
-
-.subcategory-learning-progress {
-    width: 96px;
-    max-width: 100%;
-    padding-inline: 4px;
+/* 行内首尾胶囊用 auto 外边距：有富余时自动居中，
+   需要溢出时 auto 退化为 0（不会把左侧内容推到滚不回去的位置）。 */
+.case-bar-scroll > :first-child { margin-left: auto; }
+.case-bar-scroll > :last-child { margin-right: auto; }
+.case-bar-scroll::-webkit-scrollbar { display: none; }
+/* 图与字一起构成胶囊：选中时整个（含图）被框住。
+   两行尺寸由行上的 --case-thumb/--case-pad/--case-font/--case-gap 控制：
+   分类图只有顶面色块、信息少 → 小；子分类图带侧面色块、信息多 → 大。 */
+.case-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--case-gap, 7px);
     flex: 0 0 auto;
-    margin-left: 12px;
+    min-height: calc(var(--case-thumb, 40px) + 10px);
+    padding: 0 var(--case-pad, 12px);
+    border: 1px solid transparent;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--text-muted);
+    font: inherit;
+    font-size: var(--case-font, 1rem);
+    font-weight: 600;
+    line-height: 1.4;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color .15s, color .15s, box-shadow .15s;
+}
+.case-thumb {
+    display: block;
+    flex: 0 0 auto;
+    width: var(--case-thumb, 40px);
+    height: var(--case-thumb, 40px);
+    object-fit: contain;
+}
+.case-chip small {
+    color: inherit;
+    font-size: .82rem;
+    font-weight: 400;
+    opacity: .75;
+    font-variant-numeric: tabular-nums;
+}
+.case-bar-categories { --case-thumb: 30px; --case-pad: 13px; --case-font: 1.05rem; --case-gap: 8px; }
+/* 不显示分类图时（行上没有 has-thumb），胶囊按纯文字高度排版。 */
+.case-bar-categories:not(.has-thumb) .case-chip { min-height: 34px; padding: 0 14px; }
+/* 标签宽度按最宽的子分类标签（AS1/Pi1）对齐：字形宽窄不再影响胶囊宽度，
+   切换分类时只换图和字母，位置不移动。em 单位会跟着各档字号一起缩。 */
+.case-bar-subcategories .case-chip-label { min-width: 1.9em; text-align: center; }
+.case-bar-subcategories { --case-thumb: 60px; --case-pad: 12px; --case-font: 1rem; --case-gap: 7px; }
+.case-chip:hover { background: #e9ecef; color: var(--text); }
+.case-chip.is-current,
+.case-chip[aria-current="true"] {
+    background: var(--line-hover);
+    color: #0a58ca;
+    box-shadow: inset 0 0 0 1px #4e9cff;
+}
+.case-chip:focus-visible { outline: 2px solid #0d6efd; outline-offset: 1px; }
+html[data-theme="dark"] .case-chip:hover { background: #3a3a42; color: var(--text); }
+html[data-theme="dark"] .case-chip.is-current,
+html[data-theme="dark"] .case-chip[aria-current="true"] {
+    background: #173b67;
+    color: #dbeafe;
+    box-shadow: inset 0 0 0 1px #4e9cff;
 }
 
-.toggle-icon {
-    color: #6c757d;
-    font-size: 1.4rem;
-    margin-left: 15px;
+@media (max-width: 1200px) {
+    /* 中等宽度：图降一档。 */
+    .case-bar-categories { --case-thumb: 28px; --case-pad: 9px; --case-font: .95rem; --case-gap: 5px; }
+    .case-bar-subcategories { --case-thumb: 48px; --case-pad: 9px; --case-font: .92rem; --case-gap: 5px; }
+}
+
+@media (max-width: 1000px) {
+    .case-bar-categories { --case-thumb: 26px; --case-pad: 8px; --case-font: .9rem; --case-gap: 5px; }
+    .case-bar-subcategories { --case-thumb: 38px; --case-pad: 8px; --case-font: .88rem; --case-gap: 5px; }
+}
+
+@media (max-width: 870px) {
+    /* 隐去计数：低于此宽度带图胶囊已无法一行放下 */
+    .case-chip small { display: none; }
+    .case-bar-categories { --case-thumb: 26px; --case-pad: 7px; --case-font: .88rem; --case-gap: 4px; }
+    .case-bar-subcategories { --case-thumb: 36px; --case-pad: 7px; --case-font: .86rem; --case-gap: 5px; }
+}
+
+@media (max-width: 768px) {
+    .case-bar { padding: 5px; }
+}
+
+@media (max-width: 660px) {
+    .case-bar-categories { --case-thumb: 24px; --case-pad: 6px; --case-font: .84rem; }
+    .case-bar-subcategories { --case-thumb: 30px; --case-pad: 5px; --case-font: .84rem; --case-gap: 4px; }
 }
 
 .formula-grid {
     padding: 25px;
     background: white;
-    border-radius: 0 0 8px 8px;
+    /* 必须跟 .subcategory-card 的圆角一致：否则内层白底的方角会从面板圆角里戳出来。 */
+    border-radius: 10px;
 }
 
 .sortable-container {
@@ -929,7 +989,6 @@ html[data-theme="dark"] .learning-progress {
 }
 
 /* ===== 深色模式 ===== */
-html[data-theme="dark"] .breadcrumb,
 html[data-theme="dark"] .subcategory-card,
 html[data-theme="dark"] .formula-grid,
 html[data-theme="dark"] .formula-card {
@@ -937,31 +996,8 @@ html[data-theme="dark"] .formula-card {
     border-color: var(--border);
 }
 
-html[data-theme="dark"] .breadcrumb {
-    color: var(--text);
-}
-
-html[data-theme="dark"] .category-title,
 html[data-theme="dark"] .formula-line-alg {
     color: var(--text);
-}
-
-html[data-theme="dark"] .breadcrumb-item.active,
-html[data-theme="dark"] .breadcrumb-item + .breadcrumb-item::before {
-    color: var(--text-muted);
-}
-
-html[data-theme="dark"] .sticky-header {
-    background: var(--surface);
-    box-shadow: var(--shadow);
-}
-
-html[data-theme="dark"] .sticky-header:hover {
-    background: #272d34;
-}
-
-html[data-theme="dark"] .toggle-icon {
-    color: #adb5bd;
 }
 
 html[data-theme="dark"] .formula-line {
@@ -1090,9 +1126,6 @@ html[data-theme="dark"] .form-check-label {
     .formula-line-alg {
         font-size: 1.05rem;
     }
-    .sticky-header h3 {
-        font-size: 1.2rem;
-    }
 }
 
 @media (max-width: 600px) {
@@ -1139,9 +1172,6 @@ html:not([data-theme="dark"]) .navbar {
 html:not([data-theme="dark"]) .navbar-logo { color: #1f2937; }
 html:not([data-theme="dark"]) .navbar-logo:hover,
 html:not([data-theme="dark"]) .navbar-logo:focus-visible { color: #0a58ca; }
-html:not([data-theme="dark"]) .collapse-all-btn { background: transparent; border-color: transparent; color: #334155; }
-html:not([data-theme="dark"]) .collapse-all-btn:hover,
-html:not([data-theme="dark"]) .collapse-all-btn:focus-visible { background: #eef2f7; border-color: transparent; color: #0f172a; }
 html:not([data-theme="dark"]) .theme-toggle {
     background: transparent;
     color: #4b5563;
@@ -1570,8 +1600,6 @@ html[data-theme="dark"] .variant-add-form {
 }
 
 /* PythonAnywhere category.html 卡片结构的同款规则。工作区和公开卡片共用这套尺寸。 */
-.category-title-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 25px; }
-.category-title-row .category-title { margin-bottom: 0; }
 .formula-card > .row { display: flex; flex-wrap: nowrap; gap: 16px; align-items: flex-start; margin: 0; --bs-gutter-x: 0; }
 .formula-card > .row > .col-4 { width: 140px; flex: 0 0 140px; padding: 0; }
 .formula-card > .row > .col-8 { width: auto; flex: 1 1 auto; min-width: 0; padding: 0; }
@@ -1690,15 +1718,6 @@ html[data-theme="dark"] .sortable-ghost { background: #303840; border-color: #4e
     .site-help-button svg { width: 16px; height: 16px; }
     .theme-toggle { font-size: 16px; margin-right: 5px; }
     .site-help-dialog { padding: 20px; }
-    .collapse-all-btn {
-        width: 26px;
-        height: 26px;
-        flex-basis: 26px;
-    }
-    .collapse-all-btn svg {
-        width: 17px;
-        height: 17px;
-    }
     .workspace-nav-btn {
         width: 6.4em;
         min-width: 6.4em;
@@ -1722,15 +1741,20 @@ html[data-theme="dark"] .sortable-ghost { background: #303840; border-color: #4e
 }
 
 @media (max-width: 420px) {
-    .navbar-logo {
+    /* 窄屏只留图标；文字用视觉隐藏而不是 display:none，
+       否则链接就没有可访问名了。 */
+    .navbar-logo-icon {
         width: 24px;
-        font-size: 0;
-        overflow: hidden;
+        height: 24px;
     }
-    .navbar-logo::before {
-        content: 'ZB';
-        font-size: 1rem;
-        font-weight: 700;
+    .navbar-logo-text {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
     }
     .view-mode-btn,
     .zbll-filter-btn {
@@ -1752,14 +1776,12 @@ html[data-theme="dark"] .sortable-ghost { background: #303840; border-color: #4e
     .navbar { padding: 0 6px !important; column-gap: 2px !important; }
     .navbar-left { gap: 2px; }
     .site-help-button,
-    .theme-toggle,
-    .collapse-all-btn { width: 24px; height: 24px; flex-basis: 24px; }
+    .theme-toggle { width: 24px; height: 24px; flex-basis: 24px; }
 }
 
 @media (max-width: 768px) {
     .formula-card > .row { gap: 12px; }
     .formula-card.has-card-editor .action-buttons-row { left: 12px; }
-    .category-title-row { align-items: flex-start; flex-direction: column; }
     .formula-image { height: 140px; }
     .formula-id { font-size: 1.2rem; }
     .formula-line-alg { font-size: 1.05rem; }

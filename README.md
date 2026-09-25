@@ -1,10 +1,10 @@
-# ZBLL 公式数据库
+# ZBLL 公式库
 
 <p align="center">
   <strong>简体中文</strong> | <a href="README.en.md">English</a>
 </p>
 
-一个收录 **472 个 ZBLL 情况**的在线公式数据库，包含顶层状态图、多套公式与选手实战使用标注。
+一个收录 **472 个 ZBLL 情况**的在线公式库，包含顶层状态图、多套公式与选手实战使用标注。
 
 ZBLL（Zborowski-Bruchem Last Layer）是一套在顶层棱块已定向的情况下，一步完成最后一层的公式体系。本站采用 [pepkin88 zbll-explorer](https://pepkin88.me/zbll-explorer/) 的分类方式，完整收录 472 个 ZBLL 情况，并标注 **多位顶尖选手**（耿暄一、Tymon Kolasiński、Feliks Zemdegs、南承赫、Max Park 等）实际使用过的公式。
 

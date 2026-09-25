@@ -1,7 +1,7 @@
 {
-  "name": "ZBLL数据库",
-  "short_name": "ZBLL数据库",
-  "description": "ZBLL 公式数据库",
+  "name": "ZBLL公式库",
+  "short_name": "ZBLL公式库",
+  "description": "ZBLL 公式库",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

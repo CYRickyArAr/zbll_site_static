@@ -180,9 +180,12 @@
         return promise;
     }
     function visibleThemeImagePaths(theme) {
-        return Array.prototype.map.call(appEl.querySelectorAll('.category-thumb[data-category], .subcat-thumb[data-subcategory]'), function (image) {
-            return categoryImagePath(image.getAttribute('data-category') || image.getAttribute('data-subcategory'), theme);
+        return Array.prototype.map.call(appEl.querySelectorAll('.category-thumb[data-category], .case-thumb[data-thumb]'), function (image) {
+            return categoryImagePath(themeImageId(image), theme);
         });
+    }
+    function themeImageId(image) {
+        return image.getAttribute('data-category') || image.getAttribute('data-thumb');
     }
     function scheduleRemainingThemeImages() {
         if (allThemeImagesScheduled) return;
@@ -213,8 +216,8 @@
     function applyTheme(theme, persist) {
         theme = theme === 'dark' ? 'dark' : 'light';
         document.documentElement.setAttribute('data-theme', theme);
-        appEl.querySelectorAll('.category-thumb[data-category], .subcat-thumb[data-subcategory]').forEach(function (image) {
-            image.src = categoryImagePath(image.getAttribute('data-category') || image.getAttribute('data-subcategory'), theme);
+        appEl.querySelectorAll('.category-thumb[data-category], .case-thumb[data-thumb]').forEach(function (image) {
+            image.src = categoryImagePath(themeImageId(image), theme);
         });
         if (persist) { try { localStorage.setItem(themeKey, theme); } catch (e) {} }
         var button = document.getElementById('theme-toggle');
@@ -274,12 +277,12 @@
         formulaImagePreloadCache[path] = promise;
         return promise;
     }
-    function scheduleCategoryFormulaImages(cat) {
+    function scheduleCategoryFormulaImages(cat, subs) {
         var run = ++formulaImagePreloadRun;
         var connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
         if (connection && connection.saveData) return;
         var paths = [], seen = Object.create(null);
-        (cat.subcategories || []).forEach(function (sub) {
+        (subs || cat.subcategories || []).forEach(function (sub) {
             (sub.formulas || []).forEach(function (formula) {
                 var path = formula.image || '';
                 if (!path || seen[path]) return;
@@ -356,7 +359,8 @@
     function getScrollKey(view) { return 'zbll_scroll_' + view; }
     function navOffset() {
         var nav = document.querySelector('.navbar');
-        return (nav ? nav.offsetHeight : 60) + 8;
+        var caseBar = document.querySelector('.case-bar');
+        return (nav ? nav.offsetHeight : 60) + (caseBar ? caseBar.offsetHeight : 0) + 8;
     }
     function firstVisibleAnchor() {
         var offset = navOffset();
@@ -370,7 +374,7 @@
             }
             return null;
         }
-        return findVisible('.sortable-item[id]') || findVisible('.sticky-header[id]');
+        return findVisible('.sortable-item[id]');
     }
     function saveScroll() {
         if (!currentView) return;
@@ -500,8 +504,8 @@
             });
         });
         var html = '<div class="container mt-5">';
-        if (usesLearnedStats()) html += '<div class="index-title-wrap"><h1 class="text-center mb-5">ZBLL 公式数据库</h1>' + renderLearnedProgress(learnedCases, totalCases, '已学习', 'index-learning-progress', '全部情况') + '</div>';
-        else html += '<h1 class="text-center mb-5">ZBLL 公式数据库</h1>';
+        if (usesLearnedStats()) html += '<div class="index-title-wrap"><h1 class="text-center mb-5">ZBLL 公式库</h1>' + renderLearnedProgress(learnedCases, totalCases, '已学习', 'index-learning-progress', '全部情况') + '</div>';
+        else html += '<h1 class="text-center mb-5">ZBLL 公式库</h1>';
         if (!isWorkspace()) {
             html += '<div class="player-stats">';
             getPlayerStats(data).forEach(function (p) {
@@ -534,32 +538,132 @@
         html += '</div></div>';
         appEl.innerHTML = html;
         warmThemeImages();
-        updateToggleAllButton();
+    }
+
+    // 分类页两级选择器：第一行 7 个分类，第二行当前分类的 6 个子分类。
+    function caseCountText(learned, total) { return learned + '/' + total; }
+    // 第一行（分类）是否显示魔方图。分类图只有顶面色块、信息量低，暂时关掉；
+    // 想恢复就把这里改成 true（行上的 has-thumb 类会自动跟着变）。
+    var SHOW_CATEGORY_THUMB = false;
+
+    function renderCaseChip(attrs, label, countText, current, thumbId) {
+        var theme = document.documentElement.getAttribute('data-theme');
+        var thumb = thumbId
+            ? '<img class="case-thumb" src="' + categoryImagePath(thumbId, theme) + '" data-thumb="' + escapeHtml(thumbId) + '" alt="">'
+            : '';
+        return '<button type="button" class="case-chip' + (current ? ' is-current' : '') + '" ' + attrs
+            + ' aria-current="' + (current ? 'true' : 'false') + '"'
+            + ' aria-label="' + escapeHtml(label + '，已学习 ' + countText) + '"'
+            + ' title="' + escapeHtml(label + '（已学习 ' + countText + '）') + '"'
+            + ' tabindex="' + (current ? '0' : '-1') + '">'
+            + thumb
+            + '<span class="case-chip-label">' + escapeHtml(label) + '</span>'
+            + '<small>' + escapeHtml(countText) + '</small></button>';
+    }
+    function caseCounts(subcategories) {
+        var total = 0, learned = 0;
+        (subcategories || []).forEach(function (sub) {
+            total += sub.formulas.length;
+            learned += sub.formulas.filter(function (formula) { return formula.learned; }).length;
+        });
+        return { total: total, learned: learned };
+    }
+    function activeSubcatId(cat) {
+        var subs = cat.subcategories || [];
+        var saved = null;
+        try { saved = localStorage.getItem('zbll_active_subcat_' + cat.id); } catch (e) {}
+        var found = subs.filter(function (sub) { return sub.id === saved; })[0];
+        return found ? found.id : (subs[0] ? subs[0].id : '');
+    }
+    function activeSubcatOf(cat) {
+        var subs = cat.subcategories || [], id = activeSubcatId(cat);
+        return subs.filter(function (sub) { return sub.id === id; })[0] || subs[0] || null;
+    }
+    function renderCaseBar(cat, activeSub) {
+        var data = viewData();
+        var html = '<div class="case-bar">';
+        html += '<div class="case-bar-row case-bar-categories' + (SHOW_CATEGORY_THUMB ? ' has-thumb' : '') + '">'
+            + '<div class="case-bar-scroll" role="group" aria-label="切换分类">';
+        (data.categories || []).forEach(function (item) {
+            var counts = caseCounts(item.subcategories);
+            html += renderCaseChip('data-case-category="' + escapeHtml(item.id) + '"', item.id,
+                caseCountText(counts.learned, counts.total), item.id === cat.id, SHOW_CATEGORY_THUMB ? item.id : '');
+        });
+        html += '</div></div>';
+        html += '<div class="case-bar-row case-bar-subcategories">'
+            + '<div class="case-bar-scroll" role="group" aria-label="切换子分类">';
+        (cat.subcategories || []).forEach(function (sub) {
+            var learned = sub.formulas.filter(function (formula) { return formula.learned; }).length;
+            html += renderCaseChip('data-case-subcategory="' + escapeHtml(sub.id) + '"', sub.id,
+                caseCountText(learned, sub.formulas.length), !!activeSub && sub.id === activeSub.id, sub.id);
+        });
+        html += '</div></div>';
+        html += '</div>';
+        return html;
+    }
+    // 内容顶部对齐到吸顶选择器下方（固定在导航栏与选择器之下，故用 navOffset()）。
+    function scrollToContentTop() {
+        var bar = document.querySelector('.case-bar');
+        var target = document.querySelector('.subcategory-card') || (bar && bar.nextElementSibling);
+        if (!target) return;
+        window.scrollTo(0, Math.max(0, window.pageYOffset + target.getBoundingClientRect().top - navOffset()));
+    }
+    // 一页要用到的全部图片（横栏 13 张 + 当前子分类的公式图）。
+    function categoryViewImagePaths(cat, activeSub) {
+        var theme = document.documentElement.getAttribute('data-theme');
+        var paths = [];
+        (viewData().categories || []).forEach(function (item) { paths.push(categoryImagePath(item.id, theme)); });
+        (cat.subcategories || []).forEach(function (sub) { paths.push(categoryImagePath(sub.id, theme)); });
+        (activeSub ? [activeSub] : (cat.subcategories || [])).forEach(function (sub) {
+            (sub.formulas || []).forEach(function (formula) { if (formula.image) paths.push(formula.image); });
+        });
+        return paths;
+    }
+    // 插 DOM 之前先把图解码完：innerHTML 会把 <img> 全部重建，SVG 要重新光栅化，
+    // 不预热就会出现“空白一两帧”的闪烁。已缓存时这一步几乎零耗时。
+    function preloadCategoryView(cat, activeSub) {
+        if (!cat) return Promise.resolve(false);
+        var all = Promise.all(categoryViewImagePaths(cat, activeSub).map(preloadFormulaImage));
+        // 网络慢时不拖住跳转，最多等 150ms。
+        return Promise.race([all, new Promise(function (resolve) { window.setTimeout(resolve, 150, false); })]);
+    }
+
+    // 切换子分类：先预热图片，再重渲染并回到内容顶部。
+    function selectSubcategory(catId, subId) {
+        var cat = findCategory(catId);
+        var sub = cat ? (cat.subcategories || []).filter(function (item) { return item.id === subId; })[0] : null;
+        preloadCategoryView(cat, sub).then(function () {
+            try { localStorage.setItem('zbll_active_subcat_' + catId, subId); } catch (e) {}
+            renderCategory(catId);
+            scrollToContentTop();
+        });
     }
 
     function renderCategory(catId) {
         var cat = findCategory(catId);
-        if (!cat) { cancelFormulaImagePreload(); appEl.innerHTML = '<div class="container"><div class="empty-state">分类不存在：' + escapeHtml(catId) + '</div></div>'; updateToggleAllButton(); return; }
-        var html = '<div class="container"><nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="#/">首页</a></li><li class="breadcrumb-item active">' + escapeHtml(cat.id) + ' Case</li></ol></nav>';
-        html += '<div class="category-title-row"><h1 class="category-title">' + escapeHtml(cat.id) + ' Case</h1></div>';
-        (cat.subcategories || []).forEach(function (sub) {
-            var total = sub.formulas.length, learned = sub.formulas.filter(function (formula) { return formula.learned; }).length;
-            var saved = null; try { saved = localStorage.getItem('subcat_' + sub.id); } catch (e) {}
-            var open = saved === 'open';
-            html += '<div class="subcategory-card" id="card-' + escapeHtml(sub.id) + '"><div class="sticky-header' + (open ? '' : ' sticky-header-collapsed') + '" id="header-' + escapeHtml(sub.id) + '" data-subcat="' + escapeHtml(sub.id) + '"><div class="d-flex justify-content-between align-items-center"><div class="d-flex align-items-center"><h3>' + escapeHtml(sub.id) + '</h3><img src="' + categoryImagePath(sub.id, document.documentElement.getAttribute('data-theme')) + '" class="subcat-thumb" data-subcategory="' + escapeHtml(sub.id) + '" alt="' + escapeHtml(sub.id) + '">' + renderLearnedProgress(learned, total, '已学习', 'subcategory-learning-progress', sub.id + ' 子分类') + '</div><div class="d-flex align-items-center"><span class="toggle-icon" id="icon-' + escapeHtml(sub.id) + '">' + (open ? '▼' : '▶') + '</span></div></div></div>';
-            html += '<div class="formula-grid" id="subcat-' + escapeHtml(sub.id) + '" style="display:' + (open ? 'block' : 'none') + '">';
-            if (sub.formulas.length) {
-                html += '<div class="sortable-container" data-category="' + escapeHtml(cat.id) + '" data-subcategory="' + escapeHtml(sub.id) + '">';
-                sub.formulas.forEach(function (formula, index) { html += renderFormulaCard(cat.id, sub.id, formula, index); });
+        if (!cat) { cancelFormulaImagePreload(); appEl.innerHTML = '<div class="container"><div class="empty-state">分类不存在：' + escapeHtml(catId) + '</div></div>'; currentCatId = ''; currentSubId = ''; return; }
+        var activeSub = activeSubcatOf(cat);
+        // 横栏放在 .container 外面（全宽，像 Word 的功能区）；只给读屏用的一级标题留在容器里。
+        // 不再有可见的面包屑与标题：进页面就是吸顶选择器。
+        var html = renderCaseBar(cat, activeSub);
+        html += '<div class="container container-flush"><h1 class="visually-hidden">' + escapeHtml(cat.id) + ' Case</h1>';
+        if (activeSub) {
+            var subTotal = activeSub.formulas.length;
+            html += '<div class="subcategory-card" id="card-' + escapeHtml(activeSub.id) + '">';
+            html += '<div class="formula-grid" id="subcat-' + escapeHtml(activeSub.id) + '">';
+            if (subTotal) {
+                html += '<div class="sortable-container" data-category="' + escapeHtml(cat.id) + '" data-subcategory="' + escapeHtml(activeSub.id) + '">';
+                activeSub.formulas.forEach(function (formula, index) { html += renderFormulaCard(cat.id, activeSub.id, formula, index); });
                 html += '</div>';
             } else html += '<div class="empty-state"><p class="mb-0">该子分类下暂无公式</p></div>';
             html += '</div></div>';
-        });
+        }
         html += '</div>';
         appEl.innerHTML = html;
-        scheduleCategoryFormulaImages(cat);
+        currentCatId = cat.id;
+        currentSubId = activeSub ? activeSub.id : '';
+        scheduleCategoryFormulaImages(cat, activeSub ? [activeSub] : []);
         warmThemeImages();
-        updateToggleAllButton();
         applyZbllFilter(getZbllFilter());
         if (activeWorkspace || publicCopy) bindSorting();
     }
@@ -585,7 +689,7 @@
             html += '<span class="inline-image-prompt"' + (editImage ? ' hidden' : '') + '>📷<small>选择图片</small></span>';
             html += '<input type="file" class="inline-image-input d-none" accept="image/png,image/jpeg,image/gif,image/svg+xml"></label>';
             html += '<button type="button" class="btn btn-sm btn-outline-secondary workspace-action inline-image-clear" data-action="clear-inline-image">清除图片</button></div>';
-        } else if (formula.image) html += '<img src="' + escapeHtml(formula.image) + '" class="formula-image" alt="' + escapeHtml(id) + '" loading="lazy">';
+        } else if (formula.image) html += '<img src="' + escapeHtml(formula.image) + '" class="formula-image" alt="' + escapeHtml(id) + '">';
         else html += '<div class="formula-image d-flex align-items-center justify-content-center bg-light"><span class="text-muted">无图</span></div>';
         html += '</div><div class="col-8"><div class="formula-id">' + escapeHtml(id) + '</div>';
         if (editing) {
@@ -634,14 +738,6 @@
         return html;
     }
 
-    function toggleSubcategory(subcatId) {
-        var content = document.getElementById('subcat-' + subcatId), icon = document.getElementById('icon-' + subcatId), header = document.getElementById('header-' + subcatId);
-        if (!content || !icon || !header) return;
-        var open = content.style.display === 'none';
-        content.style.display = open ? 'block' : 'none'; icon.textContent = open ? '▼' : '▶'; header.classList.toggle('sticky-header-collapsed', !open);
-        try { localStorage.setItem('subcat_' + subcatId, open ? 'open' : 'closed'); } catch (e) {}
-        updateToggleAllButton();
-    }
     function selectFormulaLine(line) {
         if (!line || line.closest('.inline-editing')) return;
         if (!isWorkspace() && !isPublicCopy()) {
@@ -671,33 +767,6 @@
         if (shouldClear) return;
         line.classList.add('selected');
         line.setAttribute('aria-selected', 'true');
-    }
-    function updateToggleAllButton() {
-        var button = document.getElementById('toggle-all-subcategories');
-        if (!button) return;
-        var headers = document.querySelectorAll('.sticky-header[id^="header-"]'), openCount = 0;
-        button.hidden = !headers.length;
-        if (!headers.length) return;
-        headers.forEach(function (header) { var content = document.getElementById('subcat-' + header.dataset.subcat); if (content && content.style.display !== 'none') openCount++; });
-        var collapse = openCount === headers.length;
-        var label = collapse ? '全部折叠' : '全部展开';
-        button.setAttribute('aria-label', label);
-        button.title = label;
-        button.innerHTML = collapse
-            ? '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"></rect><path d="M8 12h8"></path></svg>'
-            : '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"></rect><path d="M12 8v8M8 12h8"></path></svg>';
-    }
-    function toggleAllSubcategories() {
-        var headers = document.querySelectorAll('.sticky-header[id^="header-"]'), openCount = 0;
-        headers.forEach(function (header) { var content = document.getElementById('subcat-' + header.dataset.subcat); if (content && content.style.display !== 'none') openCount++; });
-        var shouldOpen = openCount !== headers.length;
-        headers.forEach(function (header) {
-            var id = header.dataset.subcat, content = document.getElementById('subcat-' + id), icon = document.getElementById('icon-' + id);
-            if (!content || !icon) return;
-            content.style.display = shouldOpen ? 'block' : 'none'; icon.textContent = shouldOpen ? '▼' : '▶'; header.classList.toggle('sticky-header-collapsed', !shouldOpen);
-            try { localStorage.setItem('subcat_' + id, shouldOpen ? 'open' : 'closed'); } catch (e) {}
-        });
-        updateToggleAllButton();
     }
     var sortableInstances = [];
     var isDraggingFormula = false;
@@ -1399,11 +1468,18 @@
         catch (error) { showOverlay('workspace-overlay', true); setWorkspaceMessage(error.message || '导入失败：文件格式无效', true); }
     }
 
+    var currentCatId = '';
+    var currentSubId = '';
+    function currentCategoryId() { return currentCatId; }
+    // 由选择器触发的跳转要落在内容顶部，而不是上一次的滚动位置。
+    var pendingSelectionScroll = false;
+
     function router() {
         var hash = location.hash || '#/', match = hash.match(/^#\/category\/([A-Za-z]+)$/), nextView = match ? 'cat:' + match[1] : 'home';
         inlineEditor = null;
-        if (currentView) saveScroll(); if (match) renderCategory(match[1]); else renderHome(); currentView = nextView;
-        restoreScroll(nextView);
+        if (currentView) saveScroll(); if (match) renderCategory(match[1]); else { currentCatId = ''; currentSubId = ''; renderHome(); } currentView = nextView;
+        if (pendingSelectionScroll) { pendingSelectionScroll = false; scrollToContentTop(); }
+        else restoreScroll(nextView);
         updateWorkspaceNav();
     }
     function initWorkspace() {
@@ -1425,9 +1501,24 @@
         promptDefaultPublicDrag();
     }, true);
     document.addEventListener('click', function (e) {
-        var header = e.target.closest('.sticky-header');
-        if (header && header.dataset.subcat) { toggleSubcategory(header.dataset.subcat); return; }
-        if (e.target.closest('#toggle-all-subcategories')) { toggleAllSubcategories(); return; }
+        // 两级选择器：第一行切分类（走 hash 路由），第二行切子分类（原地重渲染）。
+        var caseChip = e.target.closest('.case-chip');
+        if (caseChip) {
+            var nextCat = caseChip.getAttribute('data-case-category');
+            var nextSub = caseChip.getAttribute('data-case-subcategory');
+            if (nextCat) {
+                if (nextCat === currentCategoryId()) return;
+                var targetCat = findCategory(nextCat);
+                // 先预热目标分类的图，再改 hash 触发路由渲染，避免切换时图片闪一下。
+                preloadCategoryView(targetCat, targetCat ? activeSubcatOf(targetCat) : null).then(function () {
+                    pendingSelectionScroll = true;
+                    location.hash = '#/category/' + encodeURIComponent(nextCat);
+                });
+            } else if (nextSub) {
+                if (nextSub !== currentSubId) selectSubcategory(currentCatId, nextSub);
+            }
+            return;
+        }
         var formulaLine = e.target.closest('.formula-line');
         if (formulaLine) { selectFormulaLine(formulaLine); return; }
         if (e.target.closest('.drag-handle') && !activeWorkspace && !publicCopy) {
@@ -1465,6 +1556,18 @@
         if (!formulaLine) return;
         e.preventDefault();
         selectFormulaLine(formulaLine);
+    });
+    document.addEventListener('keydown', function (e) {
+        if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+        var chip = e.target.closest ? e.target.closest('.case-chip') : null;
+        if (!chip) return;
+        var buttons = Array.prototype.slice.call(chip.parentNode.querySelectorAll('.case-chip'));
+        var index = buttons.indexOf(chip);
+        if (index < 0) return;
+        e.preventDefault();
+        var nextIndex = (index + (e.key === 'ArrowRight' ? 1 : -1) + buttons.length) % buttons.length;
+        buttons.forEach(function (item, i) { item.setAttribute('tabindex', i === nextIndex ? '0' : '-1'); });
+        buttons[nextIndex].focus();
     });
     document.addEventListener('dragover', function (e) {
         var area = e.target.closest('.inline-image-drop');
