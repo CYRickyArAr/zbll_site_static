@@ -1883,3 +1883,28 @@ html[data-theme="dark"] .sortable-ghost { background: #303840; border-color: #4e
     .learn-btn { bottom: 8px; right: 8px; }
     .action-buttons .btn { padding: 6px 12px; font-size: .94rem; }
 }
+
+/* ===== 选择器紧凑（桌面 ≥769px）=====
+   第二行缩略图按原分档各降一档（60→46 / 48→40 / 38→32 / 36→30），
+   第一行文字胶囊 34→30，横栏内边距 5→4，整体薄约 20px。
+   手机（≤768px）保持原有触控尺寸不变。 */
+@media (min-width: 1201px) {
+    .case-bar-subcategories { --case-thumb: 46px; --case-pad: 10px; --case-font: .95rem; }
+    .case-bar-subcategories .case-chip { min-height: 54px; }
+}
+@media (min-width: 1001px) and (max-width: 1200px) {
+    .case-bar-subcategories { --case-thumb: 40px; --case-pad: 9px; --case-font: .92rem; }
+    .case-bar-subcategories .case-chip { min-height: 48px; }
+}
+@media (min-width: 871px) and (max-width: 1000px) {
+    .case-bar-subcategories { --case-thumb: 32px; --case-pad: 8px; --case-font: .88rem; }
+    .case-bar-subcategories .case-chip { min-height: 40px; }
+}
+@media (min-width: 769px) and (max-width: 870px) {
+    .case-bar-subcategories { --case-thumb: 30px; --case-pad: 7px; --case-font: .86rem; }
+    .case-bar-subcategories .case-chip { min-height: 38px; }
+}
+@media (min-width: 769px) {
+    .case-bar { padding: 4px 8px; }
+    .case-bar-categories:not(.has-thumb) .case-chip { min-height: 30px; padding: 0 12px; }
+}
