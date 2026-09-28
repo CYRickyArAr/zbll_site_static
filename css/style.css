@@ -1861,3 +1861,25 @@ html[data-theme="dark"] .sortable-ghost { background: #303840; border-color: #4e
     .formula-id { font-size: 1.2rem; }
     .formula-line-alg { font-size: 1.05rem; }
 }
+
+/* ===== 公式页密度：矮屏紧凑 =====
+   矮屏（桌面常见视口高度）把卡片各项尺寸收紧，让一屏能看下两行；
+   每行始终两张。手机（≤768px）不套用这套规则，保持原有单列外观。 */
+@media (min-width: 769px) and (max-height: 1080px) {
+    .formula-grid { padding: 16px; }
+    .sortable-container { gap: 14px; }
+    .sortable-item { width: calc((100% - 14px) / 2); }
+    .formula-card { padding: 14px; }
+    .formula-card.has-card-editor { padding-bottom: 48px; }
+    .formula-card.learning-enabled:not(.content-editable):not(.has-card-editor) { padding-bottom: 44px; }
+    .formula-card > .row { gap: 12px; }
+    .formula-card > .row > .col-4 { width: 112px; flex: 0 0 112px; }
+    .formula-image { width: 112px; height: 112px; padding: 6px; }
+    .formula-id { font-size: 1.15rem; margin-bottom: 2px; }
+    .formula-lines { margin-top: 8px; }
+    .formula-line { padding: 5px 7px; margin-bottom: 5px; }
+    .formula-line-alg { font-size: 1.02rem; }
+    .formula-card.has-card-editor .action-buttons-row { left: 14px; bottom: 8px; }
+    .learn-btn { bottom: 8px; right: 8px; }
+    .action-buttons .btn { padding: 6px 12px; font-size: .94rem; }
+}
