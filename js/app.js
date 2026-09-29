@@ -805,7 +805,11 @@
             html += '<textarea class="workspace-textarea form-control note-body inline-note-body" rows="4" placeholder="可以在这里写备注">' + escapeHtml(note.body) + '</textarea></div>';
         } else if (formula.notes) {
             html += '<div class="formula-note-display formula-notes"><div class="formula-note-fixed">' + escapeHtml(note.header) + '</div>';
-            if (note.body) html += '<div class="formula-note-body-display">' + escapeHtml(note.body) + '</div>';
+            if (note.body) {
+                // 备注正文：引用式外观，固定一行，超出用省略号；完整内容在悬停提示和编辑框里。
+                html += '<div class="formula-note-body-display" title="' + escapeHtml(note.body) + '">'
+                    + '<span class="formula-note-text">' + escapeHtml(note.body) + '</span></div>';
+            }
             html += '</div>';
         }
         html += '</div></div>';
