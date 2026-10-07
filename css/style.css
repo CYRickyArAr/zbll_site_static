@@ -660,6 +660,10 @@ html[data-zbll-filter="unlearned"] .sortable-item:has(.formula-card.learned) {
 }
 
 .player-stat-box {
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
     border: 1px solid #7cb3ff;
     background: #eaf3ff;
     color: #0a58ca;
@@ -984,6 +988,8 @@ html[data-theme="dark"] .case-chip[aria-current="true"] {
     display: flex;
     flex-wrap: wrap;
     gap: 3px;
+    min-width: 0;
+    max-width: 100%;
 }
 
 .formula-marks {
@@ -1359,8 +1365,9 @@ html:not([data-theme="dark"]) .workspace-nav-btn:focus-visible {
 .workspace-create-icon svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 #workspace-public-new { color: #0a58ca; }
 #workspace-public-new:hover { border-color: #7cb3ff; background: #eaf3ff; }
-#workspace-new { color: #65459a; }
-#workspace-new:hover { border-color: #8f72c3; background: #ebe5f6; }
+/* 合并成一个公式库后，统一沿用原来大神版面板的蓝色。 */
+.workspace-panel-heading .workspace-create-icon { color: #0a58ca; }
+.workspace-panel-heading .workspace-create-icon:hover { border-color: #7cb3ff; background: #eaf3ff; }
 .workspace-create-icon:focus-visible { outline: 2px solid currentColor; outline-offset: 1px; }
 .workspace-list { --workspace-list-row-height: 46px; display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; grid-auto-rows: var(--workspace-list-row-height); gap: 0; height: calc(var(--workspace-list-row-height) * 4); min-height: calc(var(--workspace-list-row-height) * 4); max-height: calc(var(--workspace-list-row-height) * 4); overflow-x: hidden; overflow-y: auto; }
 .workspace-list-row { position: relative; min-width: 0; height: var(--workspace-list-row-height); }
@@ -1377,20 +1384,13 @@ html:not([data-theme="dark"]) .workspace-nav-btn:focus-visible {
 .workspace-item-menu-trigger:focus-visible { opacity: 1; background: rgba(108, 117, 125, .15); outline: none; }
 .workspace-list-item:hover { border-color: transparent; border-radius: 6px; background: #e5e8ec; }
 .workspace-list-item:hover small { color: #495057; }
-.workspace-public-list .workspace-list-item.active {
+.workspace-list .workspace-list-item.active {
     border-color: #7cb3ff;
     border-radius: 6px;
     background: #eaf3ff;
     color: #0a58ca;
 }
-.workspace-custom-section .workspace-list-item.active {
-    border-color: #8f72c3;
-    border-radius: 6px;
-    background: #ebe5f6;
-    color: #513783;
-}
-.workspace-public-list .workspace-list-item.active small { color: #4777b9; }
-.workspace-custom-section .workspace-list-item.active small { color: #705b96; }
+.workspace-list .workspace-list-item.active small { color: #4777b9; }
 #workspace-import { display: inline-flex; align-items: center; gap: 9px; padding: 8px 10px; border: 0; border-radius: 6px; background: transparent; color: #495057; font: inherit; line-height: 1.2; cursor: pointer; }
 .workspace-import-icon { width: 24px; height: 22px; flex: 0 0 24px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
 #workspace-import:hover { background: #e9ecef; color: #212529; }
@@ -1558,9 +1558,16 @@ html:not([data-theme="dark"]) .workspace-nav-btn:focus-visible {
 }
 .formula-card.inline-editing .inline-note-body {
     font-size: 1.1rem;
-    border-width: 2px;
-    border-color: #6ea8fe;
+    border-width: 1px;
+    border-color: #a9c8ee;
 }
+.formula-card.inline-editing .inline-note-body:focus {
+    border-color: #0d6efd;
+    outline: none;
+    box-shadow: none;
+}
+html[data-theme="dark"] .formula-card.inline-editing .inline-note-body { border-color: #48698f; }
+html[data-theme="dark"] .formula-card.inline-editing .inline-note-body:focus { border-color: #6ea8fe; }
 .formula-card.notes-only-editing .inline-note-body {
     min-height: 0;
     height: auto;
@@ -1603,6 +1610,7 @@ html:not([data-theme="dark"]) .workspace-nav-btn:focus-visible {
 .inline-image-preview[hidden], .inline-image-prompt[hidden] { display: none; }
 .inline-image-prompt { display: flex; flex-direction: column; align-items: center; gap: 5px; color: var(--text-muted); }
 .inline-image-prompt small { white-space: nowrap; }
+.inline-image-actions { width: var(--formula-thumb, 140px); }
 .inline-image-clear { margin-top: 6px; width: 100%; }
 .inline-editor-actions .action-buttons-row { gap: 8px; }
 .inline-editor-actions .btn { margin-right: 0; }
@@ -1612,22 +1620,16 @@ html[data-theme="dark"] .workspace-dialog { background: var(--surface); color: v
 html[data-theme="dark"] .workspace-list-item { background: transparent; color: var(--text); }
 html[data-theme="dark"] .workspace-list-item:hover { border-color: transparent; background: #3a3a42; }
 html[data-theme="dark"] .workspace-list-item:hover small { color: #d7dce2; }
-html[data-theme="dark"] .workspace-public-list .workspace-list-item.active {
+html[data-theme="dark"] .workspace-list .workspace-list-item.active {
     border-color: #4e9cff;
     background: #173b67;
     color: #dbeafe;
 }
-html[data-theme="dark"] .workspace-custom-section .workspace-list-item.active {
-    border-color: #9b7cff;
-    background: #382d5c;
-    color: #ede9fe;
-}
-html[data-theme="dark"] .workspace-public-list .workspace-list-item.active small { color: #b9d7ff; }
-html[data-theme="dark"] .workspace-custom-section .workspace-list-item.active small { color: #d1c3ef; }
+html[data-theme="dark"] .workspace-list .workspace-list-item.active small { color: #b9d7ff; }
 html[data-theme="dark"] #workspace-public-new { color: #9cc4ff; }
 html[data-theme="dark"] #workspace-public-new:hover { border-color: #4e9cff; background: #173b67; }
-html[data-theme="dark"] #workspace-new { color: #cbb9ee; }
-html[data-theme="dark"] #workspace-new:hover { border-color: #9b7cff; background: #382d5c; }
+html[data-theme="dark"] .workspace-panel-heading .workspace-create-icon { color: #9cc4ff; }
+html[data-theme="dark"] .workspace-panel-heading .workspace-create-icon:hover { border-color: #4e9cff; background: #173b67; }
 html[data-theme="dark"] #workspace-import { color: #d0d5db; background: transparent; }
 html[data-theme="dark"] #workspace-import:hover { color: #fff; background: #3a3a42; }
 html[data-theme="dark"] #workspace-import:active { background: #46515c; }
@@ -1689,9 +1691,6 @@ html[data-theme="dark"] .variant-add-form {
 .action-buttons-row { display: flex; align-items: center; margin-top: auto; }
 .formula-card.has-card-editor .action-buttons { flex: 0 0 auto; }
 .formula-card.has-card-editor .action-buttons-row { position: absolute; left: 20px; bottom: 10px; margin-top: 0; }
-.add-variant-btn { border: 1px dashed #86b7fe; background: transparent; color: #0d6efd; border-radius: 4px; padding: 4px 12px; font-size: 1rem; line-height: 1; cursor: pointer; margin-right: 10px; transition: background .15s; }
-.add-variant-placeholder { visibility: hidden; pointer-events: none; }
-.add-variant-btn:hover, .add-variant-btn:focus-visible { background: #eaf3ff; }
 .action-buttons .btn { margin-right: 10px; font-size: 1rem; padding: 8px 16px; border-radius: 5px; }
 .formula-card.learned { outline: 3px solid #198754; outline-offset: -3px; background-color: #f0fdf4; }
 .learn-btn { position: absolute; bottom: 10px; right: 10px; z-index: 5; width: 30px; height: 30px; padding: 0; border-radius: 50%; border: 1.5px solid #adb5bd; background: #fff; color: #adb5bd; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: none; }
@@ -1967,5 +1966,46 @@ html[data-theme="dark"] .formula-note-body-display {
     /* 编辑态的图片框与展示态同尺寸（112px），否则切换时高度会跳 */
     .formula-card { --formula-thumb: 112px; }
     .inline-image-editor { width: 112px; }
-    .inline-image-drop { width: 112px; height: 112px; padding: 6px; }
+    /* 2px 虚线 + 5px 内边距 = 展示态 1px 边框 + 6px 内边距。 */
+    .inline-image-drop { width: 112px; height: 112px; padding: 5px; }
+}
+
+/* Unified libraries: one full-width library list, styled exactly like the old left
+   (大神版公式库) panel. The old two-column grid is gone because the two lists merged. */
+.workspace-panels { grid-template-columns: minmax(0, 1fr); }
+.case-line-editor { margin-top: 8px; min-width: 0; }
+.case-editor-heading { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 8px 0 4px; font-size: .9rem; }
+.case-line-editor > .case-editor-heading:first-child { margin-top: 0; }
+.case-line-editor > .case-editor-heading:nth-last-child(2) { margin-bottom: 0; }
+.case-editor-heading > span { color: var(--text-muted); font-size: .8rem; margin-right: auto; }
+.source-line-choices { max-height: 250px; overflow-y: auto; overscroll-behavior: contain; }
+.source-line-choice { flex-wrap: nowrap; cursor: pointer; }
+.source-line-choice input { flex: 0 0 auto; margin: 0; accent-color: #4e9cff; }
+.source-line-content { display: flex; flex: 1; flex-wrap: wrap; align-items: center; gap: 8px; min-width: 0; }
+.source-line-content .formula-marks-group { margin-left: auto; }
+.source-line-choice:focus-within { outline: 2px solid #4e9cff; outline-offset: -2px; }
+.source-repair-label { display: block; font-size: .875rem; color: var(--text-muted); }
+/* 个人公式单行编辑：左侧公式、右侧标记，末尾删除；内外框均保留。 */
+.own-line-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; margin: 6px 0; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); overflow: hidden; }
+.own-line-row:last-child { margin-bottom: 0; }
+.own-line-fields { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 3fr); gap: 6px; padding: 5px 6px; min-width: 0; }
+.own-line-field { display: block; min-width: 0; margin: 0; cursor: text; }
+.own-line-row .form-control { min-width: 0; padding: 4px 7px; }
+.own-line-row .own-marks { border-color: #7cb3ff; background: #eaf3ff; color: #0a58ca; }
+.own-line-row .form-control:focus { border-color: #6ea8fe; box-shadow: none; }
+.own-line-remove { border: 0; border-left: 1px solid var(--border); border-radius: 0; background: transparent; color: #d9534f; padding: 0 14px; white-space: nowrap; font: inherit; cursor: pointer; }
+.own-line-remove:hover, .own-line-remove:focus-visible { background: rgba(217, 83, 79, .12); outline: none; }
+.own-line-remove:focus-visible { box-shadow: inset 0 0 0 2px rgba(217, 83, 79, .5); }
+html[data-theme="dark"] .own-line-row { background: var(--surface-muted); }
+html[data-theme="dark"] .own-line-remove { color: #ff8a80; }
+html[data-theme="dark"] .own-line-remove:hover, html[data-theme="dark"] .own-line-remove:focus-visible { background: rgba(255, 138, 128, .16); }
+.formula-origin { font-size: .72rem; color: var(--text-muted); margin-left: 7px; white-space: nowrap; }
+.case-lines-empty { color: var(--text-muted); font-size: .875rem; margin: 12px 0 0; }
+html[data-theme="dark"] .case-line-editor .form-control { background: #20283a; color: #e5edf8; border-color: #49536a; }
+html[data-theme="dark"] .own-line-row .own-marks { background: #173b67; border-color: #4e9cff; color: #dbeafe; }
+html[data-theme="dark"] .own-line-row .form-control:focus { border-color: #6ea8fe; box-shadow: none; }
+@media (max-width: 768px) {
+    .source-line-choice { min-height: 36px; }
+    .own-line-remove { padding: 0 8px; }
+    .case-editor-heading .btn { min-height: 36px; }
 }

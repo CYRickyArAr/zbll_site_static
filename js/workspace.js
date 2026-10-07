@@ -1,447 +1,251 @@
-// static 本地工作区：数据只保存在当前浏览器或用户导出的 .zbll 文件中。
+// Unified local libraries. Built-in algorithms are immutable sources; each case stores personal overlays.
 (function () {
     'use strict';
-
-    var DB_NAME = 'zbll_local_workspaces';
-    var STORE_NAME = 'workspaces';
-    var DB_VERSION = 1;
-    var ACTIVE_KEY = 'zbll_active_workspace';
-    var PUBLIC_ID = '__public_copy__';
-
-    function makeId() {
-        if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
-        return 'ws-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2);
+    var DB_NAME = 'zbll_local_workspaces', STORE = 'workspaces', BACKUPS = 'migration_backups';
+    var ACTIVE_KEY = 'zbll_active_workspace', LEGACY_PUBLIC_KEY = 'zbll_public_mode';
+    function clone(value) { return JSON.parse(JSON.stringify(value)); }
+    function makeId() { return window.crypto && crypto.randomUUID ? crypto.randomUUID() : 'id-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2); }
+    function cases(workspace, fn) {
+        workspace.categories.forEach(function (cat) { cat.subcategories.forEach(function (sub) { sub.formulas.forEach(function (f) { fn(f, cat, sub); }); }); });
     }
-
-    function clone(value) {
-        return JSON.parse(JSON.stringify(value));
+    function caseKey(cat, sub, id) { return JSON.stringify([cat, sub, id]); }
+    function lineSignature(line) { return JSON.stringify([line.alg, line.marks]); }
+    function validLine(line) { return line && typeof line.alg === 'string' && Array.isArray(line.marks) && line.marks.every(function (m) { return typeof m === 'string'; }); }
+    function catalog(data) {
+        var result = [];
+        cases(data, function (f, cat, sub) {
+            var key = caseKey(cat.id, sub.id, f.id), seen = Object.create(null);
+            result.push({ key: key, category: cat.id, subcategory: sub.id, formulaId: f.id, lines: (f.lines || []).map(function (line) {
+                var signature = lineSignature(line), occurrence = seen[signature] || 0;
+                seen[signature] = occurrence + 1;
+                return { id: JSON.stringify([key, signature, occurrence]), alg: line.alg, marks: line.marks.slice() };
+            }) });
+        });
+        return result;
     }
-
-    function openDb() {
-        return new Promise(function (resolve, reject) {
-            if (!window.indexedDB) {
-                reject(new Error('当前浏览器不支持本地工作区存储'));
-                return;
-            }
-            var request = indexedDB.open(DB_NAME, DB_VERSION);
-            request.onupgradeneeded = function () {
-                var db = request.result;
-                if (!db.objectStoreNames.contains(STORE_NAME)) {
-                    var store = db.createObjectStore(STORE_NAME, { keyPath: 'id' });
-                    store.createIndex('updatedAt', 'updatedAt', { unique: false });
-                }
-            };
-            request.onsuccess = function () { resolve(request.result); };
-            request.onerror = function () { reject(request.error || new Error('无法打开本地工作区')); };
+    function sourceFor(workspace, formula) { return workspace.sources.find(function (s) { return s.key === formula.sourceCaseKey; }); }
+    function sourceLines(workspace, formula) { var source = sourceFor(workspace, formula); return source ? source.lines : []; }
+    function defaultImage(workspace, formula) {
+        var source = sourceFor(workspace, formula);
+        if (!source) return '';
+        var cat = window.ZBLL_DATA.categories.find(function (c) { return c.id === source.category; });
+        var sub = cat && cat.subcategories.find(function (s) { return s.id === source.subcategory; });
+        var original = sub && sub.formulas.find(function (f) { return f.id === source.formulaId; });
+        return original ? original.image || '' : '';
+    }
+    function visibleLines(workspace, formula) {
+        return sourceLines(workspace, formula).filter(function (line) { return formula.visibleSourceLineIds.indexOf(line.id) >= 0; }).map(function (line) {
+            return { id: 'source:' + line.id, alg: line.alg, marks: line.marks.slice(), origin: 'source' };
+        }).concat(formula.customLines.map(function (line) {
+            return { id: 'custom:' + line.id, alg: line.alg, marks: line.marks.slice(), origin: 'custom' };
+        }));
+    }
+    function normalizeSelection(workspace, formula) {
+        if (formula.selectedLineId && !visibleLines(workspace, formula).some(function (line) { return line.id === formula.selectedLineId; })) delete formula.selectedLineId;
+    }
+    // Derived lines remain compatible with rendering/statistics, but never enter persistence/export.
+    function hydrate(workspace) {
+        if (!workspace) return workspace;
+        workspace.sources.forEach(function (s) {
+            s.lines.forEach(function (line) { Object.freeze(line.marks); Object.freeze(line); });
+            Object.freeze(s.lines); Object.freeze(s);
+        });
+        Object.freeze(workspace.sources);
+        cases(workspace, function (f) {
+            delete f.lines;
+            Object.defineProperty(f, 'lines', { configurable: true, enumerable: false, get: function () { return visibleLines(workspace, f); } });
+            normalizeSelection(workspace, f);
+        });
+        return workspace;
+    }
+    function newLibrary(data, name) {
+        var now = new Date().toISOString();
+        var result = { format: 'zbll-workspace', version: 2, kind: 'workspace', id: makeId(), name: name || '我的公式库', createdAt: now, updatedAt: now,
+            sourceFingerprint: data.meta && data.meta.fingerprint || '', sources: catalog(data), categories: clone(data.categories) };
+        cases(result, function (f, cat, sub) {
+            f.uid = f.uid || f.id || makeId();
+            f.sourceCaseKey = caseKey(cat.id, sub.id, f.id);
+            f.visibleSourceLineIds = sourceLines(result, f).map(function (line) { return line.id; });
+            f.customLines = []; f.learned = false;
+            delete f.lines; delete f.selectedLineAlg; delete f.selectedLineIndex; delete f.selectedLineId;
+        });
+        return hydrate(result);
+    }
+    function validateStructure(raw) {
+        if (!raw || raw.format !== 'zbll-workspace' || (raw.version !== 1 && raw.version !== 2) || !Array.isArray(raw.categories)) throw new Error('不是支持的 .zbll 公式库文件');
+        var expected = window.ZBLL_DATA.categories;
+        if (raw.categories.length !== expected.length) throw new Error('公式库分类数量不一致');
+        raw.categories.forEach(function (cat, ci) {
+            if (!cat || cat.id !== expected[ci].id || !Array.isArray(cat.subcategories) || cat.subcategories.length !== expected[ci].subcategories.length) throw new Error('公式库分类结构无效');
+            cat.subcategories.forEach(function (sub, si) {
+                if (!sub || sub.id !== expected[ci].subcategories[si].id || !Array.isArray(sub.formulas)) throw new Error('公式库子分类结构无效');
+            });
         });
     }
-
-    function transaction(db, mode, action) {
-        return new Promise(function (resolve, reject) {
-            var tx = db.transaction(STORE_NAME, mode);
-            var store = tx.objectStore(STORE_NAME);
-            var result;
-            try { result = action(store); } catch (error) { reject(error); return; }
-            tx.oncomplete = function () { resolve(result); };
-            tx.onerror = function () { reject(tx.error || new Error('本地工作区保存失败')); };
-            tx.onabort = function () { reject(tx.error || new Error('本地工作区操作已取消')); };
+    function validateV2(raw) {
+        validateStructure(raw);
+        if (raw.version !== 2 || !Array.isArray(raw.sources)) throw new Error('公式库来源目录无效');
+        var keys = new Set();
+        raw.sources.forEach(function (s) {
+            if (!s || typeof s.key !== 'string' || keys.has(s.key) || typeof s.category !== 'string' || typeof s.subcategory !== 'string' || typeof s.formulaId !== 'string' || s.key !== caseKey(s.category, s.subcategory, s.formulaId) || !Array.isArray(s.lines)) throw new Error('公式库来源标识无效或重复');
+            keys.add(s.key);
+            var ids = new Set();
+            s.lines.forEach(function (line) {
+                if (!validLine(line) || typeof line.id !== 'string' || !line.id || ids.has(line.id)) throw new Error('大神公式行无效或 ID 重复');
+                ids.add(line.id);
+            });
         });
+        var uids = new Set();
+        cases(raw, function (f, cat, sub) {
+            if (!f || typeof f.uid !== 'string' || !f.uid || uids.has(f.uid) || typeof f.id !== 'string' || typeof f.notes !== 'string' || typeof f.image !== 'string' || typeof f.learned !== 'boolean' || !Array.isArray(f.customLines) || !Array.isArray(f.visibleSourceLineIds)) throw new Error('case 数据无效或 ID 重复');
+            uids.add(f.uid);
+            if (f.clearedImage !== undefined && typeof f.clearedImage !== 'string') throw new Error('已清除图片的备份无效');
+            var src = sourceFor(raw, f);
+            if (f.sourceCaseKey !== null && (!src || src.category !== cat.id || src.subcategory !== sub.id)) throw new Error('case 来源引用无效');
+            var allowed = new Set((src ? src.lines : []).map(function (line) { return line.id; }));
+            var visible = new Set();
+            f.visibleSourceLineIds.forEach(function (id) { if (!allowed.has(id) || visible.has(id)) throw new Error('显示的大神公式引用无效或重复'); visible.add(id); });
+            var customIds = new Set();
+            f.customLines.forEach(function (line) {
+                if (!validLine(line) || typeof line.id !== 'string' || !line.id || customIds.has(line.id)) throw new Error('个人公式行无效或 ID 重复');
+                customIds.add(line.id);
+            });
+            if (f.selectedLineId !== undefined && (typeof f.selectedLineId !== 'string' || !visibleLines(raw, f).some(function (line) { return line.id === f.selectedLineId; }))) throw new Error('选中公式引用无效');
+        });
+        return raw;
     }
-
+    function migrate(raw, data) {
+        validateStructure(raw);
+        if (raw.version === 2) return hydrate(validateV2(clone(raw)));
+        var result = clone(raw), publicKind = raw.id === '__public_copy__' || raw.kind === 'public-copy' || raw.kind === 'public-library';
+        result.version = 2; result.kind = 'workspace'; result.sources = catalog(data);
+        var usedUids = new Set();
+        cases(result, function (f, cat, sub) {
+            if (!f || !Array.isArray(f.lines) || !f.lines.every(validLine)) throw new Error('旧公式库包含无效公式');
+            var oldLines = f.lines, oldSelection = typeof f.selectedLineAlg === 'string' ? f.selectedLineAlg : (oldLines[f.selectedLineIndex] || {}).alg;
+            f.id = typeof f.id === 'string' ? f.id : String(f.uid || makeId());
+            f.uid = typeof f.uid === 'string' && f.uid && !usedUids.has(f.uid) ? f.uid : makeId(); usedUids.add(f.uid);
+            f.image = typeof f.image === 'string' ? f.image : ''; f.notes = typeof f.notes === 'string' ? f.notes : ''; f.learned = f.learned === true;
+            // Match immutable original IDs only, never current position, label text or image.
+            var key = caseKey(cat.id, sub.id, f.id);
+            var source = result.sources.find(function (s) { return s.key === key; });
+            if (!source && f.uid) source = result.sources.find(function (s) { return s.key === caseKey(cat.id, sub.id, f.uid); });
+            f.sourceCaseKey = source ? source.key : null;
+            f.visibleSourceLineIds = publicKind && source ? source.lines.map(function (l) { return l.id; }) : [];
+            f.customLines = [];
+            var remaining = source ? source.lines.slice() : [];
+            oldLines.forEach(function (line) {
+                var match = publicKind ? remaining.findIndex(function (s) { return lineSignature(s) === lineSignature(line); }) : -1;
+                var id;
+                if (match >= 0) id = 'source:' + remaining.splice(match, 1)[0].id;
+                else { var own = { id: makeId(), alg: line.alg, marks: line.marks.slice() }; f.customLines.push(own); id = 'custom:' + own.id; }
+                if (!f.selectedLineId && oldSelection === line.alg) f.selectedLineId = id;
+            });
+            delete f.lines; delete f.selectedLineAlg; delete f.selectedLineIndex;
+        });
+        validateV2(result);
+        return hydrate(result);
+    }
     function requestResult(request) {
+        return new Promise(function (resolve, reject) { request.onsuccess = function () { resolve(request.result); }; request.onerror = function () { reject(request.error); }; });
+    }
+    function transact(db, stores, action) {
         return new Promise(function (resolve, reject) {
-            request.onsuccess = function () { resolve(request.result); };
-            request.onerror = function () { reject(request.error || new Error('本地工作区读取失败')); };
+            var tx = db.transaction(stores, 'readwrite');
+            tx.oncomplete = function () { resolve(); };
+            tx.onerror = tx.onabort = function () { reject(tx.error || new Error('本地保存失败')); };
+            try { action(tx); } catch (error) { tx.abort(); reject(error); }
         });
     }
-
-    function fixedNotes(category, formula) {
-        var text = String(formula.notes || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-        if (/^ZBLL\s+/i.test(text.trim().split('\n')[0] || '')) return text;
-        var number = String(formula.id || '').match(/(\d+)$/);
-        return 'ZBLL ' + category + ' ' + (number ? number[1] : '');
-    }
-
-    function blankWorkspace(data, name) {
-        var now = new Date().toISOString();
-        return {
-            format: 'zbll-workspace',
-            version: 1,
-            id: makeId(),
-            name: name || '我的zbll公式库',
-            sourceFingerprint: data.meta && data.meta.fingerprint || '',
-            createdAt: now,
-            updatedAt: now,
-            categories: (data.categories || []).map(function (category) {
-                return {
-                    id: category.id,
-                    subcategories: (category.subcategories || []).map(function (subcat) {
-                        return {
-                            id: subcat.id,
-                            formulas: (subcat.formulas || []).map(function (formula) {
-                                return {
-                                    uid: formula.uid || makeId(),
-                                    id: formula.id,
-                                    image: formula.image || '',
-                                    notes: fixedNotes(category.id, formula),
-                                    lines: [],
-                                    learned: false
-                                };
-                            })
-                        };
-                    })
-                };
-            })
+    var ready = new Promise(function (resolve, reject) {
+        if (!window.indexedDB) return reject(new Error('当前浏览器不支持本地公式库存储'));
+        var req = indexedDB.open(DB_NAME, 2);
+        req.onupgradeneeded = function () {
+            var db = req.result;
+            if (!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE, { keyPath: 'id' }).createIndex('updatedAt', 'updatedAt');
+            if (!db.objectStoreNames.contains(BACKUPS)) db.createObjectStore(BACKUPS, { keyPath: 'id' });
         };
-    }
-
-    function publicCopy(data, name) {
-        var now = new Date().toISOString();
-        return {
-            format: 'zbll-workspace',
-            version: 1,
-            id: makeId(),
-            kind: 'public-copy',
-            name: name || '大神版（已编辑）',
-            sourceFingerprint: data.meta && data.meta.fingerprint || '',
-            createdAt: now,
-            updatedAt: now,
-            categories: (data.categories || []).map(function (category) {
-                return {
-                    id: category.id,
-                    subcategories: (category.subcategories || []).map(function (subcat) {
-                        return {
-                            id: subcat.id,
-                            formulas: (subcat.formulas || []).map(function (formula) {
-                                var copied = clone(formula);
-                                // 公开 data.js 可能没有 uid；沿用稳定的公式 id，避免首次编辑时找不到对应卡片。
-                                copied.uid = copied.uid || copied.id || makeId();
-                                copied.id = typeof copied.id === 'string' ? copied.id : copied.uid;
-                                copied.image = typeof copied.image === 'string' ? copied.image : '';
-                                copied.notes = typeof copied.notes === 'string' ? copied.notes : '';
-                                copied.lines = Array.isArray(copied.lines) ? copied.lines : [];
-                                copied.learned = copied.learned === true;
-                                normalizeSelectedLineSelection(copied);
-                                return copied;
-                            })
-                        };
-                    })
-                };
-            })
-        };
-    }
-
-    function formulaKey(formula) {
-        return String(formula && (formula.uid || formula.id || ''));
-    }
-
-    function selectedLineAlgFromFormula(formula) {
-        if (!formula || typeof formula !== 'object') return undefined;
-        if (typeof formula.selectedLineAlg === 'string') return formula.selectedLineAlg;
-        var index = Number(formula.selectedLineIndex);
-        var lines = Array.isArray(formula.lines) ? formula.lines : [];
-        if (Number.isInteger(index) && index >= 0 && index < lines.length) return lines[index].alg;
-        return undefined;
-    }
-
-    function mergePublicCopy(data, existing) {
-        if (!existing) return null;
-        var sameSource = (existing.sourceFingerprint || '') === ((data.meta && data.meta.fingerprint) || '');
-        var merged = publicCopy(data);
-        merged.id = existing.id || merged.id;
-        merged.kind = 'public-copy';
-        merged.name = existing.name || merged.name;
-        merged.createdAt = existing.createdAt || merged.createdAt;
-        merged.updatedAt = existing.updatedAt || merged.updatedAt;
-        var oldBySub = {};
-        (existing.categories || []).forEach(function (category) {
-            (category.subcategories || []).forEach(function (subcat) {
-                oldBySub[category.id + '::' + subcat.id] = subcat.formulas || [];
+        req.onerror = function () { reject(req.error); };
+        req.onblocked = function () { reject(new Error('请关闭其他旧版网站标签页后重试')); };
+        req.onsuccess = function () { req.result.onversionchange = function () { req.result.close(); }; resolve(req.result); };
+    }).then(async function (db) {
+        var all = await requestResult(db.transaction(STORE).objectStore(STORE).getAll());
+        var pending = all.filter(function (w) { return w.version === 1; }).map(function (old) { return { old: old, next: clone(migrate(old, window.ZBLL_DATA)) }; });
+        if (pending.length) await transact(db, [STORE, BACKUPS], function (tx) {
+            pending.forEach(function (item) {
+                tx.objectStore(BACKUPS).add({ id: 'v1:' + item.old.id, savedAt: new Date().toISOString(), original: item.old });
+                tx.objectStore(STORE).put(item.next);
             });
         });
-        merged.categories.forEach(function (category) {
-            category.subcategories.forEach(function (subcat) {
-                var oldFormulas = oldBySub[category.id + '::' + subcat.id] || [];
-                var oldByKey = {};
-                oldFormulas.forEach(function (formula) { oldByKey[formulaKey(formula)] = formula; });
-                subcat.formulas.forEach(function (formula) {
-                    var old = oldByKey[formulaKey(formula)];
-                    if (old) {
-                        formula.learned = old.learned === true;
-                        formula.selectedLineAlg = selectedLineAlgFromFormula(old);
-                        normalizeSelectedLineSelection(formula);
-                        var preserveLocalNote = old.localNoteEdited === true ||
-                            (sameSource && typeof old.notes === 'string' && old.notes !== formula.notes);
-                        if (preserveLocalNote) {
-                            formula.notes = old.notes;
-                            formula.localNoteEdited = true;
-                        }
-                    }
-                });
-                var currentByKey = {};
-                subcat.formulas.forEach(function (formula) { currentByKey[formulaKey(formula)] = formula; });
-                var used = {};
-                var reordered = oldFormulas.map(function (oldFormula) {
-                    var key = formulaKey(oldFormula), formula = currentByKey[key];
-                    if (formula) used[key] = true;
-                    return formula || null;
-                }).filter(Boolean);
-                subcat.formulas.forEach(function (formula) {
-                    if (!used[formulaKey(formula)]) reordered.push(formula);
-                });
-                subcat.formulas = reordered;
-            });
-        });
-        return merged;
-    }
-
-    function exportPublicWorkspace(data, copy) {
-        var workspace = copy ? clone(copy) : publicCopy(data);
-        workspace.id = makeId();
-        workspace.kind = 'public-copy';
-        workspace.name = copy ? (copy.name || '大神版（已编辑）') : '大神版';
-        workspace.sourceFingerprint = data.meta && data.meta.fingerprint || workspace.sourceFingerprint || '';
-        if (!copy) stripSelectedLineSelections(workspace);
-        return workspace;
-    }
-
-    function isPublicWorkspace(workspace) {
-        return !!workspace && (workspace.id === PUBLIC_ID || workspace.kind === 'public-copy' || workspace.kind === 'public-library');
-    }
-
-    function validLine(line) {
-        return line && typeof line === 'object' && typeof line.alg === 'string' &&
-            Array.isArray(line.marks) && line.marks.every(function (mark) { return typeof mark === 'string'; });
-    }
-
-    function normalizeSelectedLineSelection(formula) {
-        if (!formula || typeof formula !== 'object') return;
-        var lines = Array.isArray(formula.lines) ? formula.lines : [];
-        if (typeof formula.selectedLineAlg !== 'string' && formula.selectedLineIndex !== undefined) {
-            var index = Number(formula.selectedLineIndex);
-            if (Number.isInteger(index) && index >= 0 && index < lines.length) formula.selectedLineAlg = lines[index].alg;
+        // Keep the actual previous mode, not the last library highlighted in the manager.
+        var active = localStorage.getItem(ACTIVE_KEY), oldPublic = localStorage.getItem(LEGACY_PUBLIC_KEY);
+        if (!active && oldPublic && oldPublic !== 'default') {
+            var oldId = oldPublic === 'edited' ? (all.find(function (w) { return w.kind === 'public-copy' || w.id === '__public_copy__'; }) || {}).id : oldPublic;
+            if (all.some(function (w) { return w.id === oldId; })) localStorage.setItem(ACTIVE_KEY, oldId);
         }
-        if (typeof formula.selectedLineAlg === 'string' && lines.some(function (line) { return line.alg === formula.selectedLineAlg; })) {
-            delete formula.selectedLineIndex;
-        } else {
-            delete formula.selectedLineAlg;
-            delete formula.selectedLineIndex;
-        }
-    }
-
-    function stripSelectedLineSelections(workspace) {
-        (workspace.categories || []).forEach(function (category) {
-            (category.subcategories || []).forEach(function (subcat) {
-                (subcat.formulas || []).forEach(function (formula) {
-                    delete formula.selectedLineAlg;
-                    delete formula.selectedLineIndex;
-                });
-            });
-        });
-    }
-
-    function normalizeImported(raw) {
-        if (!raw || raw.format !== 'zbll-workspace' || raw.version !== 1 || !Array.isArray(raw.categories)) {
-            throw new Error('不是有效的 .zbll 工作区文件');
-        }
-        var publicData = window.ZBLL_DATA;
-        if (publicData && Array.isArray(publicData.categories)) {
-            if (raw.categories.length !== publicData.categories.length) throw new Error('工作区分类数量与当前 ZBLL 数据不一致');
-            publicData.categories.forEach(function (expected, index) {
-                var actual = raw.categories[index];
-                if (!actual || actual.id !== expected.id || !Array.isArray(actual.subcategories) || actual.subcategories.length !== expected.subcategories.length) {
-                    throw new Error('工作区分类结构与当前 ZBLL 数据不一致');
-                }
-                expected.subcategories.forEach(function (expectedSub, subIndex) {
-                    var actualSub = actual.subcategories[subIndex];
-                    if (!actualSub || actualSub.id !== expectedSub.id || !Array.isArray(actualSub.formulas)) throw new Error('工作区子分类结构无效：' + expectedSub.id);
-                });
-            });
-        }
-        var workspace = clone(raw);
-        workspace.id = makeId();
-        workspace.name = String(workspace.name || '导入的 ZBLL 工作区').slice(0, 80);
-        workspace.kind = isPublicWorkspace(raw) || /^大神版/.test(String(raw.name || '')) ? 'public-copy' : 'workspace';
-        workspace.createdAt = workspace.createdAt || new Date().toISOString();
-        workspace.updatedAt = new Date().toISOString();
-        workspace.categories.forEach(function (category) {
-            if (!category || typeof category.id !== 'string' || !Array.isArray(category.subcategories)) throw new Error('工作区分类数据无效');
-            category.subcategories.forEach(function (subcat) {
-                if (!subcat || typeof subcat.id !== 'string' || !Array.isArray(subcat.formulas)) throw new Error('工作区子分类数据无效');
-                subcat.formulas.forEach(function (formula) {
-                    if (!formula || typeof formula !== 'object' || !Array.isArray(formula.lines) || !formula.lines.every(validLine)) throw new Error('工作区公式数据无效');
-                    formula.uid = typeof formula.uid === 'string' ? formula.uid : makeId();
-                    formula.id = typeof formula.id === 'string' ? formula.id : formula.uid;
-                    formula.image = typeof formula.image === 'string' ? formula.image : '';
-                    formula.notes = typeof formula.notes === 'string' ? formula.notes : '';
-                    formula.learned = formula.learned === true;
-                    normalizeSelectedLineSelection(formula);
-                });
-            });
-        });
-        return workspace;
-    }
-
-    var dbPromise = openDb();
+        localStorage.removeItem(LEGACY_PUBLIC_KEY);
+        return db;
+    });
     var api = {
-        ready: dbPromise,
-        async list() {
-            var db = await dbPromise;
-            var all = await requestResult(db.transaction(STORE_NAME, 'readonly').objectStore(STORE_NAME).getAll());
-            return all.sort(function (a, b) { return String(b.updatedAt).localeCompare(String(a.updatedAt)); });
-        },
-        async get(id) {
-            var db = await dbPromise;
-            return requestResult(db.transaction(STORE_NAME, 'readonly').objectStore(STORE_NAME).get(id));
-        },
-        async getPublicCopy(data, id) {
-            var existing = await this.get(id || PUBLIC_ID);
-            if (!existing || !data) return existing;
-            var merged = mergePublicCopy(data, existing);
-            if (merged && merged.sourceFingerprint !== existing.sourceFingerprint) await this.putPublicCopy(merged);
-            return merged;
-        },
-        async listPublicCopies(data) {
-            var all = await this.list();
-            var copies = all.filter(isPublicWorkspace);
-            if (!data) return copies;
-            var merged = [];
-            for (var i = 0; i < copies.length; i++) merged.push(await this.getPublicCopy(data, copies[i].id));
-            return merged.filter(Boolean).sort(function (a, b) { return String(b.updatedAt).localeCompare(String(a.updatedAt)); });
-        },
-        async hasPublicCopy() { return !!(await this.getPublicCopy()); },
-        async ensurePublicCopy(data) {
-            var existing = await this.getPublicCopy(data);
-            if (existing) return existing;
-            var copy = publicCopy(data);
-            await this.put(copy);
-            return copy;
-        },
-        async putPublicCopy(copy) {
-            copy.id = copy.id || makeId();
-            copy.kind = 'public-copy';
-            copy.name = copy.name || '大神版（已编辑）';
-            await this.put(copy);
-            return copy;
-        },
-        async createPublicCopy(data, name) {
-            var copy = publicCopy(data, name || '大神版（已编辑）');
-            await this.putPublicCopy(copy);
-            return copy;
-        },
-        exportPublic(data, copy) {
-            return exportPublicWorkspace(data, copy);
-        },
-        async resetPublicCopy() {
-            var db = await dbPromise;
-            await transaction(db, 'readwrite', function (store) { store.delete(PUBLIC_ID); });
-        },
+        ready: ready, makeId: makeId, clone: function (w) { return hydrate(clone(w)); }, sourceLines: sourceLines,
+        normalizeSelection: normalizeSelection, defaultImage: defaultImage,
+        async list() { var db = await ready; var all = await requestResult(db.transaction(STORE).objectStore(STORE).getAll()); return all.map(hydrate).sort(function (a, b) { return String(b.updatedAt).localeCompare(String(a.updatedAt)); }); },
+        async get(id) { if (!id) return null; var db = await ready; return hydrate(await requestResult(db.transaction(STORE).objectStore(STORE).get(id))); },
         async put(workspace) {
-            workspace.updatedAt = new Date().toISOString();
-            var db = await dbPromise;
-            await transaction(db, 'readwrite', function (store) { store.put(workspace); });
-            return workspace;
+            cases(workspace, function (f) { normalizeSelection(workspace, f); });
+            var output = clone(workspace); validateV2(output); output.updatedAt = new Date().toISOString();
+            var db = await ready;
+            await transact(db, [STORE], function (tx) { tx.objectStore(STORE).put(output); });
+            workspace.updatedAt = output.updatedAt; return workspace;
         },
-        async remove(id) {
-            var db = await dbPromise;
-            await transaction(db, 'readwrite', function (store) { store.delete(id); });
-            if (localStorage.getItem(ACTIVE_KEY) === id) localStorage.removeItem(ACTIVE_KEY);
-        },
-        async create(data, name) {
-            var workspace = blankWorkspace(data, name);
-            await this.put(workspace);
-            return workspace;
-        },
+        async remove(id) { var db = await ready; await transact(db, [STORE], function (tx) { tx.objectStore(STORE).delete(id); }); if (localStorage.getItem(ACTIVE_KEY) === id) localStorage.removeItem(ACTIVE_KEY); },
+        async create(data, name) { var w = newLibrary(data, name); await this.put(w); return w; },
         async activate(id) {
-            if (id) localStorage.setItem(ACTIVE_KEY, id); else localStorage.removeItem(ACTIVE_KEY);
-            var workspace = id ? await this.get(id) : null;
-            window.dispatchEvent(new CustomEvent('zbll-workspace-changed', { detail: workspace || null }));
-            return workspace;
+            var w = id ? await this.get(id) : null;
+            if (w) localStorage.setItem(ACTIVE_KEY, w.id); else localStorage.removeItem(ACTIVE_KEY);
+            window.dispatchEvent(new CustomEvent('zbll-workspace-changed', { detail: w })); return w;
         },
-        activeId() { return localStorage.getItem(ACTIVE_KEY) || ''; },
+        activeId: function () { return localStorage.getItem(ACTIVE_KEY) || ''; },
         async importFile(file) {
-            var text = await file.text();
-            var workspace = normalizeImported(JSON.parse(text));
-            var existing = await this.list();
-            var baseName = workspace.name;
-            var suffix = 2;
-            while (existing.some(function (item) { return item.name === workspace.name; })) workspace.name = baseName + ' ' + suffix++;
-            await this.put(workspace);
-            return workspace;
+            var w = migrate(JSON.parse(await file.text()), window.ZBLL_DATA);
+            w.id = makeId(); w.kind = 'workspace'; w.name = String(w.name || '导入的公式库').slice(0, 80);
+            w.createdAt = w.createdAt || new Date().toISOString();
+            var list = await this.list(), base = w.name, n = 2;
+            while (list.some(function (item) { return item.name === w.name; })) w.name = base + ' ' + n++;
+            await this.put(w); return w;
         },
+        exportPublic: function (data) { return newLibrary(data, 'ZBLL 公式库'); },
         async exportFile(workspace, onProgress, signal) {
-            function progress(value, text) {
-                if (typeof onProgress === 'function') onProgress(value, text);
-            }
-            function checkCancelled() {
-                if (signal && signal.aborted) throw new DOMException('导出已取消', 'AbortError');
-            }
-            checkCancelled();
-            progress(0, '准备工作区数据');
-            var output = clone(workspace);
-            var formulaQueue = [], formulasDone = 0;
-            for (var countCi = 0; countCi < output.categories.length; countCi++) {
-                var countCategory = output.categories[countCi];
-                for (var countSi = 0; countSi < countCategory.subcategories.length; countSi++) {
-                    var formulas = countCategory.subcategories[countSi].formulas;
-                    formulas.forEach(normalizeSelectedLineSelection);
-                    formulaQueue = formulaQueue.concat(formulas);
-                }
-            }
-            var formulasTotal = formulaQueue.length;
-            var nextFormula = 0;
-            async function processImages() {
-                while (true) {
-                    checkCancelled();
-                    var formulaIndex = nextFormula++;
-                    if (formulaIndex >= formulasTotal) return;
-                    var formula = formulaQueue[formulaIndex];
-                    var image = formula.image;
-                    if (image && !/^data:/i.test(image)) {
-                        try {
-                            var response = await fetch(new URL(image, document.baseURI).href, signal ? { signal: signal } : undefined);
-                            if (response.ok) {
-                                var blob = await response.blob();
-                                checkCancelled();
-                                formula.image = await new Promise(function (resolve, reject) {
-                                    var reader = new FileReader();
-                                    reader.onload = function () { resolve(reader.result); };
-                                    reader.onerror = reject;
-                                    reader.readAsDataURL(blob);
-                                });
-                            }
-                        } catch (e) {
-                            if ((signal && signal.aborted) || (e && e.name === 'AbortError')) throw e;
-                            /* 路径图片无法读取时保留原路径 */
+            function progress(n, text) { if (onProgress) onProgress(n, text); }
+            function check() { if (signal && signal.aborted) throw new DOMException('导出已取消', 'AbortError'); }
+            check(); progress(0, '准备公式库数据');
+            var output = clone(workspace); validateV2(output);
+            var queue = []; cases(output, function (f) { queue.push(f); });
+            var next = 0, done = 0;
+            async function worker() {
+                while (next < queue.length) {
+                    check(); var f = queue[next++];
+                    // Include cleared-image backups so restoring also works after export/import.
+                    for (var key of ['image', 'clearedImage']) {
+                        if (f[key] && !/^data:/i.test(f[key])) {
+                            try {
+                                var response = await fetch(new URL(f[key], document.baseURI).href, signal ? { signal: signal } : undefined);
+                                if (response.ok) {
+                                    var blob = await response.blob(); check();
+                                    f[key] = await new Promise(function (resolve, reject) { var r = new FileReader(); r.onload = function () { resolve(r.result); }; r.onerror = reject; r.readAsDataURL(blob); });
+                                }
+                            } catch (error) { check(); /* Keep the original path if an image cannot be embedded. */ }
                         }
                     }
-                    formulasDone++;
-                    if (formulasDone === 1 || formulasDone === formulasTotal || formulasDone % 12 === 0) {
-                        progress(Math.round((formulasDone / Math.max(1, formulasTotal)) * 100), '整理图片和公式 ' + formulasDone + '/' + formulasTotal);
-                        await new Promise(function (resolve) { setTimeout(resolve, 0); });
-                    }
+                    done++; progress(Math.round(done / queue.length * 100), '整理图片和公式 ' + done + '/' + queue.length);
                 }
             }
-            var workerCount = Math.min(16, Math.max(1, formulasTotal));
-            var workers = [];
-            for (var wi = 0; wi < workerCount; wi++) workers.push(processImages());
-            await Promise.all(workers);
-            checkCancelled();
-            progress(100, '生成 .zbll 文件');
+            await Promise.all(Array.from({ length: Math.min(16, queue.length) }, worker)); check();
             var blob = new Blob([JSON.stringify(output, null, 2)], { type: 'application/json;charset=utf-8' });
-            checkCancelled();
-            progress(100, '准备下载');
-            var url = URL.createObjectURL(blob);
-            var link = document.createElement('a');
-            link.href = url;
-            var downloadName = (workspace.name || 'zbll-workspace').replace(/[\\/:*?"<>|]/g, '_') + '.zbll';
-            link.download = downloadName;
-            checkCancelled();
-            link.click();
-            progress(100, '已下载 ' + downloadName);
-            setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+            var url = URL.createObjectURL(blob), a = document.createElement('a'); a.href = url;
+            a.download = (workspace.name || 'zbll-workspace').replace(/[\\/:*?"<>|]/g, '_') + '.zbll';
+            a.click(); progress(100, '已下载 ' + a.download); setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
         }
     };
-
     window.ZBLL_WORKSPACE = api;
 })();
