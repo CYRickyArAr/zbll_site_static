@@ -17,21 +17,38 @@ The content is provided for learning and reference purposes and will continue to
 - **All 472 ZBLL cases**: each case includes a top-layer state diagram and its corresponding algorithms, with multiple options available for some cases.
 - **7 main categories**: H (40 cases), and U / T / L / Pi / S / AS (72 cases each).
 - **Real-solve annotations**: each algorithm is labeled with the solvers who have used it; when multiple solvers use the same algorithm, their names are shown together (e.g. "Geng Tymon Fan").
-- **Pro Library**: a curated default library based on algorithms actually used in solves by top solvers.
-- **Local algorithm libraries**: supports personal copies of the Pro Library, custom libraries, and `.zbll` file import / export.
+- **Default Pro Library**: a curated collection of algorithms used in actual solves by top solvers, available to preview immediately.
+- **Personal libraries**: choose which pro algorithms to display and add your own algorithms in the same library. Use `.zbll` files for backups or transfers.
 
 ## Usage
 
-Open the site to browse all categories. After entering a category, click a subcategory title to collapse or expand it, or use the toggle button in the top bar to expand or collapse all sections at once.
+### Browsing and choosing a library
 
-The top navigation lets you switch between **Pro** and **Custom** modes and filter algorithms by **All / Learned / Unlearned**.
+Open the site to start browsing. Within a category, use the category labels and subcategory images at the top to switch between groups of cases. Filter by **All / Learned / Unlearned**, or click the site logo in the upper-left corner to return home.
 
-Open the Local Workspace from the upper-right corner:
+The upper-right button shows the current library name. Click it to open library management:
 
-- **Default Pro Library**: preview only; browse the complete default library without modifying the original data.
-- **Personal Pro Library**: create your own copy of the Default Pro Library, with support for editing notes, ordering, and learned status.
-- **Custom Library**: freely edit algorithms, images, and notes.
-- **Algorithm selection**: in a Personal Pro Library or Custom Library, select one algorithm per case to keep it highlighted. Each case has its own selection; click the selected algorithm again to clear it. Selection does not change algorithm order and is saved in `.zbll` exports.
-- **Import / export `.zbll`**: data is stored locally in the current browser. Export a `.zbll` file for backup or to continue using your library on another device.
+- **Default Pro Library**: preview only; no personal library is needed to browse. Your first attempt to make a change prompts you to create your own library.
+- **Personal libraries**: use the new-library button to create one with all pro algorithms initially visible. Each library lets you choose pro algorithms, add your own, and save images, notes, and learned status. Libraries keep their content and settings independently.
+- **Managing libraries**: click a library name to switch to it. Use the menu beside a personal library to rename, export, or delete it.
+
+### Editing and learning
+
+In a personal library, click **Edit** on a case card:
+
+- **Pro algorithms**: check or uncheck individual algorithms to show or hide them, or use **Select all / Select none** for that case. The original algorithms and solver annotations cannot be edited. Hiding an algorithm does not delete it.
+- **My algorithms**: click **＋ Add**, enter the algorithm on the left, and optionally enter marks on the right, separated by spaces. You can edit these algorithms at any time. **Delete** removes the entire personal algorithm entry, including its marks.
+- **Images and notes**: replace, clear, or restore an image, and add notes. Notes support multiple lines while editing; when browsing, they appear on one line with an ellipsis for overflow.
+- **Save / Cancel**: click **Save** to keep your edits, or **Cancel** to discard them.
+
+Use the round check button at the lower-right of a card to toggle learned status. Drag the handle at the upper-right to reorder cases. You can also click one algorithm per case to keep it highlighted; click it again to clear the selection. Selecting an algorithm does not change its order.
+
+### Backups and transfers
+
+Click **Save** after editing, then export a `.zbll` file from the personal library's menu. The file includes your algorithms and marks, each case's pro-algorithm visibility settings, images, notes, learned status, ordering, and algorithm selections.
+
+On another browser or device, open library management and choose **Import .zbll** to restore the file as a separate personal library.
+
+**Personal libraries are stored in the current browser and do not sync automatically across devices. Clearing browser data may erase them, so export backups regularly.**
 
 > Online: [https://cyrickyarar.github.io/zbll_site_static/](https://cyrickyarar.github.io/zbll_site_static/)
