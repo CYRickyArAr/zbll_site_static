@@ -1989,7 +1989,19 @@ html[data-theme="dark"] .formula-note-body-display {
 .own-line-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; margin: 6px 0; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); overflow: hidden; }
 .own-line-row:last-child { margin-bottom: 0; }
 .own-line-fields { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 3fr); gap: 6px; padding: 5px 6px; min-width: 0; }
-.own-line-field { display: block; min-width: 0; margin: 0; cursor: text; }
+.own-line-field { position: relative; display: block; min-width: 0; margin: 0; cursor: text; }
+/* 只覆盖空框的占位提示，不移动输入值，也不改变输入框尺寸。 */
+.own-mark-hint { position: absolute; inset: 1px 8px; display: flex; align-items: center; overflow: hidden; pointer-events: none; visibility: hidden; color: #6c757d; }
+.own-mark-track { display: flex; width: max-content; flex: 0 0 auto; white-space: pre; animation: own-mark-scroll var(--own-mark-duration, 8s) linear infinite; animation-play-state: paused; }
+.own-mark-copy { flex: 0 0 auto; }
+.own-line-field.is-hint-overflow .own-marks::placeholder { color: transparent; }
+.own-line-field.is-hint-overflow .own-marks:placeholder-shown ~ .own-mark-hint { visibility: visible; }
+.own-line-field.is-hint-overflow .own-marks:placeholder-shown ~ .own-mark-hint .own-mark-track { animation-play-state: running; }
+html[data-theme="dark"] .own-mark-hint { color: #9299a3; }
+@keyframes own-mark-scroll { from { transform: translateX(0); } to { transform: translateX(var(--own-mark-shift, 0px)); } }
+@media (prefers-reduced-motion: reduce) {
+    .own-mark-track { animation: none; }
+}
 .own-line-row .form-control { min-width: 0; padding: 4px 7px; }
 .own-line-row .own-marks { border-color: #7cb3ff; background: #eaf3ff; color: #0a58ca; }
 .own-line-row .form-control:focus { border-color: #6ea8fe; box-shadow: none; }

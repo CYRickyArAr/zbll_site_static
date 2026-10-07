@@ -58,6 +58,7 @@
     var workspaceShortcutTarget = null;
     var inlineEditor = null;
     var workspaceWritePending = false;
+    var ownMarkHintsCleanup = null;
 
     // initTheme() 会调用预热，因此状态必须在任何 init 调用之前初始化。
     var formulaImagePreloadCache = Object.create(null);
@@ -541,6 +542,7 @@
     }
 
     function renderHome() {
+        clearOwnMarkHints();
         selectionRequestId++;
         clearSorting();
         cancelFormulaImagePreload();
@@ -713,6 +715,7 @@
     }
 
     function renderCategory(catId) {
+        clearOwnMarkHints();
         selectionRequestId++;
         clearSorting();
         cancelFormulaImagePreload();
@@ -749,6 +752,7 @@
         });
         currentCatId = cat.id;
         currentSubId = activeSub ? activeSub.id : '';
+        initOwnMarkHints();
         scheduleCategoryFormulaImages(cat);
         warmThemeImages();
         applyZbllFilter(getZbllFilter());
@@ -1143,6 +1147,62 @@
             if (card && typeof previousTop === 'number') window.scrollBy(0, card.getBoundingClientRect().top - previousTop);
         });
     }
+    function clearOwnMarkHints() {
+        if (ownMarkHintsCleanup) ownMarkHintsCleanup();
+        ownMarkHintsCleanup = null;
+    }
+    function initOwnMarkHints() {
+        clearOwnMarkHints();
+        var inputs = Array.from(appEl.querySelectorAll('.own-marks'));
+        if (!inputs.length || typeof ResizeObserver !== 'function') return;
+        var observer, motion, disposed = false, fullHint = '标记（可选）';
+        function refresh() {
+            if (disposed) return;
+            try {
+                inputs.forEach(function (input) {
+                    var field = input.parentElement, hint = field.querySelector('.own-mark-hint');
+                    var style = getComputedStyle(input);
+                    input.placeholder = motion.matches ? '标记' : fullHint;
+                    hint.style.font = style.font;
+                    hint.style.letterSpacing = style.letterSpacing;
+                    hint.style.left = (parseFloat(style.borderLeftWidth) + parseFloat(style.paddingLeft)) + 'px';
+                    hint.style.right = (parseFloat(style.borderRightWidth) + parseFloat(style.paddingRight)) + 'px';
+                    var copy = hint.querySelector('.own-mark-copy');
+                    var textWidth = copy.querySelector('span').getBoundingClientRect().width;
+                    var available = input.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+                    var step = copy.getBoundingClientRect().width;
+                    hint.style.setProperty('--own-mark-shift', -step + 'px');
+                    hint.style.setProperty('--own-mark-duration', (step / 20) + 's');
+                    field.classList.toggle('is-hint-overflow', !motion.matches && available > 0 && textWidth > available + 0.5);
+                });
+            } catch (error) { clearOwnMarkHints(); }
+        }
+        ownMarkHintsCleanup = function () {
+            disposed = true;
+            if (observer) observer.disconnect();
+            if (motion) {
+                if (motion.removeEventListener) motion.removeEventListener('change', refresh);
+                else motion.removeListener(refresh);
+            }
+            if (document.fonts && document.fonts.removeEventListener) document.fonts.removeEventListener('loadingdone', refresh);
+            inputs.forEach(function (input) {
+                input.placeholder = fullHint;
+                input.parentElement.classList.remove('is-hint-overflow');
+            });
+        };
+        try {
+            motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+            observer = new ResizeObserver(refresh);
+            inputs.forEach(function (input) { observer.observe(input); });
+            if (motion.addEventListener) motion.addEventListener('change', refresh);
+            else motion.addListener(refresh);
+            if (document.fonts) {
+                document.fonts.ready.then(refresh);
+                if (document.fonts.addEventListener) document.fonts.addEventListener('loadingdone', refresh);
+            }
+            refresh();
+        } catch (error) { clearOwnMarkHints(); }
+    }
     function ownLineRow(line) {
         // 一整行：公式与标记并排输入，最右侧删除整条；保留内外框。
         // algs 单行输入，历史数据里可能存在的换行先折成空格，避免保存时把两段公式粘在一起。
@@ -1150,7 +1210,8 @@
         return '<div class="own-line-row" data-line-id="' + escapeHtml(line.id) + '">'
             + '<div class="own-line-fields">'
             + '<label class="own-line-field"><span class="visually-hidden">公式</span><input type="text" class="form-control own-alg" placeholder="输入公式" value="' + escapeHtml(alg) + '"></label>'
-            + '<label class="own-line-field"><span class="visually-hidden">标记</span><input type="text" class="form-control own-marks" placeholder="标记（可选）" title="多个标记用空格分隔" value="' + escapeHtml(line.marks.join(' ')) + '"></label>'
+            + '<label class="own-line-field"><span class="visually-hidden">标记（可选），多个标记用空格分隔</span><input type="text" class="form-control own-marks" placeholder="标记（可选）" title="标记（可选），多个标记用空格分隔" value="' + escapeHtml(line.marks.join(' ')) + '">'
+            + '<span class="own-mark-hint" aria-hidden="true"><span class="own-mark-track"><span class="own-mark-copy"><span>标记（可选）</span>&nbsp;</span><span class="own-mark-copy"><span>标记（可选）</span>&nbsp;</span></span></span></label>'
             + '</div>'
             + '<button type="button" class="workspace-action own-line-remove" data-action="remove-own-line" title="删除这条公式（不影响大神公式）">删除</button></div>';
     }
@@ -1292,9 +1353,9 @@
         }
         if (action === 'add-own-line') {
             var rows = button.closest('.formula-card').querySelector('.own-line-rows');
-            rows.insertAdjacentHTML('beforeend', ownLineRow({ id: WS.makeId(), alg: '', marks: [] })); rows.lastElementChild.querySelector('.own-alg').focus(); return;
+            rows.insertAdjacentHTML('beforeend', ownLineRow({ id: WS.makeId(), alg: '', marks: [] })); initOwnMarkHints(); rows.lastElementChild.querySelector('.own-alg').focus(); return;
         }
-        if (action === 'remove-own-line') { button.closest('.own-line-row').remove(); return; }
+        if (action === 'remove-own-line') { clearOwnMarkHints(); button.closest('.own-line-row').remove(); initOwnMarkHints(); return; }
         if (action === 'cancel-inline-edit') { cancelInlineEditor(button); return; }
         if (action === 'save-inline-edit') { await saveInlineEditor(button); return; }
         if (action === 'clear-inline-image') { clearInlineImage(button); return; }
