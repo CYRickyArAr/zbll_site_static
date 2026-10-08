@@ -3,6 +3,8 @@
     'use strict';
     var DB_NAME = 'zbll_local_workspaces', STORE = 'workspaces', BACKUPS = 'migration_backups';
     var ACTIVE_KEY = 'zbll_active_workspace', LEGACY_PUBLIC_KEY = 'zbll_public_mode';
+    function t(key, args) { return window.ZBLL_I18N ? window.ZBLL_I18N.t(key, args) : key.replace(/\{(\w+)\}/g, function (match, name) { return args && name in args ? args[name] : match; }); }
+    function failure(key) { return window.ZBLL_I18N ? window.ZBLL_I18N.error(key) : new Error(key); }
     function clone(value) { return JSON.parse(JSON.stringify(value)); }
     function makeId() { return window.crypto && crypto.randomUUID ? crypto.randomUUID() : 'id-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2); }
     function cases(workspace, fn) {
@@ -60,7 +62,7 @@
     }
     function newLibrary(data, name) {
         var now = new Date().toISOString();
-        var result = { format: 'zbll-workspace', version: 2, kind: 'workspace', id: makeId(), name: name || '我的公式库', createdAt: now, updatedAt: now,
+        var result = { format: 'zbll-workspace', version: 2, kind: 'workspace', id: makeId(), name: name || t('我的公式库'), createdAt: now, updatedAt: now,
             sourceFingerprint: data.meta && data.meta.fingerprint || '', sources: catalog(data), categories: clone(data.categories) };
         cases(result, function (f, cat, sub) {
             f.uid = f.uid || f.id || makeId();
@@ -72,45 +74,45 @@
         return hydrate(result);
     }
     function validateStructure(raw) {
-        if (!raw || raw.format !== 'zbll-workspace' || (raw.version !== 1 && raw.version !== 2) || !Array.isArray(raw.categories)) throw new Error('不是支持的 .zbll 公式库文件');
+        if (!raw || raw.format !== 'zbll-workspace' || (raw.version !== 1 && raw.version !== 2) || !Array.isArray(raw.categories)) throw failure('不是支持的 .zbll 公式库文件');
         var expected = window.ZBLL_DATA.categories;
-        if (raw.categories.length !== expected.length) throw new Error('公式库分类数量不一致');
+        if (raw.categories.length !== expected.length) throw failure('公式库分类数量不一致');
         raw.categories.forEach(function (cat, ci) {
-            if (!cat || cat.id !== expected[ci].id || !Array.isArray(cat.subcategories) || cat.subcategories.length !== expected[ci].subcategories.length) throw new Error('公式库分类结构无效');
+            if (!cat || cat.id !== expected[ci].id || !Array.isArray(cat.subcategories) || cat.subcategories.length !== expected[ci].subcategories.length) throw failure('公式库分类结构无效');
             cat.subcategories.forEach(function (sub, si) {
-                if (!sub || sub.id !== expected[ci].subcategories[si].id || !Array.isArray(sub.formulas)) throw new Error('公式库子分类结构无效');
+                if (!sub || sub.id !== expected[ci].subcategories[si].id || !Array.isArray(sub.formulas)) throw failure('公式库子分类结构无效');
             });
         });
     }
     function validateV2(raw) {
         validateStructure(raw);
-        if (raw.version !== 2 || !Array.isArray(raw.sources)) throw new Error('公式库来源目录无效');
+        if (raw.version !== 2 || !Array.isArray(raw.sources)) throw failure('公式库来源目录无效');
         var keys = new Set();
         raw.sources.forEach(function (s) {
-            if (!s || typeof s.key !== 'string' || keys.has(s.key) || typeof s.category !== 'string' || typeof s.subcategory !== 'string' || typeof s.formulaId !== 'string' || s.key !== caseKey(s.category, s.subcategory, s.formulaId) || !Array.isArray(s.lines)) throw new Error('公式库来源标识无效或重复');
+            if (!s || typeof s.key !== 'string' || keys.has(s.key) || typeof s.category !== 'string' || typeof s.subcategory !== 'string' || typeof s.formulaId !== 'string' || s.key !== caseKey(s.category, s.subcategory, s.formulaId) || !Array.isArray(s.lines)) throw failure('公式库来源标识无效或重复');
             keys.add(s.key);
             var ids = new Set();
             s.lines.forEach(function (line) {
-                if (!validLine(line) || typeof line.id !== 'string' || !line.id || ids.has(line.id)) throw new Error('大神公式行无效或 ID 重复');
+                if (!validLine(line) || typeof line.id !== 'string' || !line.id || ids.has(line.id)) throw failure('大神公式行无效或 ID 重复');
                 ids.add(line.id);
             });
         });
         var uids = new Set();
         cases(raw, function (f, cat, sub) {
-            if (!f || typeof f.uid !== 'string' || !f.uid || uids.has(f.uid) || typeof f.id !== 'string' || typeof f.notes !== 'string' || typeof f.image !== 'string' || typeof f.learned !== 'boolean' || !Array.isArray(f.customLines) || !Array.isArray(f.visibleSourceLineIds)) throw new Error('case 数据无效或 ID 重复');
+            if (!f || typeof f.uid !== 'string' || !f.uid || uids.has(f.uid) || typeof f.id !== 'string' || typeof f.notes !== 'string' || typeof f.image !== 'string' || typeof f.learned !== 'boolean' || !Array.isArray(f.customLines) || !Array.isArray(f.visibleSourceLineIds)) throw failure('case 数据无效或 ID 重复');
             uids.add(f.uid);
-            if (f.clearedImage !== undefined && typeof f.clearedImage !== 'string') throw new Error('已清除图片的备份无效');
+            if (f.clearedImage !== undefined && typeof f.clearedImage !== 'string') throw failure('已清除图片的备份无效');
             var src = sourceFor(raw, f);
-            if (f.sourceCaseKey !== null && (!src || src.category !== cat.id || src.subcategory !== sub.id)) throw new Error('case 来源引用无效');
+            if (f.sourceCaseKey !== null && (!src || src.category !== cat.id || src.subcategory !== sub.id)) throw failure('case 来源引用无效');
             var allowed = new Set((src ? src.lines : []).map(function (line) { return line.id; }));
             var visible = new Set();
-            f.visibleSourceLineIds.forEach(function (id) { if (!allowed.has(id) || visible.has(id)) throw new Error('显示的大神公式引用无效或重复'); visible.add(id); });
+            f.visibleSourceLineIds.forEach(function (id) { if (!allowed.has(id) || visible.has(id)) throw failure('显示的大神公式引用无效或重复'); visible.add(id); });
             var customIds = new Set();
             f.customLines.forEach(function (line) {
-                if (!validLine(line) || typeof line.id !== 'string' || !line.id || customIds.has(line.id)) throw new Error('个人公式行无效或 ID 重复');
+                if (!validLine(line) || typeof line.id !== 'string' || !line.id || customIds.has(line.id)) throw failure('个人公式行无效或 ID 重复');
                 customIds.add(line.id);
             });
-            if (f.selectedLineId !== undefined && (typeof f.selectedLineId !== 'string' || !visibleLines(raw, f).some(function (line) { return line.id === f.selectedLineId; }))) throw new Error('选中公式引用无效');
+            if (f.selectedLineId !== undefined && (typeof f.selectedLineId !== 'string' || !visibleLines(raw, f).some(function (line) { return line.id === f.selectedLineId; }))) throw failure('选中公式引用无效');
         });
         return raw;
     }
@@ -121,7 +123,7 @@
         result.version = 2; result.kind = 'workspace'; result.sources = catalog(data);
         var usedUids = new Set();
         cases(result, function (f, cat, sub) {
-            if (!f || !Array.isArray(f.lines) || !f.lines.every(validLine)) throw new Error('旧公式库包含无效公式');
+            if (!f || !Array.isArray(f.lines) || !f.lines.every(validLine)) throw failure('旧公式库包含无效公式');
             var oldLines = f.lines, oldSelection = typeof f.selectedLineAlg === 'string' ? f.selectedLineAlg : (oldLines[f.selectedLineIndex] || {}).alg;
             f.id = typeof f.id === 'string' ? f.id : String(f.uid || makeId());
             f.uid = typeof f.uid === 'string' && f.uid && !usedUids.has(f.uid) ? f.uid : makeId(); usedUids.add(f.uid);
@@ -153,12 +155,12 @@
         return new Promise(function (resolve, reject) {
             var tx = db.transaction(stores, 'readwrite');
             tx.oncomplete = function () { resolve(); };
-            tx.onerror = tx.onabort = function () { reject(tx.error || new Error('本地保存失败')); };
+            tx.onerror = tx.onabort = function () { reject(tx.error || failure('本地保存失败')); };
             try { action(tx); } catch (error) { tx.abort(); reject(error); }
         });
     }
     var ready = new Promise(function (resolve, reject) {
-        if (!window.indexedDB) return reject(new Error('当前浏览器不支持本地公式库存储'));
+        if (!window.indexedDB) return reject(failure('当前浏览器不支持本地公式库存储'));
         var req = indexedDB.open(DB_NAME, 2);
         req.onupgradeneeded = function () {
             var db = req.result;
@@ -166,7 +168,7 @@
             if (!db.objectStoreNames.contains(BACKUPS)) db.createObjectStore(BACKUPS, { keyPath: 'id' });
         };
         req.onerror = function () { reject(req.error); };
-        req.onblocked = function () { reject(new Error('请关闭其他旧版网站标签页后重试')); };
+        req.onblocked = function () { reject(failure('请关闭其他旧版网站标签页后重试')); };
         req.onsuccess = function () { req.result.onversionchange = function () { req.result.close(); }; resolve(req.result); };
     }).then(async function (db) {
         var all = await requestResult(db.transaction(STORE).objectStore(STORE).getAll());
@@ -208,16 +210,16 @@
         activeId: function () { return localStorage.getItem(ACTIVE_KEY) || ''; },
         async importFile(file) {
             var w = migrate(JSON.parse(await file.text()), window.ZBLL_DATA);
-            w.id = makeId(); w.kind = 'workspace'; w.name = String(w.name || '导入的公式库').slice(0, 80);
+            w.id = makeId(); w.kind = 'workspace'; w.name = String(w.name || t('导入的公式库')).slice(0, 80);
             w.createdAt = w.createdAt || new Date().toISOString();
             var list = await this.list(), base = w.name, n = 2;
             while (list.some(function (item) { return item.name === w.name; })) w.name = base + ' ' + n++;
             await this.put(w); return w;
         },
-        exportPublic: function (data) { return newLibrary(data, 'ZBLL 公式库'); },
+        exportPublic: function (data) { return newLibrary(data, t('ZBLL 公式库')); },
         async exportFile(workspace, onProgress, signal) {
-            function progress(n, text) { if (onProgress) onProgress(n, text); }
-            function check() { if (signal && signal.aborted) throw new DOMException('导出已取消', 'AbortError'); }
+            function progress(n, key, args) { if (onProgress) onProgress(n, t(key, args), { key: key, args: args }); }
+            function check() { if (signal && signal.aborted) throw new DOMException(t('导出已取消'), 'AbortError'); }
             check(); progress(0, '准备公式库数据');
             var output = clone(workspace); validateV2(output);
             var queue = []; cases(output, function (f) { queue.push(f); });
@@ -237,15 +239,25 @@
                             } catch (error) { check(); /* Keep the original path if an image cannot be embedded. */ }
                         }
                     }
-                    done++; progress(Math.round(done / queue.length * 100), '整理图片和公式 ' + done + '/' + queue.length);
+                    done++; progress(Math.round(done / queue.length * 100), '整理图片和公式 {done}/{total}', { done: done, total: queue.length });
                 }
             }
             await Promise.all(Array.from({ length: Math.min(16, queue.length) }, worker)); check();
             var blob = new Blob([JSON.stringify(output, null, 2)], { type: 'application/json;charset=utf-8' });
             var url = URL.createObjectURL(blob), a = document.createElement('a'); a.href = url;
             a.download = (workspace.name || 'zbll-workspace').replace(/[\\/:*?"<>|]/g, '_') + '.zbll';
-            a.click(); progress(100, '已下载 ' + a.download); setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+            a.click(); progress(100, '已下载 {name}', { name: a.download }); setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
         }
     };
+    // Disable language changes only while asynchronous library operations are in flight.
+    ['put', 'remove', 'create', 'activate', 'importFile', 'exportFile'].forEach(function (name) {
+        var original = api[name];
+        api[name] = async function () {
+            var i18n = window.ZBLL_I18N;
+            if (i18n) i18n.setBusy(1);
+            try { return await original.apply(this, arguments); }
+            finally { if (i18n) i18n.setBusy(-1); }
+        };
+    });
     window.ZBLL_WORKSPACE = api;
 })();

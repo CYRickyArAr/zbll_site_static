@@ -24,6 +24,8 @@ The content is provided for learning and reference purposes and will continue to
 
 ### Browsing and choosing a library
 
+Click the language (文 / A) icon in the top bar to choose **简体中文 / English**. Your first visit follows your browser’s preferred language; a manual choice is remembered. English mode displays known solver labels in English (e.g. 耿 → Xuanyi, 南 → Nahm). Personal library names, notes, and the original text in mark input fields are unchanged.
+
 Open the site to start browsing. Within a category, use the category labels and subcategory images at the top to switch between groups of cases. Filter by **All / Learned / Unlearned**, or click the site logo in the upper-left corner to return home.
 
 The upper-right button shows the current library name. Click it to open library management:

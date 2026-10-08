@@ -282,6 +282,19 @@ html:not([data-theme="dark"]) .site-help-button:focus-visible { background: #eef
     .site-help-button { transition: none; }
 }
 
+/* Language menu lives outside the navbar's mobile clipping region. */
+.language-toggle:disabled { opacity: .45; cursor: default; }
+.language-menu { position: fixed; z-index: 2100; min-width: 156px; padding: 5px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text); box-shadow: 0 6px 20px #0002; }
+.language-menu[hidden] { display: none; }
+.language-menu button { display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 10px; border: 0; border-radius: 5px; background: transparent; color: inherit; font: inherit; font-size: .9rem; text-align: left; }
+.language-menu button::before { content: ''; width: 1em; flex: 0 0 1em; }
+.language-menu button[aria-checked="true"]::before { content: '✓'; }
+.language-menu button:hover, .language-menu button:focus-visible { background: var(--surface-muted); outline: 1px solid #6ea8fe; outline-offset: -1px; }
+@media (max-width: 700px) {
+    html[lang="en"] .navbar-logo-text { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+}
+html[lang="en"] .workspace-help { white-space: normal; font-size: .875rem; }
+
 .site-help-dialog {
     width: min(560px, calc(100% - 32px));
     max-height: calc(100dvh - 32px);

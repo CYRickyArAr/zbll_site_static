@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZBLL公式库</title>
+    <script src="js/i18n.js?v=2"></script>
+    <title data-i18n="ZBLL公式库">ZBLL公式库</title>
     <link rel="icon" href="favicon.ico" sizes="any">
     <link rel="icon" type="image/svg+xml" href="images/icons/zbll-icon.svg">
     <link rel="apple-touch-icon" href="images/icons/apple-touch-icon.png">
@@ -13,7 +14,7 @@
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/style.css?v=264" rel="stylesheet">
+    <link href="css/style.css?v=265" rel="stylesheet">
     <link rel="preload" href="images/image-library.json.gz?v=948c94316eb7e335" as="fetch" crossorigin>
     <script defer src="js/image-library.js?v=1" data-bundle="images/image-library.json.gz?v=948c94316eb7e335" data-fallback="images/image-library.json?v=948c94316eb7e335"></script>
     <script>
@@ -31,10 +32,10 @@
                 var hasAnchor = !!localStorage.getItem(key + '_anchor');
                 var y = parseInt(localStorage.getItem(key), 10) || 0;
                 if (hasAnchor || y > 0) document.documentElement.setAttribute('data-scroll-restore', 'pending');
-                var snapshotRaw = sessionStorage.getItem('zbll_render_snapshot_v3');
+                var snapshotRaw = sessionStorage.getItem('zbll_render_snapshot_v4');
                 if (snapshotRaw) {
                     var snapshot = JSON.parse(snapshotRaw);
-                    if (snapshot && snapshot.hash === hash && snapshot.appHtml) {
+                    if (snapshot && snapshot.language === ZBLL_I18N.language() && snapshot.hash === hash && snapshot.appHtml) {
                         document.documentElement.setAttribute('data-render-snapshot', 'pending');
                     }
                 }
@@ -49,65 +50,74 @@
     <!-- 顶部导航栏 -->
     <div class="navbar">
         <div class="navbar-left">
-            <a href="#/" class="navbar-logo"><img class="navbar-logo-icon" src="images/icons/zbll-icon.svg" width="28" height="28" alt=""><span class="navbar-logo-text">ZBLL 公式库</span></a>
+            <a href="#/" class="navbar-logo"><img class="navbar-logo-icon" src="images/icons/zbll-icon.svg" width="28" height="28" alt=""><span class="navbar-logo-text" data-i18n="nav.brand">ZBLL 公式库</span></a>
         </div>
         <div class="navbar-center">
-            <div class="zbll-filter" role="group" aria-label="公式筛选">
-                <button type="button" class="zbll-filter-btn" data-filter="all">全部</button>
-                <button type="button" class="zbll-filter-btn" data-filter="learned">已学</button>
-                <button type="button" class="zbll-filter-btn" data-filter="unlearned">未学</button>
+            <div class="zbll-filter" role="group" aria-label="公式筛选" data-i18n-aria-label="公式筛选">
+                <button type="button" class="zbll-filter-btn" data-filter="all" data-i18n="全部">全部</button>
+                <button type="button" class="zbll-filter-btn" data-filter="learned" data-i18n="已学">已学</button>
+                <button type="button" class="zbll-filter-btn" data-filter="unlearned" data-i18n="未学">未学</button>
             </div>
         </div>
         <div class="navbar-right">
-            <button type="button" class="site-help-button" id="site-help-open" title="关于本站" aria-label="关于本站" aria-haspopup="dialog" aria-controls="site-help-dialog">
+            <button type="button" class="site-help-button" id="site-help-open" title="关于本站" aria-label="关于本站" data-i18n-title="关于本站" data-i18n-aria-label="关于本站" aria-haspopup="dialog" aria-controls="site-help-dialog">
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><path d="M12 17h.01"></path></svg>
             </button>
-            <button type="button" class="theme-toggle" id="theme-toggle" aria-label="切换到深色模式" title="切换到深色模式" aria-pressed="false">
+            <button type="button" class="site-help-button language-toggle" id="language-toggle" disabled title="语言" aria-label="语言" data-i18n-title="语言" data-i18n-aria-label="语言" aria-haspopup="menu" aria-controls="language-menu" aria-expanded="false">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v1.99h11.17A15.7 15.7 0 0 1 9 11.35 15.65 15.65 0 0 1 6.69 8h-2a17.58 17.58 0 0 0 2.98 4.56L2.58 17.58 4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7 1.62-4.33L19.12 17h-3.24z"></path></svg>
+            </button>
+            <button type="button" class="theme-toggle" id="theme-toggle" aria-label="切换到深色模式" title="切换到深色模式" data-i18n-title="切换到深色模式" data-i18n-aria-label="切换到深色模式" aria-pressed="false">
                 <svg class="theme-toggle-icon theme-toggle-icon-light" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                     <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                 </svg><span class="theme-toggle-icon theme-toggle-icon-dark" aria-hidden="true">☀</span>
             </button>
-            <button type="button" class="workspace-nav-btn" id="workspace-open" title="打开本地工作区"><span class="workspace-nav-clip"><span class="workspace-nav-label">本地工作区</span></span></button>
+            <button type="button" class="workspace-nav-btn" id="workspace-open" title="打开本地工作区" data-i18n-title="打开本地工作区"><span class="workspace-nav-clip"><span class="workspace-nav-label" data-i18n="本地工作区">本地工作区</span></span></button>
         </div>
     </div>
 
+    <div class="language-menu" id="language-menu" role="menu" aria-label="语言" data-i18n-aria-label="语言" hidden>
+        <button type="button" role="menuitemradio" aria-checked="false" data-language-choice="zh" lang="zh-CN">简体中文</button>
+        <button type="button" role="menuitemradio" aria-checked="false" data-language-choice="en" lang="en">English</button>
+    </div>
+    <script>ZBLL_I18N.translate(document);</script>
+
     <dialog class="site-help-dialog" id="site-help-dialog" aria-labelledby="site-help-title">
         <div class="site-help-header">
-            <h2 id="site-help-title">关于本站</h2>
-            <button type="button" class="site-help-close" id="site-help-close" aria-label="关闭">×</button>
+            <h2 id="site-help-title" data-i18n="关于本站">关于本站</h2>
+            <button type="button" class="site-help-close" id="site-help-close" aria-label="关闭" data-i18n-aria-label="关闭">×</button>
         </div>
         <section class="site-help-section" aria-labelledby="site-help-intro">
-            <h3 id="site-help-intro">网站介绍</h3>
+            <h3 id="site-help-intro" data-i18n="网站介绍">网站介绍</h3>
             <div class="site-help-intro-card">
-                <p>本站公式整理自 <a href="https://reco.nz/" target="_blank" rel="noopener noreferrer">reco.nz</a>、<a href="https://cubestation.com/" target="_blank" rel="noopener noreferrer">魔方星球</a>、<a href="https://wcucube.club/" target="_blank" rel="noopener noreferrer">WCU Cube</a> 的复盘记录，数据真实可靠。</p>
-                <p class="site-help-disclaimer">注：公式实战使用过不一定代表是当前主力公式</p>
+                <p><span data-i18n="本站公式整理自 ">本站公式整理自 </span><a href="https://reco.nz/" target="_blank" rel="noopener noreferrer">reco.nz</a><span data-i18n="、">、</span><a href="https://cubestation.com/" target="_blank" rel="noopener noreferrer" data-i18n="魔方星球">魔方星球</a><span data-i18n="、">、</span><a href="https://wcucube.club/" target="_blank" rel="noopener noreferrer">WCU Cube</a><span data-i18n=" 的复盘记录，数据真实可靠。"> 的复盘记录，数据真实可靠。</span></p>
+                <p class="site-help-disclaimer" data-i18n="注：公式实战使用过不一定代表是当前主力公式">注：公式实战使用过不一定代表是当前主力公式</p>
             </div>
         </section>
         <section class="site-help-section" aria-labelledby="site-help-repo">
-            <h3 id="site-help-repo">GitHub 仓库</h3>
-            <a href="https://github.com/CYRickyArAr/zbll_site_static" target="_blank" rel="noopener noreferrer" class="about-link site-help-repo-link" title="GitHub 仓库" aria-label="GitHub 仓库">
+            <h3 id="site-help-repo" data-i18n="GitHub 仓库">GitHub 仓库</h3>
+            <a href="https://github.com/CYRickyArAr/zbll_site_static" target="_blank" rel="noopener noreferrer" class="about-link site-help-repo-link" title="GitHub 仓库" aria-label="GitHub 仓库" data-i18n-title="GitHub 仓库" data-i18n-aria-label="GitHub 仓库">
                     <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
                     <span>CYRickyArAr/zbll_site_static</span>
             </a>
         </section>
         <section class="site-help-section site-help-author" aria-labelledby="site-help-author">
-            <h3 id="site-help-author">关于作者</h3>
+            <h3 id="site-help-author" data-i18n="关于作者">关于作者</h3>
             <div class="site-help-author-links">
-                <a href="https://www.worldcubeassociation.org/persons/2019CAIY01" target="_blank" rel="noopener noreferrer" class="about-link" title="WCA 主页">
+                <a href="https://www.worldcubeassociation.org/persons/2019CAIY01" target="_blank" rel="noopener noreferrer" class="about-link" title="WCA 主页" data-i18n-title="WCA 主页">
                     <img class="about-wca-icon" src="images/wca.svg" width="28" height="28" alt="WCA">
                 </a>
-                <a href="https://cubing.com/results/person/2019CAIY01" target="_blank" rel="noopener noreferrer" class="about-link" title="粗饼主页">
-                    <img class="about-cubing-icon" src="images/cubing.png" width="28" height="28" alt="粗饼">
+                <a href="https://cubing.com/results/person/2019CAIY01" target="_blank" rel="noopener noreferrer" class="about-link" title="粗饼主页" data-i18n-title="粗饼主页">
+                    <img class="about-cubing-icon" src="images/cubing.png" width="28" height="28" alt="粗饼" data-i18n-alt="粗饼">
                 </a>
-                <a href="https://space.bilibili.com/432492806" target="_blank" rel="noopener noreferrer" class="about-link about-bili" title="bilibili 主页" aria-label="bilibili 主页">
+                <a href="https://space.bilibili.com/432492806" target="_blank" rel="noopener noreferrer" class="about-link about-bili" title="bilibili 主页" aria-label="bilibili 主页" data-i18n-title="bilibili 主页" data-i18n-aria-label="bilibili 主页">
                     <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" aria-hidden="true"><path d="M17.813 4.653h.854c1.51.054 2.769.578 3.773 1.574 1.004.995 1.524 2.249 1.56 3.76v7.36c-.036 1.51-.556 2.769-1.56 3.773s-2.262 1.524-3.773 1.56H5.333c-1.51-.036-2.769-.556-3.773-1.56S.036 18.858 0 17.347v-7.36c.036-1.511.556-2.765 1.56-3.76 1.004-.996 2.262-1.52 3.773-1.574h.774l-1.174-1.12a1.234 1.234 0 0 1-.373-.906c0-.356.124-.658.373-.907l.027-.027c.267-.249.573-.373.92-.373.347 0 .653.124.92.373L9.653 4.44c.071.071.134.142.187.213h4.267a.836.836 0 0 1 .16-.213l2.853-2.747c.267-.249.573-.373.92-.373.347 0 .662.151.929.4.267.249.391.551.391.907 0 .355-.124.657-.373.906zM5.333 7.24c-.746.018-1.373.276-1.88.773-.506.498-.769 1.13-.786 1.894v7.52c.017.764.28 1.395.786 1.893.507.498 1.134.756 1.88.773h13.334c.746-.017 1.373-.275 1.88-.773.506-.498.769-1.129.786-1.893v-7.52c-.017-.765-.28-1.396-.786-1.894-.507-.497-1.134-.755-1.88-.773zM8 11.107c.373 0 .684.124.933.373.25.249.383.569.4.96v1.173c-.017.391-.15.711-.4.96-.249.25-.56.374-.933.374s-.684-.125-.933-.374c-.25-.249-.383-.569-.4-.96V12.44c0-.373.129-.689.386-.947.258-.257.574-.386.947-.386zm8 0c.373 0 .684.124.933.373.25.249.383.569.4.96v1.173c-.017.391-.15.711-.4.96-.249.25-.56.374-.933.374s-.684-.125-.933-.374c-.25-.249-.383-.569-.4-.96V12.44c.017-.391.15-.711.4-.96.249-.249.56-.373.933-.373Z"/></svg>
                 </a>
             </div>
         </section>
         <p class="site-help-footer">
-            <span>内容仅供学习与参考</span>
-            <span><span aria-hidden="true">· </span>本站持续更新</span>
-            <span><span aria-hidden="true">· </span><a href="https://message.bilibili.com/#/whisper/mid432492806" target="_blank" rel="noopener noreferrer">问题反馈</a></span>
+            <span data-i18n="内容仅供学习与参考">内容仅供学习与参考</span>
+            <span><span aria-hidden="true">· </span><span data-i18n="本站持续更新">本站持续更新</span></span>
+            <span><span aria-hidden="true">· </span><a href="https://message.bilibili.com/#/whisper/mid432492806" target="_blank" rel="noopener noreferrer" data-i18n="问题反馈">问题反馈</a></span>
         </p>
     </dialog>
 
@@ -128,8 +138,8 @@
                     <rect x="64" y="64" width="22" height="22" rx="4" fill="#00d8ff" style="--tile:4"/>
                 </g>
             </svg>
-            <div class="site-loader-title">ZBLL 公式库</div>
-            <div class="site-loader-caption">正在加载公式库<span class="site-loader-dots" aria-hidden="true">…</span></div>
+            <div class="site-loader-title" data-i18n="ZBLL 公式库">ZBLL 公式库</div>
+            <div class="site-loader-caption"><span data-i18n="正在加载公式库">正在加载公式库</span><span class="site-loader-dots" aria-hidden="true">…</span></div>
         </div>
     </div>
     <div class="main-content">
@@ -138,11 +148,12 @@
     <script>
         (function () {
             try {
-                var raw = sessionStorage.getItem('zbll_render_snapshot_v3');
+                ZBLL_I18N.translate(document);
+                var raw = sessionStorage.getItem('zbll_render_snapshot_v4');
                 if (!raw) return;
                 var snapshot = JSON.parse(raw);
                 var hash = location.hash || '#/';
-                if (!snapshot || snapshot.hash !== hash || !snapshot.appHtml) return;
+                if (!snapshot || snapshot.language !== ZBLL_I18N.language() || snapshot.hash !== hash || !snapshot.appHtml) return;
                 var app = document.getElementById('app');
                 if (!app) return;
                 app.innerHTML = snapshot.appHtml;
@@ -176,18 +187,18 @@
     <div class="workspace-overlay" id="workspace-overlay" hidden>
         <div class="workspace-dialog" role="dialog" aria-modal="true" aria-labelledby="workspace-dialog-title">
             <div class="workspace-dialog-header">
-                <h2 id="workspace-dialog-title">本地工作区</h2>
+                <h2 id="workspace-dialog-title" data-i18n="本地工作区">本地工作区</h2>
                 <div id="workspace-message" class="workspace-message" role="status"></div>
-                <button type="button" class="workspace-close" id="workspace-close" aria-label="关闭">×</button>
+                <button type="button" class="workspace-close" id="workspace-close" aria-label="关闭" data-i18n-aria-label="关闭">×</button>
             </div>
             <div class="workspace-help-row">
                 <div class="workspace-help-box" role="note">
-                    <p class="workspace-help">大神公式只读；可按 case 勾选显示，自己的公式可随时增删改。修改保存在当前浏览器。</p>
+                    <p class="workspace-help" data-i18n="大神公式只读；可按 case 勾选显示，自己的公式可随时增删改。修改保存在当前浏览器。">大神公式只读；可按 case 勾选显示，自己的公式可随时增删改。修改保存在当前浏览器。</p>
                 </div>
                 <div class="workspace-actions workspace-common-actions">
-                    <button type="button" id="workspace-import" aria-label="导入 .zbll 文件">
+                    <button type="button" id="workspace-import" aria-label="导入 .zbll 文件" data-i18n-aria-label="导入 .zbll 文件">
                         <svg class="workspace-import-icon" viewBox="14 24 44 34" aria-hidden="true"><path d="M19.5 50.5 17.5 32C17.15 28.5 19.4 26.5 23 26.5H28C30 26.5 31 27.1 32.5 28.5L34 30H44C47.8 30 49.5 31.8 50 35L50.5 38.5"></path><path d="M24 55H44.5C47 55 48.2 53.7 49.3 51.4L55 41.5C55.8 39.8 54.9 38.5 53 38.5H29C26.6 38.5 25.4 39.3 24.5 41.3L19.8 50C18.6 52.8 20.3 55 24 55Z"></path></svg>
-                        <span>导入 .zbll</span>
+                        <span data-i18n="导入 .zbll">导入 .zbll</span>
                     </button>
                     <input type="file" id="workspace-file" accept=".zbll,.json,application/json" hidden>
                 </div>
@@ -196,8 +207,8 @@
                 <div class="workspace-panel-column">
                     <section class="workspace-custom-section" aria-labelledby="workspace-custom-title">
                         <div class="workspace-panel-heading">
-                            <h3 id="workspace-custom-title" class="workspace-list-title">公式库</h3>
-                            <button type="button" class="workspace-create-icon" id="workspace-new" aria-label="新建公式库" title="新建公式库">
+                            <h3 id="workspace-custom-title" class="workspace-list-title" data-i18n="公式库">公式库</h3>
+                            <button type="button" class="workspace-create-icon" id="workspace-new" aria-label="新建公式库" title="新建公式库" data-i18n-aria-label="新建公式库" data-i18n-title="新建公式库">
                                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6M12 11v6M9 14h6"></path></svg>
                             </button>
                         </div>
@@ -209,25 +220,26 @@
                 <div class="workspace-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="workspace-progress-bar"></div></div>
                 <div class="workspace-progress-meta">
                     <div class="workspace-progress-text"></div>
-                    <button type="button" class="btn btn-sm btn-outline-danger" id="workspace-export-cancel" hidden>取消导出</button>
+                    <button type="button" class="btn btn-sm btn-outline-danger" id="workspace-export-cancel" data-i18n="取消导出" hidden>取消导出</button>
                 </div>
             </div>
         </div>
         <div class="workspace-context-menu" id="workspace-context-menu" role="menu" hidden>
             <div data-context-group="public">
-                <button type="button" class="workspace-context-action" id="workspace-public-export" role="menuitem"><span>导出 .zbll</span></button>
+                <button type="button" class="workspace-context-action" id="workspace-public-export" role="menuitem"><span data-i18n="导出 .zbll">导出 .zbll</span></button>
             </div>
             <div data-context-group="custom" hidden>
-                <button type="button" class="workspace-context-action" id="workspace-rename" role="menuitem"><span>重命名</span><kbd>F2</kbd></button>
-                <button type="button" class="workspace-context-action" id="workspace-custom-export" role="menuitem"><span>导出 .zbll</span></button>
-                <button type="button" class="workspace-context-action is-danger" id="workspace-delete" role="menuitem"><span>删除</span><kbd>Del</kbd></button>
+                <button type="button" class="workspace-context-action" id="workspace-rename" role="menuitem"><span data-i18n="重命名">重命名</span><kbd>F2</kbd></button>
+                <button type="button" class="workspace-context-action" id="workspace-custom-export" role="menuitem"><span data-i18n="导出 .zbll">导出 .zbll</span></button>
+                <button type="button" class="workspace-context-action is-danger" id="workspace-delete" role="menuitem"><span data-i18n="删除">删除</span><kbd>Del</kbd></button>
             </div>
         </div>
     </div>
 
+    <script>ZBLL_I18N.translate(document);</script>
     <!-- 数据 + 逻辑 -->
     <script defer src="data.js?v=92"></script>
-    <script defer src="js/workspace.js?v=17"></script>
-    <script defer src="js/app.js?v=172"></script>
+    <script defer src="js/workspace.js?v=18"></script>
+    <script defer src="js/app.js?v=173"></script>
 </body>
 </html>

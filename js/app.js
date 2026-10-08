@@ -2,6 +2,7 @@
 (function () {
     'use strict';
 
+    var I18N = window.ZBLL_I18N, t = I18N.t, tx = I18N.html, ta = I18N.attr;
     var siteHelpDialog = document.getElementById('site-help-dialog');
     var siteHelpOpen = document.getElementById('site-help-open');
     function syncModalScrollLock() {
@@ -31,7 +32,7 @@
     var WS = window.ZBLL_WORKSPACE;
     var appEl = document.getElementById('app');
     if (!DATA || !appEl || !WS) {
-        if (appEl) appEl.innerHTML = '<div class="container mt-5"><div class="empty-state">数据加载失败：未找到页面数据</div></div>';
+        if (appEl) appEl.innerHTML = '<div class="container mt-5"><div class="empty-state">' + tx('数据加载失败：未找到页面数据') + '</div></div>';
         return;
     }
 
@@ -39,19 +40,16 @@
         'U': 'bg-primary', 'T': 'bg-danger', 'L': 'bg-warning text-dark',
         'Pi': 'bg-success', 'S': 'bg-orange', 'AS': 'bg-dark', 'H': 'bg-secondary'
     };
-    var LABEL_TO_NAME = {
-        '耿': 'Xuanyi Geng (耿暄一)', 'Tymon': 'Tymon Kolasiński', '杜': 'Yufang Du (杜昱方)',
-        '董': 'Yize Dong (董一泽)', 'Feliks': 'Feliks Zemdegs', '南': 'Seung Hyuk Nahm',
-        'Park': 'Max Park', '藩': 'Bofan Zhang (张博藩)', 'Leo': 'Leo Borromeo',
-        '懿': 'Yi Shen (沈懿)', 'Matty': 'Matty Hiroto Inaba', 'Luke': 'Luke Garrett',
-        '昆': 'Zhaokun Li (李昭昆)', '连': 'Yunzhi Lian (连允之)'
-    };
+    function solverText(mark) { return '<span data-solver-label="' + escapeHtml(mark) + '">' + escapeHtml(I18N.mark(mark)) + '</span>'; }
+    function solverBadge(mark) {
+        return '<span class="formula-marks" data-solver-title="' + escapeHtml(mark) + '" title="' + escapeHtml(I18N.fullName(mark)) + '">' + solverText(mark) + '</span>';
+    }
     var currentView = '';
     var activeWorkspace = null;
     var themeKey = 'zbll_theme';
     var filterKey = 'zbll_filter';
     var selectedWorkspaceKey = 'zbll_selected_workspace';
-    var renderSnapshotKey = 'zbll_render_snapshot_v3';
+    var renderSnapshotKey = 'zbll_render_snapshot_v4';
     var workspaceProgressState = null;
     var workspaceExportController = null;
     var workspaceContextTarget = null;
@@ -84,7 +82,7 @@
     function updateWorkspaceNav() {
         var nav = document.getElementById('workspace-open');
         // 右上角按钮跟随当前选中的库：默认大神版，或用户自己的公式库名。
-        var publicLabel = '默认大神版';
+        var publicLabel = t('默认大神版');
         if (nav) {
             var navText = activeWorkspace ? activeWorkspace.name : publicLabel;
             var label = nav.querySelector('.workspace-nav-label');
@@ -95,7 +93,9 @@
                 var clip = nav.querySelector('.workspace-nav-clip');
                 (clip || nav).appendChild(label);
             }
+            delete label.dataset.i18n;
             label.textContent = navText;
+            delete nav.dataset.i18nTitle;
             nav.title = activeWorkspace ? activeWorkspace.name : publicLabel;
             requestAnimationFrame(function () {
                 var navStyle = window.getComputedStyle(nav);
@@ -115,7 +115,7 @@
     }
     async function ensureEditableData() {
         if (activeWorkspace) return activeWorkspace;
-        if (!window.confirm('当前是默认大神版（仅预览）。创建自己的公式库后即可修改，是否创建？')) return null;
+        if (!window.confirm(t('当前是默认大神版（仅预览）。创建自己的公式库后即可修改，是否创建？'))) return null;
         await createWorkspace();
         return activeWorkspace;
     }
@@ -125,7 +125,7 @@
         try { return await WS.put(activeWorkspace); }
         finally { workspaceWritePending = false; }
     }
-    function operationError(error) { window.alert(error && error.message ? error.message : '保存失败，请重试'); }
+    function operationError(error) { window.alert(I18N.errorText(error, '保存失败，请重试')); }
     function editorSnapshot() {
         if (!inlineEditor) return '';
         var card = findInlineCard(inlineEditor.uid);
@@ -134,7 +134,7 @@
     function editorDirty() { return !!inlineEditor && editorSnapshot() !== inlineEditor.initialSnapshot; }
     function discardEditor(render) {
         if (workspaceWritePending || (inlineEditor && inlineEditor.saving)) return false;
-        if (editorDirty() && !window.confirm('有未保存的修改，放弃这些修改？')) return false;
+        if (editorDirty() && !window.confirm(t('有未保存的修改，放弃这些修改？'))) return false;
         var previous = inlineEditor;
         inlineEditor = null;
         if (previous && render !== false) renderCategory(previous.catId);
@@ -224,7 +224,10 @@
         var button = document.getElementById('theme-toggle');
         if (!button) return;
         var dark = theme === 'dark';
-        var label = dark ? '切换到浅色模式' : '切换到深色模式';
+        var labelKey = dark ? '切换到浅色模式' : '切换到深色模式';
+        button.setAttribute('data-i18n-title', labelKey);
+        button.setAttribute('data-i18n-aria-label', labelKey);
+        var label = t(labelKey);
         button.setAttribute('aria-label', label);
         button.setAttribute('title', label);
         button.setAttribute('aria-pressed', dark ? 'true' : 'false');
@@ -375,6 +378,7 @@
         var help = document.querySelector('.workspace-help');
         if (!help) return;
         help.style.removeProperty('--workspace-help-font-size');
+        if (I18N.language() === 'en') return;
         var available = help.clientWidth;
         var text = help.textContent || '';
         if (!available || !text.trim()) return;
@@ -476,6 +480,7 @@
             var navOpen = document.getElementById('workspace-open');
             var anchor = firstVisibleAnchor();
             var snapshot = {
+                language: I18N.language(),
                 hash: location.hash || '#/',
                 scrollY: window.pageYOffset || window.scrollY || 0,
                 anchor: anchor,
@@ -535,10 +540,11 @@
     function renderLearnedProgress(learned, total, label, className, scope) {
         total = Math.max(0, Number(total) || 0);
         learned = Math.min(total, Math.max(0, Number(learned) || 0));
+        var scopeText = scope === '全部情况' ? t(scope) : t('{category} 分类', { category: scope });
         return '<div class="learning-progress ' + escapeHtml(className) + '">' +
-            '<div class="learning-progress-meta"><span class="learning-progress-label">' + escapeHtml(label) + '</span>' +
+            '<div class="learning-progress-meta"><span class="learning-progress-label">' + tx(label) + '</span>' +
             '<span class="learning-progress-count"><strong>' + learned + '</strong><span>/' + total + '</span></span></div>' +
-            '<progress class="learning-progress-track" value="' + learned + '" max="' + (total || 1) + '" aria-label="' + escapeHtml(scope) + '学习进度" aria-valuetext="已学习 ' + learned + '/' + total + '个情况"></progress></div>';
+            '<progress class="learning-progress-track" value="' + learned + '" max="' + (total || 1) + '"' + ta('aria-label', '{scope}学习进度', { scope: scopeText }) + ta('aria-valuetext', '已学习 {learned}/{total}个情况', { learned: learned, total: total }) + '></progress></div>';
     }
 
     function renderHome() {
@@ -555,14 +561,13 @@
             });
         });
         var html = '<div class="container mt-5">';
-        if (usesLearnedStats()) html += '<div class="index-title-wrap"><h1 class="text-center mb-5">ZBLL 公式库</h1>' + renderLearnedProgress(learnedCases, totalCases, '已学习', 'index-learning-progress', '全部情况') + '</div>';
-        else html += '<h1 class="text-center mb-5">ZBLL 公式库</h1>';
+        if (usesLearnedStats()) html += '<div class="index-title-wrap"><h1 class="text-center mb-5">' + tx('ZBLL 公式库') + '</h1>' + renderLearnedProgress(learnedCases, totalCases, '已学习', 'index-learning-progress', '全部情况') + '</div>';
+        else html += '<h1 class="text-center mb-5">' + tx('ZBLL 公式库') + '</h1>';
         html += '<div class="player-stats">';
         getPlayerStats(data).forEach(function (p) {
             if (p.wca) {
-                var name = LABEL_TO_NAME[p.label] || p.label;
-                html += '<a class="player-stat-box" href="https://www.worldcubeassociation.org/persons/' + encodeURIComponent(p.wca) + '" target="_blank" rel="noopener noreferrer" title="' + escapeHtml(name) + '">' + escapeHtml(p.label) + ' <b>' + p.count + '</b></a>';
-            } else html += '<span class="player-stat-box" title="' + escapeHtml(p.label + '：' + p.count) + '">' + escapeHtml(p.label) + ' <b>' + p.count + '</b></span>';
+                html += '<a class="player-stat-box" href="https://www.worldcubeassociation.org/persons/' + encodeURIComponent(p.wca) + '" target="_blank" rel="noopener noreferrer" data-solver-title="' + escapeHtml(p.label) + '" title="' + escapeHtml(I18N.fullName(p.label)) + '">' + solverText(p.label) + ' <b>' + p.count + '</b></a>';
+            } else html += '<span class="player-stat-box" title="' + escapeHtml(I18N.mark(p.label) + '：' + p.count) + '">' + solverText(p.label) + ' <b>' + p.count + '</b></span>';
         });
         html += '</div>';
         html += '<div class="category-grid">';
@@ -573,7 +578,7 @@
             html += '<img src="' + escapeHtml(imageSource(categoryImagePath(cat.id, document.documentElement.getAttribute('data-theme')))) + '" class="category-thumb" data-category="' + escapeHtml(cat.id) + '" alt="' + escapeHtml(cat.id) + '"><div class="category-card-info"><h2 class="card-title">' + escapeHtml(cat.id) + '</h2>';
             var learned = 0;
             (cat.subcategories || []).forEach(function (sub) { learned += sub.formulas.filter(function (formula) { return formula.learned; }).length; });
-            html += usesLearnedStats() ? renderLearnedProgress(learned, total, '已学习', 'category-learning-progress', cat.id + ' 分类') : '<p class="card-text">' + total + '个情况</p>';
+            html += usesLearnedStats() ? renderLearnedProgress(learned, total, '已学习', 'category-learning-progress', cat.id) : '<p class="card-text">' + tx('{count}个情况', { count: total }) + '</p>';
             html += '<span class="badge ' + (CAT_BADGE[cat.id] || 'bg-secondary') + '">' + escapeHtml(subcatRange(cat)) + '</span>';
             html += '</div></div></div></a></div>';
         });
@@ -595,8 +600,8 @@
             : '';
         return '<button type="button" class="case-chip' + (current ? ' is-current' : '') + '" ' + attrs
             + ' aria-current="' + (current ? 'true' : 'false') + '"'
-            + ' aria-label="' + escapeHtml(label + '，已学习 ' + countText) + '"'
-            + ' title="' + escapeHtml(label + '（已学习 ' + countText + '）') + '"'
+            + ta('aria-label', '{label}，已学习 {count}', { label: label, count: countText })
+            + ta('title', '{label}（已学习 {count}）', { label: label, count: countText })
             + ' tabindex="' + (current ? '0' : '-1') + '">'
             + thumb
             + '<span class="case-chip-label">' + escapeHtml(label) + '</span>'
@@ -625,7 +630,7 @@
         var data = viewData();
         var html = '<div class="case-bar">';
         html += '<div class="case-bar-row case-bar-categories' + (SHOW_CATEGORY_THUMB ? ' has-thumb' : '') + '">'
-            + '<div class="case-bar-scroll" role="group" aria-label="切换分类">';
+            + '<div class="case-bar-scroll" role="group"' + ta('aria-label', '切换分类') + '>';
         (data.categories || []).forEach(function (item) {
             var counts = caseCounts(item.subcategories);
             html += renderCaseChip('data-case-category="' + escapeHtml(item.id) + '"', item.id,
@@ -633,7 +638,7 @@
         });
         html += '</div></div>';
         html += '<div class="case-bar-row case-bar-subcategories">'
-            + '<div class="case-bar-scroll" role="group" aria-label="切换子分类">';
+            + '<div class="case-bar-scroll" role="group"' + ta('aria-label', '切换子分类') + '>';
         (cat.subcategories || []).forEach(function (sub) {
             var learned = sub.formulas.filter(function (formula) { return formula.learned; }).length;
             html += renderCaseChip('data-case-subcategory="' + escapeHtml(sub.id) + '"', sub.id,
@@ -720,7 +725,7 @@
         clearSorting();
         cancelFormulaImagePreload();
         var cat = findCategory(catId);
-        if (!cat) { cancelFormulaImagePreload(); appEl.innerHTML = '<div class="container"><div class="empty-state">分类不存在：' + escapeHtml(catId) + '</div></div>'; currentCatId = ''; currentSubId = ''; return; }
+        if (!cat) { cancelFormulaImagePreload(); appEl.innerHTML = '<div class="container"><div class="empty-state">' + tx('分类不存在：{category}', { category: catId }) + '</div></div>'; currentCatId = ''; currentSubId = ''; return; }
         var activeSub = activeSubcatOf(cat);
         // 横栏放在 .container 外面（全宽，像 Word 的功能区）；只给读屏用的一级标题留在容器里。
         // 不再有可见的面包屑与标题：进页面就是吸顶选择器。
@@ -734,7 +739,7 @@
                 html += '<div class="sortable-container" data-category="' + escapeHtml(cat.id) + '" data-subcategory="' + escapeHtml(activeSub.id) + '">';
                 activeSub.formulas.forEach(function (formula, index) { html += renderFormulaCard(cat.id, activeSub.id, formula, index); });
                 html += '</div>';
-            } else html += '<div class="empty-state"><p class="mb-0">该子分类下暂无公式</p></div>';
+            } else html += '<div class="empty-state"><p class="mb-0">' + tx('该子分类下暂无公式') + '</p></div>';
             html += '</div></div>';
         }
         html += '</div>';
@@ -770,20 +775,20 @@
         var editing = !!inlineEditor && inlineEditor.catId === catId && inlineEditor.subId === subId && inlineEditor.uid === uid;
         var note = splitNotes(formula.notes, formula, subId);
         html += '<div class="formula-card' + (formula.learned ? ' learned' : '') + ' learning-enabled has-card-editor' + (canEditContent ? ' content-editable' : '') + (editing ? ' inline-editing' : '') + '">';
-        if (isEditableView()) html += '<div class="drag-handle" title="拖动排序" aria-label="拖动排序">⋮⋮</div>';
+        if (isEditableView()) html += '<div class="drag-handle"' + ta('title', '拖动排序') + ta('aria-label', '拖动排序') + '>⋮⋮</div>';
         html += '<div class="row"><div class="col-4">';
         if (editing) {
             var editImage = inlineEditor.imageCleared ? '' : (inlineEditor.selectedImage || formula.image || '');
-            html += '<div class="inline-image-editor"><label class="drag-area inline-image-drop" title="点击选择图片">';
-            html += '<img class="inline-image-preview" alt="图片预览"' + (editImage ? ' src="' + escapeHtml(imageSource(editImage)) + '"' : ' hidden') + '>';
-            html += '<span class="inline-image-prompt"' + (editImage ? ' hidden' : '') + '>📷<small>选择图片</small></span>';
+            html += '<div class="inline-image-editor"><label class="drag-area inline-image-drop"' + ta('title', '点击选择图片') + '>';
+            html += '<img class="inline-image-preview"' + ta('alt', '图片预览') + (editImage ? ' src="' + escapeHtml(imageSource(editImage)) + '"' : ' hidden') + '>';
+            html += '<span class="inline-image-prompt"' + (editImage ? ' hidden' : '') + '>📷<small>' + tx('选择图片') + '</small></span>';
             html += '<input type="file" class="inline-image-input d-none" accept="image/png,image/jpeg,image/gif,image/svg+xml"></label></div>';
         } else if (formula.image) html += '<img src="' + escapeHtml(imageSource(formula.image)) + '" class="formula-image" alt="' + escapeHtml(id) + '">';
-        else html += '<div class="formula-image d-flex align-items-center justify-content-center bg-light"><span class="text-muted">无图</span></div>';
+        else html += '<div class="formula-image d-flex align-items-center justify-content-center bg-light"><span class="text-muted">' + tx('无图') + '</span></div>';
         html += '</div><div class="col-8"><div class="formula-id">' + escapeHtml(id) + '</div>';
         if (editing) {
             html += '<div class="inline-note-editor"><div class="formula-notes formula-note-fixed inline-note-header">' + escapeHtml(note.header) + '</div>';
-            html += '<textarea class="workspace-textarea form-control note-body inline-note-body" rows="4" placeholder="可以在这里写备注">' + escapeHtml(note.body) + '</textarea></div>';
+            html += '<textarea class="workspace-textarea form-control note-body inline-note-body" rows="4"' + ta('placeholder', '可以在这里写备注') + '>' + escapeHtml(note.body) + '</textarea></div>';
         } else if (formula.notes) {
             html += '<div class="formula-note-display formula-notes"><div class="formula-note-fixed">' + escapeHtml(note.header) + '</div>';
             if (note.body) {
@@ -796,7 +801,7 @@
         html += '</div></div>';
         if (editing) {
             // Keep the image action in normal flow below the fixed-height image/note row.
-            html += '<div class="inline-image-actions"><button type="button" class="btn btn-sm btn-outline-secondary workspace-action inline-image-clear" data-action="' + (editImage ? 'clear-inline-image' : 'restore-inline-image') + '">' + (editImage ? '清除图片' : '恢复图片') + '</button></div>';
+            html += '<div class="inline-image-actions"><button type="button" class="btn btn-sm btn-outline-secondary workspace-action inline-image-clear" data-action="' + (editImage ? 'clear-inline-image' : 'restore-inline-image') + '">' + tx(editImage ? '清除图片' : '恢复图片') + '</button></div>';
             html += renderLineEditor(formula, subId);
         } else if (formula.lines && formula.lines.length) {
             html += '<div class="formula-lines">';
@@ -808,27 +813,27 @@
                 var selected = canSelectLine && selectedLineIndex === lineIndex;
                 var lineAttrs = canSelectLine ? ' data-category="' + escapeHtml(catId) + '" data-subcategory="' + escapeHtml(subId) + '" data-uid="' + escapeHtml(uid) + '" data-formula-card-key="' + escapeHtml(cardKey) + '" data-formula-line-key="' + escapeHtml(lineKey) + '" data-formula-line-index="' + lineIndex + '" role="button" tabindex="0" aria-selected="' + (selected ? 'true' : 'false') + '"' : '';
                 html += '<div class="formula-line' + (canSelectLine ? ' selectable' : '') + (selected ? ' selected' : '') + '"' + lineAttrs + '><span class="formula-line-alg">' + escapeHtml(line.alg) + '</span>';
-                if (line.origin === 'custom') html += '<span class="formula-origin">我的</span>';
+                if (line.origin === 'custom') html += '<span class="formula-origin">' + tx('我的') + '</span>';
                 if (line.marks && line.marks.length) {
                     html += '<span class="formula-marks-group">';
-                    line.marks.forEach(function (mark) { html += '<span class="formula-marks" title="' + escapeHtml(LABEL_TO_NAME[mark] || mark) + '">' + escapeHtml(mark) + '</span>'; });
+                    line.marks.forEach(function (mark) { html += solverBadge(mark); });
                     html += '</span>';
                 }
                 html += '</div>';
             });
             html += '</div>';
         }
-        if (!editing && !(formula.lines || []).length) html += '<p class="case-lines-empty">暂无显示的公式，点编辑勾选大神公式或添加自己的公式。</p>';
+        if (!editing && !(formula.lines || []).length) html += '<p class="case-lines-empty">' + tx('暂无显示的公式，点编辑勾选大神公式或添加自己的公式。') + '</p>';
         if (editing) {
             html += '<div class="action-buttons inline-editor-actions"><div class="action-buttons-row">';
-            html += '<button type="button" class="btn btn-secondary btn-sm workspace-action" data-action="cancel-inline-edit">取消</button>';
-            html += '<button type="button" class="btn btn-primary btn-sm workspace-action" data-action="save-inline-edit">保存</button>';
+            html += '<button type="button" class="btn btn-secondary btn-sm workspace-action" data-action="cancel-inline-edit">' + tx('取消') + '</button>';
+            html += '<button type="button" class="btn btn-primary btn-sm workspace-action" data-action="save-inline-edit">' + tx('保存') + '</button>';
             html += '</div></div>';
         } else if (canShowFormulaEditor()) {
             html += '<div class="action-buttons">';
-            html += '<div class="action-buttons-row"><button type="button" class="btn btn-outline-secondary btn-sm workspace-action" data-action="edit-formula" data-category="' + escapeHtml(catId) + '" data-subcategory="' + escapeHtml(subId) + '" data-uid="' + escapeHtml(uid) + '">编辑</button></div></div>';
+            html += '<div class="action-buttons-row"><button type="button" class="btn btn-outline-secondary btn-sm workspace-action" data-action="edit-formula" data-category="' + escapeHtml(catId) + '" data-subcategory="' + escapeHtml(subId) + '" data-uid="' + escapeHtml(uid) + '">' + tx('编辑') + '</button></div></div>';
         }
-        html += '<button type="button" class="learn-btn workspace-action' + (formula.learned ? ' learned' : '') + '" data-action="toggle-learned" data-category="' + escapeHtml(catId) + '" data-subcategory="' + escapeHtml(subId) + '" data-uid="' + escapeHtml(uid) + '" title="' + (formula.learned ? '取消已学' : '标记已学') + '" aria-label="' + (formula.learned ? '取消已学' : '标记已学') + '"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg></button>';
+        html += '<button type="button" class="learn-btn workspace-action' + (formula.learned ? ' learned' : '') + '" data-action="toggle-learned" data-category="' + escapeHtml(catId) + '" data-subcategory="' + escapeHtml(subId) + '" data-uid="' + escapeHtml(uid) + '"' + ta('title', formula.learned ? '取消已学' : '标记已学') + ta('aria-label', formula.learned ? '取消已学' : '标记已学') + '><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg></button>';
         html += '</div></div>';
         return html;
     }
@@ -1044,12 +1049,17 @@
         if (el) el.hidden = !show;
         syncModalScrollLock();
     }
-    function setWorkspaceMessage(text, error) {
+    function setWorkspaceMessage(text, error, args) {
         var el = document.getElementById('workspace-message'); if (!el) return;
-        el.textContent = text || ''; el.classList.toggle('is-error', !!error);
+        I18N.setText(el, text || '', args); el.classList.toggle('is-error', !!error);
     }
-    function setWorkspaceProgress(value, text) {
-        workspaceProgressState = value === null || value === undefined ? null : { value: value, text: text || '' };
+    function setWorkspaceFailure(error, fallback) {
+        if (error && error.i18nKey) setWorkspaceMessage(error.i18nKey, true, error.i18nArgs);
+        else if (error && error.message) setWorkspaceMessage('操作失败：{detail}', true, { detail: error.message });
+        else setWorkspaceMessage(fallback, true);
+    }
+    function setWorkspaceProgress(value, text, message) {
+        workspaceProgressState = value === null || value === undefined ? null : { value: value, text: text || '', message: message };
         var wrap = document.getElementById('workspace-progress'); if (!wrap) return;
         var bar = wrap.querySelector('.workspace-progress-bar');
         var label = wrap.querySelector('.workspace-progress-text');
@@ -1060,7 +1070,7 @@
         if (bar) bar.style.width = value + '%';
         var track = wrap.querySelector('.workspace-progress-track');
         if (track) track.setAttribute('aria-valuenow', String(value));
-        if (label) label.textContent = (text || '处理中') + ' · ' + value + '%';
+        if (label) label.textContent = (message ? t(message.key, message.args) : t(text || '处理中')) + ' · ' + value + '%';
         var cancel = document.getElementById('workspace-export-cancel');
         if (cancel) { cancel.hidden = !workspaceExportController; cancel.disabled = false; }
     }
@@ -1068,9 +1078,9 @@
         var listEl = document.getElementById('workspace-list');
         if (!listEl) return;
         var list = await WS.list();
-        listEl.innerHTML = '<div class="workspace-list-row"><button type="button" class="workspace-list-item' + (!activeWorkspace ? ' active' : '') + '" data-public-library="default"><span>默认大神版</span><small>仅预览</small></button><span class="workspace-item-lock" aria-label="默认大神版仅预览" title="默认大神版仅预览"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg></span></div>' +
+        listEl.innerHTML = '<div class="workspace-list-row"><button type="button" class="workspace-list-item' + (!activeWorkspace ? ' active' : '') + '" data-public-library="default">' + tx('默认大神版') + '<small>' + tx('仅预览') + '</small></button><span class="workspace-item-lock"' + ta('aria-label', '默认大神版仅预览') + ta('title', '默认大神版仅预览') + '><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg></span></div>' +
             list.map(function (item) {
-                return '<div class="workspace-list-row"><button type="button" class="workspace-list-item' + (activeWorkspace && activeWorkspace.id === item.id ? ' active' : '') + '" data-workspace-id="' + escapeHtml(item.id) + '"><span>' + escapeHtml(item.name) + '</span><small>' + escapeHtml(new Date(item.updatedAt).toLocaleString()) + '</small></button><button type="button" class="workspace-item-menu-trigger" data-workspace-menu="custom" data-target-id="' + escapeHtml(item.id) + '" aria-haspopup="menu" aria-label="' + escapeHtml(item.name) + '的更多操作" title="更多操作">…</button></div>';
+                return '<div class="workspace-list-row"><button type="button" class="workspace-list-item' + (activeWorkspace && activeWorkspace.id === item.id ? ' active' : '') + '" data-workspace-id="' + escapeHtml(item.id) + '"><span>' + escapeHtml(item.name) + '</span><small data-local-date="' + escapeHtml(item.updatedAt) + '">' + escapeHtml(new Date(item.updatedAt).toLocaleString(I18N.language() === 'en' ? 'en-US' : 'zh-CN')) + '</small></button><button type="button" class="workspace-item-menu-trigger" data-workspace-menu="custom" data-target-id="' + escapeHtml(item.id) + '" aria-haspopup="menu"' + ta('aria-label', '{name}的更多操作', { name: item.name }) + ta('title', '更多操作') + '>…</button></div>';
             }).join('');
         updateWorkspaceNav();
     }
@@ -1078,7 +1088,7 @@
         hideWorkspaceContextMenu();
         workspaceShortcutTarget = null;
         setWorkspaceMessage('');
-        if (workspaceProgressState) setWorkspaceProgress(workspaceProgressState.value, workspaceProgressState.text);
+        if (workspaceProgressState) setWorkspaceProgress(workspaceProgressState.value, workspaceProgressState.text, workspaceProgressState.message);
         else setWorkspaceProgress(null);
         showOverlay('workspace-overlay', true);
         scheduleWorkspaceHelpFit();
@@ -1099,14 +1109,14 @@
         setWorkspaceProgress(0, '开始导出');
         try {
             await WS.exportFile(target, setWorkspaceProgress, workspaceExportController.signal);
-            setWorkspaceMessage('已下载 ' + (target.name || 'zbll-workspace').replace(/[\\/:*?"<>|]/g, '_') + '.zbll');
+            setWorkspaceMessage('已下载 {name}', false, { name: (target.name || 'zbll-workspace').replace(/[\\/:*?"<>|]/g, '_') + '.zbll' });
             setTimeout(function () { if (!workspaceExportController) setWorkspaceProgress(null); }, 1200);
         } catch (error) {
             if (workspaceExportController.signal.aborted || (error && error.name === 'AbortError')) {
                 setWorkspaceMessage('已取消导出。');
                 setWorkspaceProgress(null);
             } else {
-                setWorkspaceMessage(error && error.message ? error.message : '导出失败，请重试。', true);
+                setWorkspaceFailure(error, '导出失败，请重试。');
                 setWorkspaceProgress(null);
             }
         } finally {
@@ -1122,11 +1132,11 @@
     }
     async function createWorkspace() {
         if (!discardEditor()) return;
-        var name = window.prompt('请输入新建公式库名称', '我的公式库');
+        var name = window.prompt(t('请输入新建公式库名称'), t('我的公式库'));
         if (!name || !name.trim()) return;
         var workspace = await WS.create(DATA, name.trim());
         await activateWorkspace(workspace.id);
-        setWorkspaceMessage('已创建：' + workspace.name);
+        setWorkspaceMessage('已创建：{name}', false, { name: workspace.name });
     }
     function splitNotes(notes, formula, subId) {
         var text = String(notes || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n'), parts = text.split('\n');
@@ -1155,14 +1165,14 @@
         clearOwnMarkHints();
         var inputs = Array.from(appEl.querySelectorAll('.own-marks'));
         if (!inputs.length || typeof ResizeObserver !== 'function') return;
-        var observer, motion, disposed = false, fullHint = '标记（可选）';
+        var observer, motion, disposed = false, fullHint = t('标记（可选）');
         function refresh() {
             if (disposed) return;
             try {
                 inputs.forEach(function (input) {
                     var field = input.parentElement, hint = field.querySelector('.own-mark-hint');
                     var style = getComputedStyle(input);
-                    input.placeholder = motion.matches ? '标记' : fullHint;
+                    input.placeholder = motion.matches ? t('标记') : fullHint;
                     hint.style.font = style.font;
                     hint.style.letterSpacing = style.letterSpacing;
                     hint.style.left = (parseFloat(style.borderLeftWidth) + parseFloat(style.paddingLeft)) + 'px';
@@ -1209,28 +1219,28 @@
         var alg = String(line.alg || '').replace(/\s*\n\s*/g, ' ');
         return '<div class="own-line-row" data-line-id="' + escapeHtml(line.id) + '">'
             + '<div class="own-line-fields">'
-            + '<label class="own-line-field"><span class="visually-hidden">公式</span><input type="text" class="form-control own-alg" placeholder="输入公式" value="' + escapeHtml(alg) + '"></label>'
-            + '<label class="own-line-field"><span class="visually-hidden">标记（可选），多个标记用空格分隔</span><input type="text" class="form-control own-marks" placeholder="标记（可选）" title="标记（可选），多个标记用空格分隔" value="' + escapeHtml(line.marks.join(' ')) + '">'
-            + '<span class="own-mark-hint" aria-hidden="true"><span class="own-mark-track"><span class="own-mark-copy"><span>标记（可选）</span>&nbsp;</span><span class="own-mark-copy"><span>标记（可选）</span>&nbsp;</span></span></span></label>'
+            + '<label class="own-line-field"><span class="visually-hidden">' + tx('公式') + '</span><input type="text" class="form-control own-alg"' + ta('placeholder', '输入公式') + ' value="' + escapeHtml(alg) + '"></label>'
+            + '<label class="own-line-field"><span class="visually-hidden">' + tx('标记（可选），多个标记用空格分隔') + '</span><input type="text" class="form-control own-marks"' + ta('placeholder', '标记（可选）') + ta('title', '标记（可选），多个标记用空格分隔') + ' value="' + escapeHtml(line.marks.join(' ')) + '">'
+            + '<span class="own-mark-hint" aria-hidden="true"><span class="own-mark-track"><span class="own-mark-copy">' + tx('标记（可选）') + '&nbsp;</span><span class="own-mark-copy">' + tx('标记（可选）') + '&nbsp;</span></span></span></label>'
             + '</div>'
-            + '<button type="button" class="workspace-action own-line-remove" data-action="remove-own-line" title="删除这条公式（不影响大神公式）">删除</button></div>';
+            + '<button type="button" class="workspace-action own-line-remove" data-action="remove-own-line"' + ta('title', '删除这条公式（不影响大神公式）') + '>' + tx('删除') + '</button></div>';
     }
     function sourceChoices(formula) {
         return WS.sourceLines(activeWorkspace, formula).map(function (line) {
             var marks = (line.marks || []).map(function (mark) {
-                return '<span class="formula-marks" title="' + escapeHtml(LABEL_TO_NAME[mark] || mark) + '">' + escapeHtml(mark) + '</span>';
+                return solverBadge(mark);
             }).join('');
             return '<label class="formula-line source-line-choice"><input type="checkbox" name="source-line" value="' + escapeHtml(line.id) + '"' + (formula.visibleSourceLineIds.indexOf(line.id) >= 0 ? ' checked' : '') + '><span class="source-line-content"><span class="formula-line-alg">' + escapeHtml(line.alg) + '</span>' + (marks ? '<span class="formula-marks-group">' + marks + '</span>' : '') + '</span></label>';
         }).join('');
     }
     function renderLineEditor(formula, subId) {
-        var html = '<section class="case-line-editor"><div class="case-editor-heading"><strong>大神公式</strong><button type="button" class="btn btn-sm btn-outline-secondary workspace-action" data-action="source-all">全选</button><button type="button" class="btn btn-sm btn-outline-secondary workspace-action" data-action="source-none">全不选</button></div>';
+        var html = '<section class="case-line-editor"><div class="case-editor-heading"><strong>' + tx('大神公式') + '</strong><button type="button" class="btn btn-sm btn-outline-secondary workspace-action" data-action="source-all">' + tx('全选') + '</button><button type="button" class="btn btn-sm btn-outline-secondary workspace-action" data-action="source-none">' + tx('全不选') + '</button></div>';
         if (!formula.sourceCaseKey) {
-            html += '<label class="source-repair-label">旧卡片来源未关联（不会覆盖个人内容）<select class="form-control source-repair"><option value="">选择对应 case</option>';
+            html += '<label class="source-repair-label">' + tx('旧卡片来源未关联（不会覆盖个人内容）') + '<select class="form-control source-repair"><option value="" data-i18n="选择对应 case">' + escapeHtml(t('选择对应 case')) + '</option>';
             activeWorkspace.sources.filter(function (s) { return s.subcategory === subId && s.category === inlineEditor.catId; }).forEach(function (s) { html += '<option value="' + escapeHtml(s.key) + '">' + escapeHtml(s.formulaId) + '</option>'; });
             html += '</select></label>';
         }
-        html += '<div class="source-line-choices">' + sourceChoices(formula) + '</div><div class="case-editor-heading"><strong>我的公式</strong><button type="button" class="btn btn-sm btn-outline-secondary workspace-action" data-action="add-own-line">＋ 添加</button></div><div class="own-line-rows">';
+        html += '<div class="source-line-choices">' + sourceChoices(formula) + '</div><div class="case-editor-heading"><strong>' + tx('我的公式') + '</strong><button type="button" class="btn btn-sm btn-outline-secondary workspace-action" data-action="add-own-line">' + tx('＋ 添加') + '</button></div><div class="own-line-rows">';
         formula.customLines.forEach(function (line) { html += ownLineRow(line); });
         return html + '</div></section>';
     }
@@ -1256,7 +1266,7 @@
         if (!inlineEditor || inlineEditor.saving) return;
         var state = inlineEditor, card = button && button.closest('.formula-card');
         if (!card) return;
-        if (state.imagePending) { window.alert('图片正在读取，请稍候'); return; }
+        if (state.imagePending) { window.alert(t('图片正在读取，请稍候')); return; }
         var candidate = WS.clone(activeWorkspace);
         var formula = candidate.categories.find(function (c) { return c.id === state.catId; }).subcategories.find(function (s) { return s.id === state.subId; }).formulas.find(function (f) { return f.uid === state.uid; });
         var header = card.querySelector('.inline-note-header').textContent;
@@ -1268,7 +1278,7 @@
         formula.customLines = Array.from(card.querySelectorAll('.own-line-row')).map(function (row) {
             return { id: row.dataset.lineId, alg: row.querySelector('.own-alg').value.trim(), marks: row.querySelector('.own-marks').value.split(/[\s,，]+/).filter(Boolean) };
         });
-        if (formula.customLines.some(function (line) { return !line.alg; })) { window.alert('个人公式不能为空；不需要的行请删除。'); return; }
+        if (formula.customLines.some(function (line) { return !line.alg; })) { window.alert(t('个人公式不能为空；不需要的行请删除。')); return; }
         if (state.imageCleared) {
             formula.image = '';
             if (state.imageBeforeClear) formula.clearedImage = state.imageBeforeClear;
@@ -1299,7 +1309,7 @@
             state.selectedImage = dataUrl;
             state.imageCleared = false;
             syncInlineImage(area && area.closest('.inline-image-editor'));
-        }).catch(function () { if (inlineEditor === state && state.imageRequest === request) { state.imagePending = false; window.alert('图片读取失败'); } });
+        }).catch(function () { if (inlineEditor === state && state.imageRequest === request) { state.imagePending = false; window.alert(t('图片读取失败')); } });
     }
     function currentInlineImage() {
         if (!inlineEditor || inlineEditor.imageCleared) return '';
@@ -1314,7 +1324,7 @@
         editor.querySelector('.inline-image-prompt').hidden = !!path;
         var button = editor.closest('.formula-card').querySelector('.inline-image-clear');
         button.dataset.action = path ? 'clear-inline-image' : 'restore-inline-image';
-        button.textContent = path ? '清除图片' : '恢复图片';
+        I18N.setText(button, path ? '清除图片' : '恢复图片');
     }
     function clearInlineImage(button) {
         if (!inlineEditor || inlineEditor.saving) return;
@@ -1336,7 +1346,7 @@
         var repair = button.closest('.formula-card').querySelector('.source-repair');
         var source = repair ? { sourceCaseKey: repair.value || null } : ref.formula;
         var path = inlineEditor.imageBeforeClear || WS.defaultImage(activeWorkspace, source);
-        if (!path) { window.alert('暂无可恢复的图片。请选择图片，或先关联对应的 case。'); return; }
+        if (!path) { window.alert(t('暂无可恢复的图片。请选择图片，或先关联对应的 case。')); return; }
         inlineEditor.imageRequest = (inlineEditor.imageRequest || 0) + 1;
         inlineEditor.imagePending = false;
         inlineEditor.selectedImage = path;
@@ -1380,7 +1390,9 @@
                 var card = button.closest('.formula-card');
                 if (card) card.classList.toggle('learned', ref.formula.learned);
                 button.classList.toggle('learned', ref.formula.learned);
-                button.title = ref.formula.learned ? '取消已学' : '标记已学';
+                button.dataset.i18nTitle = ref.formula.learned ? '取消已学' : '标记已学';
+                button.setAttribute('data-i18n-aria-label', button.dataset.i18nTitle);
+                button.title = t(button.dataset.i18nTitle);
                 button.setAttribute('aria-label', button.title);
                 return;
             }
@@ -1528,7 +1540,7 @@
             if (id === 'workspace-rename') {
                 var selectedWorkspace = await getContextWorkspace(contextTarget);
                 if (!selectedWorkspace) { setWorkspaceMessage('请先选择要重命名的公式库。', true); await refreshWorkspaceList(); return; }
-                var name = window.prompt('新的公式库名称', selectedWorkspace.name);
+                var name = window.prompt(t('新的公式库名称'), selectedWorkspace.name);
                 if (name && name.trim()) {
                     if (inlineEditor && inlineEditor.saving) return;
                     selectedWorkspace.name = name.trim();
@@ -1541,7 +1553,7 @@
             if (id === 'workspace-delete') {
                 var selectedToDelete = await getContextWorkspace(contextTarget);
                 if (!selectedToDelete) { setWorkspaceMessage('请先选择要删除的公式库。', true); await refreshWorkspaceList(); return; }
-                if (!window.confirm('删除选中的公式库？导出的 .zbll 文件不受影响。')) return;
+                if (!window.confirm(t('删除选中的公式库？导出的 .zbll 文件不受影响。'))) return;
                 var removedId = selectedToDelete.id;
                 var customSelectionPlan = workspaceDeletionSelectionPlan({ kind: 'custom', id: removedId });
                 if (activeWorkspace && activeWorkspace.id === removedId && !discardEditor()) return;
@@ -1560,7 +1572,7 @@
                 return;
             }
             if (id === 'workspace-close') { hideWorkspaceContextMenu(); return showOverlay('workspace-overlay', false); }
-        } catch (error) { setWorkspaceMessage(error.message || '工作区操作失败', true); setWorkspaceProgress(null); await refreshWorkspaceList(); }
+        } catch (error) { setWorkspaceFailure(error, '工作区操作失败'); setWorkspaceProgress(null); await refreshWorkspaceList(); }
     }
     async function importWorkspaceFile(e) {
         var file = e.target.files && e.target.files[0]; e.target.value = ''; if (!file) return;
@@ -1568,10 +1580,10 @@
             if (!discardEditor()) return;
             var imported = await WS.importFile(file);
             await activateWorkspace(imported.id);
-            setWorkspaceMessage('已导入公式库：' + imported.name);
+            setWorkspaceMessage('已导入公式库：{name}', false, { name: imported.name });
             await refreshWorkspaceList();
         }
-        catch (error) { showOverlay('workspace-overlay', true); setWorkspaceMessage(error.message || '导入失败：文件格式无效', true); }
+        catch (error) { showOverlay('workspace-overlay', true); setWorkspaceFailure(error, '导入失败：文件格式无效'); }
     }
 
     var currentCatId = '';
@@ -1601,7 +1613,7 @@
             activeWorkspace = id ? await WS.get(id) : null;
             if (!activeWorkspace && id) await WS.activate(null);
             router();
-        }).catch(function (error) { console.warn(error); activeWorkspace = null; router(); window.alert('本地公式库暂时不可用，已保留原数据，本次只能浏览默认大神版。\n' + (error.message || '请重试')); }).finally(async function () {
+        }).catch(function (error) { console.warn(error); activeWorkspace = null; router(); window.alert(t('本地公式库暂时不可用，已保留原数据，本次只能浏览默认大神版。\n{detail}', { detail: I18N.errorText(error, '请重试') })); }).finally(async function () {
             // 只解码当前屏幕要显示的图；其余图片的字节已经在内存中。
             var images = Array.prototype.slice.call(appEl.querySelectorAll('img'));
             await Promise.race([
@@ -1615,7 +1627,7 @@
             if (status) {
                 if (imageLibrary && imageLibrary.state === 'fallback') {
                     status.classList.add('is-fallback');
-                    status.textContent = '图片合集暂时不可用，正在使用原图。';
+                    I18N.setText(status, '图片合集暂时不可用，正在使用原图。');
                     window.setTimeout(function () { status.hidden = true; }, 5000);
                 } else {
                     // 不设置最短等待时长；快加载/快照恢复不会为了动画额外等待。
@@ -1782,5 +1794,23 @@
         if (inlineEditor) { cancelInlineEditor(findInlineCard(inlineEditor.uid)); return; }
         showOverlay('workspace-overlay', false);
     });
-    initWorkspace();
+    I18N.initMenu();
+    window.addEventListener('zbll-language-changed', function () {
+        var x = window.scrollX, y = window.scrollY;
+        var scrolls = Array.from(document.querySelectorAll('.case-bar-scroll, .source-line-choices, .workspace-list')).map(function (node) { return { node: node, left: node.scrollLeft, top: node.scrollTop }; });
+        clearOwnMarkHints();
+        if (currentView === 'home') renderHome();
+        I18N.translate(document);
+        updateWorkspaceNav();
+        if (workspaceProgressState) setWorkspaceProgress(workspaceProgressState.value, workspaceProgressState.text, workspaceProgressState.message);
+        initOwnMarkHints();
+        scheduleWorkspaceHelpFit();
+        requestAnimationFrame(function () {
+            scrolls.forEach(function (item) { if (item.node.isConnected) { item.node.scrollLeft = item.left; item.node.scrollTop = item.top; } });
+            window.scrollTo(x, y);
+            saveRenderSnapshot();
+        });
+    });
+    I18N.setBusy(1);
+    initWorkspace().finally(function () { I18N.setBusy(-1); });
 })();
