@@ -112,8 +112,8 @@ window.ZBLL_DATA = {
         "wca": "2025LIAN01"
       }
     ],
-    "generatedAt": "2026-10-08T17:35:20+08:00",
-    "fingerprint": "2980796962b663efcfc6b6f78dd5527fc8bf5bc48880959a8dab03e0bcf48c45"
+    "generatedAt": "2026-10-08T17:38:33+08:00",
+    "fingerprint": "25653d7e52b78849118f438ee8b9b0275309a5ddd97dd447bd858df2d1a00983"
   },
   "categories": [
     {
@@ -378,6 +378,7 @@ window.ZBLL_DATA = {
                     "耿",
                     "杜",
                     "藩",
+                    "余",
                     "Feliks",
                     "Luke",
                     "南"
@@ -1042,9 +1043,10 @@ window.ZBLL_DATA = {
                   "marks": [
                     "耿",
                     "Tymon",
+                    "董",
                     "杜",
                     "藩",
-                    "董",
+                    "余",
                     "Feliks"
                   ]
                 }
@@ -1477,7 +1479,8 @@ window.ZBLL_DATA = {
                   "marks": [
                     "耿",
                     "Tymon",
-                    "杜"
+                    "杜",
+                    "余"
                   ]
                 },
                 {
@@ -3451,7 +3454,8 @@ window.ZBLL_DATA = {
                 {
                   "alg": "R' U' R U' R' U2 R' D' R U2 R' D R U2 R",
                   "marks": [
-                    "耿"
+                    "耿",
+                    "余"
                   ]
                 },
                 {
@@ -3901,9 +3905,10 @@ window.ZBLL_DATA = {
                   "marks": [
                     "耿",
                     "Tymon",
+                    "董",
                     "昆",
                     "杜",
-                    "董"
+                    "余"
                   ]
                 }
               ]
@@ -5409,7 +5414,8 @@ window.ZBLL_DATA = {
                   "marks": [
                     "耿",
                     "Tymon",
-                    "杜"
+                    "杜",
+                    "余"
                   ]
                 },
                 {
