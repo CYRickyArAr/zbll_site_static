@@ -28,7 +28,7 @@ Click the language (文 / A) icon in the top bar to choose **简体中文 / Engl
 
 Open the site to start browsing. Within a category, use the category labels and subcategory images at the top to switch between groups of cases. Filter by **All / Learned / Unlearned**, or click the site logo in the upper-left corner to return home.
 
-Click the question-mark icon to open **About this site**. The lower-right corner shows when the built-in algorithm data was last updated (UTC+8); personal library edits do not change this time.
+Click the question-mark icon to open **About this site**. The lower-right corner shows the site's latest publication time (UTC+8), covering algorithm, interface, and feature updates. Personal library edits and visits do not change this time.
 
 The upper-right button shows the current library name. Click it to open library management:
 

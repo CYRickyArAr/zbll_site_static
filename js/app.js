@@ -14,6 +14,7 @@
         if (siteHelpDialog.open) return;
         siteHelpDialog.showModal();
         syncModalScrollLock();
+        updateSiteTimestamp();
     });
     document.getElementById('site-help-close').addEventListener('click', function () { siteHelpDialog.close(); });
     siteHelpDialog.addEventListener('click', function (e) {
@@ -29,24 +30,38 @@
     });
 
     var DATA = window.ZBLL_DATA;
-    function updateSiteTimestamp() {
+    var siteTimestampPending = false;
+    async function updateSiteTimestamp() {
         var row = document.getElementById('site-help-updated');
         var time = document.getElementById('site-help-updated-time');
-        var generatedAt = DATA && DATA.meta && DATA.meta.generatedAt;
-        if (!row || !time) return;
-        row.hidden = true;
-        if (!generatedAt) return;
-        var date = new Date(generatedAt);
-        if (!Number.isFinite(date.getTime())) return;
-        // Show the built-in data's export time in UTC+8, never a personal library's save time.
-        time.dateTime = date.toISOString();
-        time.textContent = date.toLocaleString('sv-SE', {
-            timeZone: 'Asia/Shanghai', year: 'numeric', month: '2-digit', day: '2-digit',
-            hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
-        }) + ' (UTC+8)';
-        row.hidden = false;
+        if (!row || !time || !row.hidden || siteTimestampPending) return;
+        siteTimestampPending = true;
+        var controller = new AbortController();
+        var timeout = window.setTimeout(function () { controller.abort(); }, 5000);
+        try {
+            // Pages rebuilds index.html on deployment, including UI-only updates.
+            // Read its actual Last-Modified header, never the request's Date or the visitor's clock.
+            var response = await fetch(new URL('index.html', document.baseURI).href, {
+                method: 'HEAD', cache: 'no-cache', signal: controller.signal
+            });
+            if (!response.ok) return;
+            var modified = response.headers.get('Last-Modified');
+            if (!modified) return;
+            var date = new Date(modified);
+            if (!Number.isFinite(date.getTime())) return;
+            time.dateTime = date.toISOString();
+            time.textContent = date.toLocaleString('sv-SE', {
+                timeZone: 'Asia/Shanghai', year: 'numeric', month: '2-digit', day: '2-digit',
+                hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
+            });
+            row.hidden = false;
+        } catch (error) {
+            // If unavailable, omit the time and retry on reopening instead of inventing a date.
+        } finally {
+            window.clearTimeout(timeout);
+            siteTimestampPending = false;
+        }
     }
-    updateSiteTimestamp();
     var WS = window.ZBLL_WORKSPACE;
     var appEl = document.getElementById('app');
     if (!DATA || !appEl || !WS) {
