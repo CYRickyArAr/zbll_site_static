@@ -14,7 +14,6 @@
         if (siteHelpDialog.open) return;
         siteHelpDialog.showModal();
         syncModalScrollLock();
-        updateSiteTimestamp();
     });
     document.getElementById('site-help-close').addEventListener('click', function () { siteHelpDialog.close(); });
     siteHelpDialog.addEventListener('click', function (e) {
@@ -30,38 +29,22 @@
     });
 
     var DATA = window.ZBLL_DATA;
-    var siteTimestampPending = false;
-    async function updateSiteTimestamp() {
+    function updateSiteTimestamp() {
         var row = document.getElementById('site-help-updated');
         var time = document.getElementById('site-help-updated-time');
-        if (!row || !time || !row.hidden || siteTimestampPending) return;
-        siteTimestampPending = true;
-        var controller = new AbortController();
-        var timeout = window.setTimeout(function () { controller.abort(); }, 5000);
-        try {
-            // Pages rebuilds index.html on deployment, including UI-only updates.
-            // Read its actual Last-Modified header, never the request's Date or the visitor's clock.
-            var response = await fetch(new URL('index.html', document.baseURI).href, {
-                method: 'HEAD', cache: 'no-cache', signal: controller.signal
-            });
-            if (!response.ok) return;
-            var modified = response.headers.get('Last-Modified');
-            if (!modified) return;
-            var date = new Date(modified);
-            if (!Number.isFinite(date.getTime())) return;
-            time.dateTime = date.toISOString();
-            time.textContent = date.toLocaleString('sv-SE', {
-                timeZone: 'Asia/Shanghai', year: 'numeric', month: '2-digit', day: '2-digit',
-                hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
-            });
-            row.hidden = false;
-        } catch (error) {
-            // If unavailable, omit the time and retry on reopening instead of inventing a date.
-        } finally {
-            window.clearTimeout(timeout);
-            siteTimestampPending = false;
-        }
+        if (!row || !time) return;
+        // Pages and the local preview server supply Last-Modified with the HTML response.
+        // The browser already exposes it in local time; no second request is needed.
+        var date = new Date(document.lastModified);
+        if (!Number.isFinite(date.getTime())) return;
+        time.dateTime = date.toISOString();
+        time.textContent = date.toLocaleString('sv-SE', {
+            timeZone: 'Asia/Shanghai', year: 'numeric', month: '2-digit', day: '2-digit',
+            hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
+        });
+        row.hidden = false;
     }
+    updateSiteTimestamp();
     var WS = window.ZBLL_WORKSPACE;
     var appEl = document.getElementById('app');
     if (!DATA || !appEl || !WS) {
