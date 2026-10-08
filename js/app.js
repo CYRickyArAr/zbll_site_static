@@ -29,6 +29,24 @@
     });
 
     var DATA = window.ZBLL_DATA;
+    function updateSiteTimestamp() {
+        var row = document.getElementById('site-help-updated');
+        var time = document.getElementById('site-help-updated-time');
+        var generatedAt = DATA && DATA.meta && DATA.meta.generatedAt;
+        if (!row || !time) return;
+        row.hidden = true;
+        if (!generatedAt) return;
+        var date = new Date(generatedAt);
+        if (!Number.isFinite(date.getTime())) return;
+        // Show the built-in data's export time in UTC+8, never a personal library's save time.
+        time.dateTime = date.toISOString();
+        time.textContent = date.toLocaleString('sv-SE', {
+            timeZone: 'Asia/Shanghai', year: 'numeric', month: '2-digit', day: '2-digit',
+            hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
+        }) + ' (UTC+8)';
+        row.hidden = false;
+    }
+    updateSiteTimestamp();
     var WS = window.ZBLL_WORKSPACE;
     var appEl = document.getElementById('app');
     if (!DATA || !appEl || !WS) {

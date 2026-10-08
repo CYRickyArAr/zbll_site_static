@@ -403,6 +403,8 @@ html[data-theme="dark"] .site-help-footer a:focus-visible { color: #bdd0ff; }
     line-height: 1.6;
 }
 .site-help-footer > span { white-space: nowrap; }
+.site-help-updated { margin: 8px 0 0; color: var(--text-muted); font-size: .75rem; line-height: 1.6; text-align: right; }
+.site-help-updated span, .site-help-updated time { display: inline-block; white-space: nowrap; }
 
 .theme-toggle {
     width: 32px;
