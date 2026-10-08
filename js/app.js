@@ -49,7 +49,7 @@
     var themeKey = 'zbll_theme';
     var filterKey = 'zbll_filter';
     var selectedWorkspaceKey = 'zbll_selected_workspace';
-    var renderSnapshotKey = 'zbll_render_snapshot_v4';
+    var renderSnapshotKey = 'zbll_render_snapshot_v5';
     var workspaceProgressState = null;
     var workspaceExportController = null;
     var workspaceContextTarget = null;
@@ -526,8 +526,9 @@
         var last = cat.subcategories[cat.subcategories.length - 1].id;
         return first === last ? first : first + '-' + last;
     }
-    function displayFormulaId(sub, formula, index) {
-        return isWorkspace() ? sub.id + '-' + (index + 1) : (formula.name || formula.id || sub.id + '-' + (index + 1));
+    function displayFormulaId(sub, formula) {
+        // Case identity is independent of its current position in a personal library.
+        return formula.id || formula.name || formula.uid || sub.id;
     }
     function lineText(line) {
         var marks = line.marks && line.marks.length ? ' （' + line.marks.join(' ') + '）' : '';
@@ -766,7 +767,7 @@
 
     function renderFormulaCard(catId, subId, formula, index) {
         var cat = findCategory(catId), sub = cat.subcategories.filter(function (s) { return s.id === subId; })[0];
-        var id = displayFormulaId(sub, formula, index), uid = formula.uid || formula.id || (subId + '-' + index);
+        var id = displayFormulaId(sub, formula), uid = formula.uid || formula.id || (subId + '-' + index);
         // 显示位置仅用于页面锚点；大神来源与个人设置始终使用稳定 ID。
         var positionAnchor = sub.id + '-' + (index + 1);
         // SortableJS 使用 forceFallback 模式接管拖动；不要再设置原生 draggable，避免出现双重拖影。
@@ -1030,11 +1031,8 @@
                         }
                         if (inlineEditor) {
                             Array.prototype.forEach.call(evt.to.children, function (item, index) {
-                                var formula = sub.formulas[index];
                                 var positionAnchor = sub.id + '-' + (index + 1);
                                 item.id = 'formula-position-' + positionAnchor;
-                                var idNode = item.querySelector('.formula-id');
-                                if (idNode) idNode.textContent = displayFormulaId(sub, formula, index);
                             });
                         } else renderCategory(evt.to.dataset.category);
                     }

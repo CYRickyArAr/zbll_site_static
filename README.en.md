@@ -43,7 +43,7 @@ In a personal library, click **Edit** on a case card:
 - **Images and notes**: replace, clear, or restore an image, and add notes. Notes support multiple lines while editing; when browsing, they appear on one line with an ellipsis for overflow.
 - **Save / Cancel**: click **Save** to keep your edits, or **Cancel** to discard them.
 
-Use the round check button at the lower-right of a card to toggle learned status. Drag the handle at the upper-right to reorder cases. You can also click one algorithm per case to keep it highlighted; click it again to clear the selection. Selecting an algorithm does not change its order.
+Use the round check button at the lower-right of a card to toggle learned status. Drag the handle at the upper-right to reorder cases without changing their identifiers (for example, “ZBLL U 13” always remains U2-1). You can also click one algorithm per case to keep it highlighted; click it again to clear the selection. Selecting an algorithm does not change its order.
 
 ### Backups and transfers
 
