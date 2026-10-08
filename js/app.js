@@ -168,6 +168,8 @@
             order[item.label] = index;
             wcaMap[item.label] = item.wca || '';
         });
+        // Supplement export metadata without changing raw marks or personal library snapshots.
+        wcaMap['余'] = '2023YUHA01';
         (data.categories || []).forEach(function (cat) {
             (cat.subcategories || []).forEach(function (sub) {
                 (sub.formulas || []).forEach(function (formula) {

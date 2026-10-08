@@ -66,12 +66,12 @@
         '整理图片和公式 {done}/{total}': 'Preparing images and algorithms {done}/{total}'
     };
     var zh = { 'nav.brand': 'ZBLL 公式库' };
-    var shortNames = { '耿': 'Xuanyi', '杜': 'Yufang', '董': 'Yize', '藩': 'Bofan', '昆': 'Zhaokun', '懿': 'Yi', '连': 'Yunzhi', '南': 'Nahm' };
+    var shortNames = { '耿': 'Xuanyi', '杜': 'Yufang', '董': 'Yize', '藩': 'Bofan', '昆': 'Zhaokun', '懿': 'Yi', '连': 'Yunzhi', '南': 'Nahm', '余': 'Hansen' };
     var fullNames = {
         '耿': 'Xuanyi Geng (耿暄一)', 'Tymon': 'Tymon Kolasiński', '杜': 'Yufang Du (杜昱方)', '董': 'Yize Dong (董一泽)',
         'Feliks': 'Feliks Zemdegs', '南': 'Seung Hyuk Nahm', 'Park': 'Max Park', '藩': 'Bofan Zhang (张博藩)',
         'Leo': 'Leo Borromeo', '懿': 'Yi Shen (沈懿)', 'Matty': 'Matty Hiroto Inaba', 'Luke': 'Luke Garrett',
-        '昆': 'Zhaokun Li (李昭昆)', '连': 'Yunzhi Lian (连允之)'
+        '昆': 'Zhaokun Li (李昭昆)', '连': 'Yunzhi Lian (连允之)', '余': 'Hansen Yu (余翰森)'
     };
     var language, busy = 0, key = 'zbll_language';
     try { language = localStorage.getItem(key); } catch (_) {}
