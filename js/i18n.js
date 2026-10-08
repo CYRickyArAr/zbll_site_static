@@ -3,7 +3,7 @@
     'use strict';
     // Chinese strings are explicit, stable translation keys; missing English entries fall back to Chinese.
     var en = {
-        'ZBLL公式库': 'ZBLL Algorithm Library', 'ZBLL 公式库': 'ZBLL Algorithm Library',
+        'ZBLL公式库': 'ZBLL Library', 'ZBLL 公式库': 'ZBLL Library',
         'nav.brand': 'ZBLL Library', '语言': 'Language', '关于本站': 'About this site', '关闭': 'Close',
         '公式筛选': 'Filter cases', '全部': 'All', '已学': 'Learned', '未学': 'Unlearned',
         '切换到浅色模式': 'Switch to light mode', '切换到深色模式': 'Switch to dark mode',
