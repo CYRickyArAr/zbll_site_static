@@ -4,7 +4,7 @@
     // Chinese strings are explicit, stable translation keys; missing English entries fall back to Chinese.
     var en = {
         'ZBLL公式库': 'ZBLL Library', 'ZBLL 公式库': 'ZBLL Library',
-        'nav.brand': 'ZBLL Library', '语言': 'Language', '关于本站': 'About this site', '最近更新：': 'Last updated:', '关闭': 'Close',
+        'nav.brand': 'ZBLL Library', '语言': 'Language', '关于本站': 'About this site', '最近更新：': 'Updated:', '关闭': 'Close',
         '公式筛选': 'Filter cases', '全部': 'All', '已学': 'Learned', '未学': 'Unlearned',
         '切换到浅色模式': 'Switch to light mode', '切换到深色模式': 'Switch to dark mode',
         '打开本地工作区': 'Open local libraries', '本地工作区': 'Local Libraries',
@@ -13,8 +13,8 @@
         '本站公式整理自 ': 'Algorithms are compiled from solve reconstructions on ',
         '、': ', ', ' 的复盘记录，数据真实可靠。': ', based on actual solves.', '魔方星球': 'CubeStation',
         'WCA 主页': 'WCA profile', '粗饼主页': 'Cubing.com profile', '粗饼': 'Cubing.com',
-        'bilibili 主页': 'bilibili profile', '内容仅供学习与参考': 'For learning and reference',
-        '本站持续更新': 'Continuously updated', '问题反馈': 'Report an issue',
+        'bilibili 主页': 'bilibili profile', '内容仅供学习与参考': 'For reference',
+        '本站持续更新': 'Updated regularly', '问题反馈': 'Feedback',
         '正在加载公式库': 'Loading algorithm library', '取消导出': 'Cancel export',
         '大神公式只读；可按 case 勾选显示，自己的公式可随时增删改。修改保存在当前浏览器。': 'Pro algorithms are read-only. Choose which to show per case and edit your own algorithms. Changes stay in this browser.',
         '导入 .zbll 文件': 'Import a .zbll file', '导入 .zbll': 'Import .zbll', '导出 .zbll': 'Export .zbll',
