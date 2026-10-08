@@ -36,6 +36,8 @@ The upper-right button shows the current library name. Click it to open library 
 - **Personal libraries**: use the new-library button to create one with all pro algorithms initially visible. Each library lets you choose pro algorithms, add your own, and save images, notes, and learned status. Libraries keep their content and settings independently.
 - **Managing libraries**: click a library name to switch to it. Use the menu beside a personal library to rename, export, or delete it.
 
+When updated pro algorithms are published, reload the site to sync them into all personal libraries. Older `.zbll` imports are synced too. Existing show/hide choices are preserved; newly added pro algorithms are shown by default. Changes to solver annotations retain the corresponding algorithm's visibility choice. Your personal algorithms, notes, images, learned status, and case order stay unchanged.
+
 ### Editing and learning
 
 In a personal library, click **Edit** on a case card:

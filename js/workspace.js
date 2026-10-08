@@ -116,6 +116,86 @@
         });
         return raw;
     }
+    function matchSourceLines(previous, current) {
+        var matches = new Map(), used = new Set();
+        var byId = new Map(previous.map(function (line) { return [line.id, line]; }));
+        // Exact IDs first, so duplicate algorithms cannot steal each other's visibility.
+        current.forEach(function (line) {
+            var old = byId.get(line.id);
+            if (old) { matches.set(line.id, old); used.add(old.id); }
+        });
+        var byAlgorithm = new Map();
+        function algorithmKey(line) { return line.alg.trim().replace(/\s+/g, ' '); }
+        previous.forEach(function (line) {
+            if (used.has(line.id)) return;
+            var key = algorithmKey(line);
+            if (!byAlgorithm.has(key)) byAlgorithm.set(key, []);
+            byAlgorithm.get(key).push(line);
+        });
+        // Adding/changing solver marks changes a source-line ID, but not the algorithm.
+        current.forEach(function (line) {
+            if (matches.has(line.id)) return;
+            var candidates = byAlgorithm.get(algorithmKey(line));
+            if (candidates && candidates.length) matches.set(line.id, candidates.shift());
+        });
+        return matches;
+    }
+    function syncSources(workspace, data) {
+        validateV2(workspace);
+        var current = catalog(data), fingerprint = data.meta && data.meta.fingerprint || '';
+        var linked = new Set();
+        cases(workspace, function (f) { if (f.sourceCaseKey) linked.add(f.sourceCaseKey); });
+        if (workspace.sourceFingerprint === fingerprint && JSON.stringify(workspace.sources) === JSON.stringify(current) && current.every(function (s) { return linked.has(s.key); })) return null;
+        var result = clone(workspace), oldSources = new Map(workspace.sources.map(function (s) { return [s.key, s]; }));
+        var currentSources = new Map(current.map(function (s) { return [s.key, s]; }));
+        // Retain unresolvable historical cases rather than deleting someone's personal content.
+        result.sources = current.concat(clone(workspace.sources.filter(function (s) { return !currentSources.has(s.key); })));
+        result.sourceFingerprint = fingerprint;
+        var seen = new Set(), usedUids = new Set();
+        cases(result, function (f, cat, sub) {
+            usedUids.add(f.uid);
+            var source = currentSources.get(f.sourceCaseKey);
+            if (!source && f.sourceCaseKey === null) {
+                source = currentSources.get(caseKey(cat.id, sub.id, f.id)) || currentSources.get(caseKey(cat.id, sub.id, f.uid));
+            }
+            if (!source) return;
+            seen.add(source.key);
+            var old = oldSources.get(f.sourceCaseKey), visible = new Set(f.visibleSourceLineIds);
+            var matches = matchSourceLines(old ? old.lines : [], source.lines);
+            var selected = f.selectedLineId;
+            f.sourceCaseKey = source.key;
+            f.visibleSourceLineIds = source.lines.filter(function (line) {
+                var previous = matches.get(line.id);
+                return !previous || visible.has(previous.id);
+            }).map(function (line) { return line.id; });
+            if (selected && selected.indexOf('source:') === 0) {
+                var replacement = source.lines.find(function (line) {
+                    var previous = matches.get(line.id);
+                    return previous && 'source:' + previous.id === selected;
+                });
+                if (replacement) f.selectedLineId = 'source:' + replacement.id;
+                else delete f.selectedLineId;
+            }
+            normalizeSelection(result, f);
+        });
+        // Keep existing case order; append newly available cases without renumbering old ones.
+        cases(data, function (original, cat, sub) {
+            var key = caseKey(cat.id, sub.id, original.id);
+            if (seen.has(key)) return;
+            var target = result.categories.find(function (c) { return c.id === cat.id; }).subcategories.find(function (s) { return s.id === sub.id; });
+            var f = clone(original);
+            f.uid = f.uid || f.id || makeId();
+            while (usedUids.has(f.uid)) f.uid = makeId();
+            usedUids.add(f.uid);
+            f.sourceCaseKey = key;
+            f.visibleSourceLineIds = currentSources.get(key).lines.map(function (line) { return line.id; });
+            f.customLines = []; f.learned = false;
+            delete f.lines; delete f.selectedLineAlg; delete f.selectedLineIndex; delete f.selectedLineId;
+            target.formulas.push(f);
+        });
+        validateV2(result);
+        return JSON.stringify(result) === JSON.stringify(workspace) ? null : result;
+    }
     function migrate(raw, data) {
         validateStructure(raw);
         if (raw.version === 2) return hydrate(validateV2(clone(raw)));
@@ -172,10 +252,17 @@
         req.onsuccess = function () { req.result.onversionchange = function () { req.result.close(); }; resolve(req.result); };
     }).then(async function (db) {
         var all = await requestResult(db.transaction(STORE).objectStore(STORE).getAll());
-        var pending = all.filter(function (w) { return w.version === 1; }).map(function (old) { return { old: old, next: clone(migrate(old, window.ZBLL_DATA)) }; });
+        var pending = [];
+        all.forEach(function (old) {
+            var migrated = old.version === 1 ? clone(migrate(old, window.ZBLL_DATA)) : old;
+            var next = syncSources(migrated, window.ZBLL_DATA) || migrated;
+            if (next !== old) pending.push({ old: old, next: next });
+        });
+        // Back up and synchronize every library atomically before exposing any of them to the UI.
         if (pending.length) await transact(db, [STORE, BACKUPS], function (tx) {
             pending.forEach(function (item) {
-                tx.objectStore(BACKUPS).add({ id: 'v1:' + item.old.id, savedAt: new Date().toISOString(), original: item.old });
+                var backupId = item.old.version === 1 ? 'v1:' + item.old.id : 'sources:' + item.old.id + ':' + makeId();
+                tx.objectStore(BACKUPS).add({ id: backupId, savedAt: new Date().toISOString(), original: item.old });
                 tx.objectStore(STORE).put(item.next);
             });
         });
@@ -210,6 +297,8 @@
         activeId: function () { return localStorage.getItem(ACTIVE_KEY) || ''; },
         async importFile(file) {
             var w = migrate(JSON.parse(await file.text()), window.ZBLL_DATA);
+            var synced = syncSources(w, window.ZBLL_DATA);
+            if (synced) w = hydrate(synced);
             w.id = makeId(); w.kind = 'workspace'; w.name = String(w.name || t('导入的公式库')).slice(0, 80);
             w.createdAt = w.createdAt || new Date().toISOString();
             var list = await this.list(), base = w.name, n = 2;
