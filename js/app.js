@@ -65,7 +65,7 @@
     var themeKey = 'zbll_theme';
     var filterKey = 'zbll_filter';
     var selectedWorkspaceKey = 'zbll_selected_workspace';
-    var renderSnapshotKey = 'zbll_render_snapshot_v6';
+    var renderSnapshotKey = 'zbll_render_snapshot_v7';
     var workspaceProgressState = null;
     var workspaceExportController = null;
     var workspaceContextTarget = null;
@@ -548,6 +548,13 @@
         // Case identity is independent of its current position in a personal library.
         return formula.id || formula.name || formula.uid || sub.id;
     }
+    function renderAlgorithm(algorithm) {
+        var text = String(algorithm || '');
+        // Only a standalone leading U turn is pre-AUF; leave Uw, internal U moves, etc. alone.
+        var prefix = /^(\s*)(U(?:2|['’‘′])?)(?=\s|$)/.exec(text);
+        if (!prefix) return escapeHtml(text);
+        return escapeHtml(prefix[1]) + '<span class="formula-preauf" title="pre-AUF">' + escapeHtml(prefix[2]) + '</span>' + escapeHtml(text.slice(prefix[0].length));
+    }
     function lineText(line) {
         var marks = line.marks && line.marks.length ? ' （' + line.marks.join(' ') + '）' : '';
         return (line.alg || '') + marks;
@@ -831,7 +838,7 @@
                 var lineKey = catId + '::' + subId + '::' + uid + '::' + lineIndex;
                 var selected = canSelectLine && selectedLineIndex === lineIndex;
                 var lineAttrs = canSelectLine ? ' data-category="' + escapeHtml(catId) + '" data-subcategory="' + escapeHtml(subId) + '" data-uid="' + escapeHtml(uid) + '" data-formula-card-key="' + escapeHtml(cardKey) + '" data-formula-line-key="' + escapeHtml(lineKey) + '" data-formula-line-index="' + lineIndex + '" role="button" tabindex="0" aria-selected="' + (selected ? 'true' : 'false') + '"' : '';
-                html += '<div class="formula-line' + (canSelectLine ? ' selectable' : '') + (selected ? ' selected' : '') + '"' + lineAttrs + '><span class="formula-line-alg">' + escapeHtml(line.alg) + '</span>';
+                html += '<div class="formula-line' + (canSelectLine ? ' selectable' : '') + (selected ? ' selected' : '') + '"' + lineAttrs + '><span class="formula-line-alg">' + renderAlgorithm(line.alg) + '</span>';
                 if (line.origin === 'custom') html += '<span class="formula-origin">' + tx('我的') + '</span>';
                 if (line.marks && line.marks.length) {
                     html += '<span class="formula-marks-group">';
@@ -1246,7 +1253,7 @@
             var marks = (line.marks || []).map(function (mark) {
                 return solverBadge(mark);
             }).join('');
-            return '<label class="formula-line source-line-choice"><input type="checkbox" name="source-line" value="' + escapeHtml(line.id) + '"' + (formula.visibleSourceLineIds.indexOf(line.id) >= 0 ? ' checked' : '') + '><span class="source-line-content"><span class="formula-line-alg">' + escapeHtml(line.alg) + '</span>' + (marks ? '<span class="formula-marks-group">' + marks + '</span>' : '') + '</span></label>';
+            return '<label class="formula-line source-line-choice"><input type="checkbox" name="source-line" value="' + escapeHtml(line.id) + '"' + (formula.visibleSourceLineIds.indexOf(line.id) >= 0 ? ' checked' : '') + '><span class="source-line-content"><span class="formula-line-alg">' + renderAlgorithm(line.alg) + '</span>' + (marks ? '<span class="formula-marks-group">' + marks + '</span>' : '') + '</span></label>';
         }).join('');
     }
     function renderLineEditor(formula, subId) {

@@ -40,6 +40,8 @@ When updated pro algorithms are published, reload the site to sync them into all
 
 ### Editing and learning
 
+A leading pre-AUF (U, U′, or U2) appears as a small muted badge, separate from the main algorithm. No badge is shown when there is no pre-AUF. This is display-only; the original algorithm text is unchanged.
+
 In a personal library, click **Edit** on a case card:
 
 - **Pro algorithms**: check or uncheck individual algorithms to show or hide them, or use **Select all / Select none** for that case. The original algorithms and solver annotations cannot be edited. Hiding an algorithm does not delete it.
