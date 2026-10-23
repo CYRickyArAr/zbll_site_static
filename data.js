@@ -112,8 +112,8 @@ window.ZBLL_DATA = {
         "wca": "2017GARR05"
       }
     ],
-    "generatedAt": "2026-10-23T23:14:48+08:00",
-    "fingerprint": "dcbba4d09b4e8f4173be3304c32f48a80b4b2dfd873db3928e15a167bc61691e"
+    "generatedAt": "2026-10-24T00:37:05+08:00",
+    "fingerprint": "2ce3e3143549f3f6823223f15c5fb39d50ce94c3fcb793c86148c73b9c63262b"
   },
   "categories": [
     {
@@ -7939,12 +7939,7 @@ window.ZBLL_DATA = {
                 {
                   "alg": "U' L' U2 R U' L U R' U L' U L",
                   "marks": [
-                    "耿"
-                  ]
-                },
-                {
-                  "alg": "U' r' F2 R F' r U R' U r' F r",
-                  "marks": [
+                    "耿",
                     "连",
                     "余"
                   ]
