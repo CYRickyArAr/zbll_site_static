@@ -63,7 +63,7 @@ window.ZBLL_DATA = {
       },
       {
         "label": "连",
-        "count": 211,
+        "count": 212,
         "wca": "2025LIAN01"
       },
       {
@@ -112,8 +112,8 @@ window.ZBLL_DATA = {
         "wca": "2017GARR05"
       }
     ],
-    "generatedAt": "2026-10-25T13:32:33+08:00",
-    "fingerprint": "25ff0a93b9d53e1ecb7e2c1a2574f8962be2f696c98265fac0155de9bfd1394e"
+    "generatedAt": "2026-10-28T23:36:45+08:00",
+    "fingerprint": "7f83dbececc0cf81508defecdff662f88f5ac5a15a0dedfa4fa541b3e216e6d3"
   },
   "categories": [
     {
@@ -3242,9 +3242,10 @@ window.ZBLL_DATA = {
                   "marks": [
                     "耿",
                     "Tymon",
+                    "董",
+                    "连",
                     "昆",
-                    "杜",
-                    "董"
+                    "杜"
                   ]
                 }
               ]
