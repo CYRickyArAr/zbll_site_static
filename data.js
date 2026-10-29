@@ -112,8 +112,8 @@ window.ZBLL_DATA = {
         "wca": "2017GARR05"
       }
     ],
-    "generatedAt": "2026-10-29T12:14:48+08:00",
-    "fingerprint": "7ae2584e5549ca45d3d84c45da32916e0969ef8fb15498857e9b310c6d3e1bb2"
+    "generatedAt": "2026-10-29T15:30:38+08:00",
+    "fingerprint": "abe5a0b3c371f842693d4560d561296ef5dbfd206116aa6742b15aa9b127ae96"
   },
   "categories": [
     {
@@ -2876,7 +2876,7 @@ window.ZBLL_DATA = {
               "notes": "ZBLL T 44",
               "lines": [
                 {
-                  "alg": "U' F' U' F U R' F R2 U R' U' R' F' R2 U R'",
+                  "alg": "F' U' F U R' F R2 U R' U' R' F' R2 U R'",
                   "marks": [
                     "耿",
                     "连"
@@ -7573,7 +7573,7 @@ window.ZBLL_DATA = {
                   ]
                 },
                 {
-                  "alg": "U2 R' U2 R U R' U R U' R U R' U' R' F R2 U' R' U' R U R' F'",
+                  "alg": "R' U2 R U R' U R U' R U R' U' R' F R2 U' R' U' R U R' F'",
                   "marks": [
                     "杜"
                   ]
@@ -9777,7 +9777,7 @@ window.ZBLL_DATA = {
                   ]
                 },
                 {
-                  "alg": "U R2 D' R U2 R' D R U2 F' r U R U' r' F",
+                  "alg": "R2 D' R U2 R' D R U2 F' r U R U' r' F",
                   "marks": [
                     "杜"
                   ]
@@ -10166,7 +10166,7 @@ window.ZBLL_DATA = {
               "notes": "ZBLL H 18",
               "lines": [
                 {
-                  "alg": "R' U' R U' R U R2 U R2 U L' U R' U' L",
+                  "alg": "U2 R' U' R U' R U R2 U R2 U L' U R' U' L",
                   "marks": [
                     "耿"
                   ]
@@ -10354,7 +10354,7 @@ window.ZBLL_DATA = {
                   ]
                 },
                 {
-                  "alg": "U' R2 F' R U R U' R' F R U' R' U R U' R' U2 R U R' U R",
+                  "alg": "U2 R2 F' R U R U' R' F R U' R' U R U' R' U2 R U R' U R",
                   "marks": [
                     "董"
                   ]
