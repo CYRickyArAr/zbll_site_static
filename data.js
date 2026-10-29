@@ -112,8 +112,8 @@ window.ZBLL_DATA = {
         "wca": "2017GARR05"
       }
     ],
-    "generatedAt": "2026-10-29T11:39:36+08:00",
-    "fingerprint": "ce475d824f10cb20eef340dc310abd3ecb1b76fd3da3a5faca8728d98d74b5fa"
+    "generatedAt": "2026-10-29T12:11:50+08:00",
+    "fingerprint": "6bd21e1cda6c735967607d047a877851669c2bf685fa46bad4c3f68d7d0bc694"
   },
   "categories": [
     {
@@ -8225,7 +8225,7 @@ window.ZBLL_DATA = {
                   ]
                 },
                 {
-                  "alg": "R U R' U R U2 R2 U R' U' R3 U' R' U R U R2",
+                  "alg": "U R U R' U R U2 R2 U R' U' R3 U' R' U R U R2",
                   "marks": [
                     "杜"
                   ]
