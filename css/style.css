@@ -674,22 +674,7 @@ html[data-zbll-filter="unlearned"] .sortable-item:has(.formula-card.learned) {
 }
 
 @media (max-width: 768px) {
-    .category-grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 10px;
-    }
-    .category-card-body {
-        grid-template-columns: minmax(0, 1fr);
-        gap: 4px;
-        min-height: 0;
-        padding: 8px;
-    }
-    .category-thumb { width: 72px; height: 72px; justify-self: center; }
-    .category-card .card-title { font-size: 1.15rem; margin-bottom: 4px; }
-    .category-learning-progress { margin: 0 auto; padding: 4px; gap: 4px; }
-    .category-learning-progress .learning-progress-meta { font-size: .75rem; }
-    .category-card .badge { margin-top: 6px; }
+    .category-grid { row-gap: 10px; }
 }
 
 /* 选手公式数统计框 */
