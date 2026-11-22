@@ -1833,26 +1833,37 @@ html[data-theme="dark"] .sortable-ghost { background: #303840; border-color: #4e
     .zbll-filter-btn {
         min-width: 0;
         flex: 1 1 0;
-        padding: 5px 2px;
-        font-size: .62rem;
+        height: 34px;
+        padding: 0 2px;
+        font-size: .75rem;
+        line-height: 1;
         white-space: nowrap;
+    }
+    /* 英文标签更长：按内容占比分配空间，稍小一号，避免被截断。 */
+    html[lang="en"] .zbll-filter-btn {
+        flex: 1 1 auto;
+        min-width: max-content;
+        padding: 0 4px;
+        font-size: .6875rem;
     }
     .navbar-right {
-        gap: 2px;
+        gap: 0;
         white-space: nowrap;
     }
+    /* 手机端顶栏：图标按钮 36px 点击区，图标本身保持 18px。 */
     .site-help-button,
     .theme-toggle {
-        width: 26px;
-        height: 26px;
-        flex-basis: 26px;
+        width: 36px;
+        height: 36px;
+        flex-basis: 36px;
     }
     .theme-toggle svg.theme-toggle-icon {
-        width: 16px;
-        height: 16px;
+        width: 18px;
+        height: 18px;
     }
-    .site-help-button svg { width: 16px; height: 16px; }
-    .theme-toggle { font-size: 16px; margin-right: 5px; }
+    .site-help-button svg { width: 18px; height: 18px; }
+    .theme-toggle { font-size: 18px; margin-right: 4px; }
+    .navbar-logo { min-height: 40px; min-width: 32px; justify-content: center; padding: 0 4px; }
     .site-help-dialog { padding: 20px; }
     .workspace-nav-btn {
         width: 6.4em;
@@ -1860,8 +1871,9 @@ html[data-theme="dark"] .sortable-ghost { background: #303840; border-color: #4e
         max-width: 6.4em;
         flex: 0 0 6.4em !important;
         overflow: hidden;
-        padding: 4px 0.5em;
-        font-size: .68rem;
+        height: 36px;
+        padding: 0 0.5em;
+        font-size: .75rem;
     }
     .workspace-help-row {
         flex-wrap: wrap;
@@ -1877,8 +1889,10 @@ html[data-theme="dark"] .sortable-ghost { background: #303840; border-color: #4e
 }
 
 @media (max-width: 420px) {
+    .navbar { padding: 0 8px !important; column-gap: 4px !important; }
     /* 窄屏只留图标；文字用视觉隐藏而不是 display:none，
        否则链接就没有可访问名了。 */
+    .navbar-logo { padding: 0; }
     .navbar-logo-icon {
         width: 24px;
         height: 24px;
@@ -1894,25 +1908,55 @@ html[data-theme="dark"] .sortable-ghost { background: #303840; border-color: #4e
     }
     .view-mode-btn,
     .zbll-filter-btn {
-        font-size: .54rem;
-        padding-left: 1px;
-        padding-right: 1px;
+        font-size: .75rem;
+        padding-left: 2px;
+        padding-right: 2px;
+    }
+    /* 英文窄屏：工作区按钮略收窄，筛选尽量保 11px 完整显示。 */
+    html[lang="en"] .zbll-filter-btn {
+        font-size: .6875rem;
+        padding: 0 3px;
     }
     .workspace-nav-btn {
         width: 6.4em;
         min-width: 6.4em;
         max-width: 6.4em;
         flex: 0 0 6.4em !important;
-        font-size: .58rem;
+        font-size: .75rem;
+    }
+    html[lang="en"] .workspace-nav-btn {
+        width: 5.2em;
+        min-width: 5.2em;
+        max-width: 5.2em;
+        flex: 0 0 5.2em !important;
     }
 }
 
 @media (max-width: 360px) {
-    .theme-toggle { margin-right: 4px; }
-    .navbar { padding: 0 6px !important; column-gap: 2px !important; }
+    .navbar { padding: 0 6px !important; column-gap: 3px !important; }
     .navbar-left { gap: 2px; }
+    .navbar-logo { min-width: 28px; }
+    .theme-toggle { margin-right: 3px; }
     .site-help-button,
-    .theme-toggle { width: 24px; height: 24px; flex-basis: 24px; }
+    .theme-toggle { width: 32px; height: 36px; flex-basis: 32px; }
+}
+
+@media (max-width: 340px) {
+    .navbar { padding: 0 4px !important; column-gap: 2px !important; }
+    .navbar-logo { min-width: 26px; }
+    .theme-toggle { margin-right: 2px; }
+    .site-help-button,
+    .theme-toggle { width: 28px; height: 36px; flex-basis: 28px; }
+    .workspace-nav-btn { font-size: .6875rem; }
+    html[lang="en"] .workspace-nav-btn {
+        width: 4.8em;
+        min-width: 4.8em;
+        max-width: 4.8em;
+        flex: 0 0 4.8em !important;
+    }
+    .view-mode-btn,
+    .zbll-filter-btn { font-size: .6875rem; padding-left: 0; padding-right: 0; }
+    html[lang="en"] .zbll-filter-btn { font-size: .6rem; padding: 0 2px; }
 }
 
 @media (max-width: 768px) {
